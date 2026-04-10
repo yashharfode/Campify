@@ -8,13 +8,13 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   FileText,
   Users,
-  Trophy,
   Zap,
   ArrowRight,
   GraduationCap,
-  Calendar
+  Calendar,
 } from 'lucide-react';
 
+/** Cinematic landing — GSAP hooks preserved: loader-*, hero-*, problem-panel, solution-*, pillar-anim, stack-card, magnet-btn */
 export default function LandingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const containerRef = useRef(null);
@@ -186,139 +186,178 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative bg-black text-white min-h-screen overflow-x-hidden font-sans">
+    <div
+      ref={containerRef}
+      className="landing-cinematic relative isolate min-h-screen overflow-x-hidden bg-[#05080c] text-[#e8e4dc] font-sans antialiased selection:bg-[#c9a86c]/30 selection:text-[#fdfbf7]"
+    >
+      {/* Film grain + vignette */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 opacity-[0.07]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        }}
+      />
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,transparent_0%,rgba(5,8,12,0.85)_100%)]" />
 
       {/* PRELOADER */}
       {isLoading && (
-        <div className="loader-overlay fixed inset-0 bg-black z-[9999] flex justify-center items-center">
+        <div className="loader-overlay fixed inset-0 z-[9999] flex items-center justify-center bg-[#05080c]">
           <div className="text-center">
-            <div className="mx-auto mb-4 h-24 w-24 rounded-full border border-white/20 bg-white/5 p-2 backdrop-blur-xl animate-pulse">
-              <div className="flex h-full w-full items-center justify-center rounded-full border border-indigo-400/50 bg-indigo-500/10 text-3xl font-black text-white">
+            <div className="mx-auto mb-4 h-24 w-24 animate-pulse rounded-full border border-[#c9a86c]/25 bg-[#0c1219] p-2 backdrop-blur-xl">
+              <div className="flex h-full w-full items-center justify-center rounded-full border border-[#5a9a94]/40 bg-[#1a2e2c]/60 text-3xl font-black text-[#c9a86c]">
                 C
               </div>
             </div>
-            <div className="text-6xl font-black tracking-tighter mb-2 overflow-hidden">
-              <span className="loader-text inline-block translate-y-full">CAM</span>
-              <span className="loader-text inline-block translate-y-full text-indigo-500">PIFY</span>
+            <div className="mb-2 overflow-hidden text-6xl font-black tracking-[-0.04em]">
+              <span className="loader-text inline-block translate-y-full text-[#e8e4dc]">CAM</span>
+              <span className="loader-text inline-block translate-y-full text-[#c9a86c]">PIFY</span>
             </div>
-            <p className="loader-text translate-y-full text-xs uppercase tracking-[0.26em] text-white/60">Campus Reimagined</p>
-            <div className="w-48 h-[1px] bg-gray-800 mx-auto mt-4 overflow-hidden">
-              <div className="loader-line w-full h-full bg-white origin-left scale-x-0"></div>
+            <p className="loader-text translate-y-full text-xs uppercase tracking-[0.26em] text-[#8a939e]">
+              Campus Reimagined
+            </p>
+            <div className="mx-auto mt-4 h-px w-48 overflow-hidden bg-[#1a222c]">
+              <div className="loader-line h-full w-full origin-left scale-x-0 bg-gradient-to-r from-[#5a9a94] to-[#c9a86c]"></div>
             </div>
           </div>
         </div>
       )}
 
       {/* NAVBAR */}
-      <nav className="fixed top-0 w-full z-50 px-6 py-6 flex justify-between items-center mix-blend-difference">
-        <a href="#" className="text-2xl font-black tracking-tighter">
-          CAMPIFY<span className="text-indigo-500">.</span>
+      <nav className="fixed top-0 z-50 flex w-full items-center justify-between border-b border-[#1a222c]/80 bg-[#05080c]/75 px-5 py-5 backdrop-blur-xl md:px-10">
+        <a href="#" className="text-xl font-black tracking-[-0.04em] text-[#e8e4dc] md:text-2xl">
+          CAMPIFY<span className="text-[#c9a86c]">.</span>
         </a>
 
-        <div className="hidden md:flex gap-8">
-          <a href="#problems" className="text-sm uppercase tracking-widest hover:text-indigo-400 transition">Mission</a>
-          <a href="#solutions" className="text-sm uppercase tracking-widest hover:text-indigo-400 transition">Features</a>
+        <div className="hidden gap-10 md:flex">
+          <a
+            href="#problems"
+            className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#9aa3ad] transition hover:text-[#c9a86c]"
+          >
+            Mission
+          </a>
+          <a
+            href="#solutions"
+            className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#9aa3ad] transition hover:text-[#c9a86c]"
+          >
+            Features
+          </a>
         </div>
 
-        <Link href="/login" className="magnet-btn px-6 py-2 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition">
+        <Link
+          href="/login"
+          className="magnet-btn rounded-full border border-[#c9a86c]/35 bg-[#c9a86c]/10 px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#f0e6d4] transition hover:border-[#c9a86c]/60 hover:bg-[#c9a86c]/20"
+        >
           Start Beta
         </Link>
       </nav>
 
       {/* HERO SECTION */}
-      <section className="relative h-screen flex flex-col justify-center items-center px-6 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
+      <section className="relative flex h-screen flex-col items-center justify-center overflow-hidden px-6">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute left-1/2 top-[42%] h-[min(85vw,720px)] w-[min(85vw,720px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#1a3a40]/35 blur-[120px]" />
+          <div className="absolute right-[-10%] top-[15%] h-[45vw] max-h-[480px] w-[45vw] max-w-[480px] rounded-full bg-[#c9a86c]/12 blur-[100px]" />
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c9a86c]/20 to-transparent" />
+        </div>
 
-        <div className="z-10 text-center max-w-5xl">
-          <div className="overflow-hidden mb-2">
-            <h1 className="hero-title text-6xl md:text-9xl leading-[0.9] font-black tracking-tighter">
+        <div className="relative z-10 max-w-5xl text-center">
+          <div className="mb-1 overflow-hidden">
+            <h1 className="hero-title text-[clamp(2.75rem,12vw,8.5rem)] font-black leading-[0.92] tracking-[-0.04em] text-[#f5f1ea]">
               CAMPUS LIFE.
             </h1>
           </div>
-          <div className="overflow-hidden mb-8">
-            <h1 className="hero-title text-6xl md:text-9xl leading-[0.9] font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+          <div className="mb-10 overflow-hidden">
+            <h1 className="hero-title text-[clamp(2.75rem,12vw,8.5rem)] font-black leading-[0.92] tracking-[-0.04em] text-transparent bg-clip-text bg-gradient-to-r from-[#e8d5b8] via-[#c9a86c] to-[#8fb5b0]">
               REMASTERED.
             </h1>
           </div>
 
-          <p className="hero-sub text-gray-400 text-lg md:text-xl max-w-2xl mx-auto opacity-0 translate-y-10 leading-relaxed">
-            No more WhatsApp spam. No more missed hackathons. <br />
-            The operating system your college actually needs.
+          <p className="hero-sub mx-auto max-w-xl translate-y-10 text-base font-light leading-relaxed text-[#9aa3ad] opacity-0 md:text-lg">
+            No more WhatsApp spam. No more missed hackathons.
+            <br />
+            <span className="text-[#c5cbcf]">The operating system your college actually needs.</span>
           </p>
 
-          <div className="mt-12 flex justify-center gap-6 hero-sub opacity-0 translate-y-10">
-            <Link href="/login" className="magnet-btn bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+          <div className="hero-sub mt-12 flex translate-y-10 flex-col items-center justify-center gap-4 opacity-0 sm:flex-row sm:gap-5">
+            <Link
+              href="/login"
+              className="magnet-btn inline-flex items-center justify-center rounded-full bg-gradient-to-b from-[#f2eadc] to-[#dcd4c4] px-10 py-4 text-base font-semibold text-[#0a0f16] shadow-[0_4px_32px_rgba(201,168,108,0.25)] transition hover:scale-[1.02] hover:shadow-[0_8px_40px_rgba(201,168,108,0.35)]"
+            >
               Get Started
             </Link>
-            <button className="magnet-btn px-10 py-4 rounded-full border border-white/20 font-bold text-lg hover:bg-white/5 transition flex items-center gap-2">
-              <Zap className="w-5 h-5" /> Demo
+            <button
+              type="button"
+              className="magnet-btn inline-flex items-center justify-center gap-2 rounded-full border border-[#2a3544] bg-[#0c1219]/80 px-10 py-4 text-base font-semibold text-[#e8e4dc] backdrop-blur-sm transition hover:border-[#5a9a94]/40 hover:bg-[#111923]"
+            >
+              <Zap className="h-5 w-5 text-[#c9a86c]" strokeWidth={1.75} /> Demo
             </button>
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-10 flex flex-col items-center gap-2 opacity-50">
-          <span className="text-[10px] uppercase tracking-widest">Scroll to Explore</span>
-          <div className="w-[1px] h-12 bg-gradient-to-b from-white to-transparent"></div>
+        <div className="absolute bottom-10 z-10 flex flex-col items-center gap-2 text-[#6b7480]">
+          <span className="text-[10px] font-medium uppercase tracking-[0.28em]">Scroll to Explore</span>
+          <div className="h-12 w-px bg-gradient-to-b from-[#c9a86c]/50 to-transparent" />
         </div>
       </section>
 
       {/* 3D FLOATING CARDS SHOWCASE */}
-      <section className="py-20 px-6 relative">
-        <div className="max-w-md mx-auto hero-cards-container relative h-96">
-          {/* Card 1: Notes */}
-          <div className="hero-card absolute top-0 left-0 w-full h-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 transform rotate-[-6deg] translate-y-4 z-10 border-l-4 border-l-yellow-400">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-yellow-400 font-bold text-sm">NOTES</span>
-              <FileText className="w-6 h-6 text-gray-400" />
+      <section className="relative px-6 py-24">
+        <div className="relative mx-auto h-96 max-w-md hero-cards-container">
+          <div className="hero-card absolute left-0 top-0 z-10 h-full w-full -translate-y-4 rotate-[-5deg] transform rounded-2xl border border-[#2a3544] border-l-[3px] border-l-[#c9a86c] bg-[#0c1219]/90 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="text-xs font-bold tracking-[0.2em] text-[#c9a86c]">NOTES</span>
+              <FileText className="h-6 w-6 text-[#6b7480]" strokeWidth={1.5} />
             </div>
-            <div className="h-2 w-1/2 bg-gray-700 rounded mb-2"></div>
-            <div className="h-2 w-3/4 bg-gray-700 rounded mb-8"></div>
-            <div className="bg-yellow-400/10 p-3 rounded-lg border border-yellow-400/20">
-              <p className="text-xs text-yellow-200">"Bro, Engineering Maths ke notes bhej de pls!"</p>
-            </div>
-          </div>
-
-          {/* Card 2: Teams */}
-          <div className="hero-card absolute top-4 left-4 w-full h-full bg-gray-900 backdrop-blur-xl border border-white/10 rounded-2xl p-6 transform rotate-[6deg] translate-x-4 z-20 border-l-4 border-l-green-400">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-green-400 font-bold text-sm">TEAMS</span>
-              <Users className="w-6 h-6 text-gray-400" />
-            </div>
-            <div className="flex -space-x-2 mb-6">
-              <div className="w-8 h-8 rounded-full bg-blue-500 border-2 border-gray-900"></div>
-              <div className="w-8 h-8 rounded-full bg-purple-500 border-2 border-gray-900"></div>
-              <div className="w-8 h-8 rounded-full bg-red-500 border-2 border-gray-900"></div>
-              <div className="w-8 h-8 rounded-full bg-gray-700 border-2 border-gray-900 flex items-center justify-center text-xs">+1</div>
-            </div>
-            <div className="bg-green-400/10 p-3 rounded-lg border border-green-400/20">
-              <p className="text-xs text-green-200">Looking for a frontend dev for Hackathon!</p>
+            <div className="mb-2 h-2 w-1/2 rounded bg-[#1a222c]"></div>
+            <div className="mb-8 h-2 w-3/4 rounded bg-[#1a222c]"></div>
+            <div className="rounded-xl border border-[#c9a86c]/20 bg-[#c9a86c]/5 p-3">
+              <p className="text-xs leading-relaxed text-[#d4cfc4]">
+                &ldquo;Bro, Engineering Maths ke notes bhej de pls!&rdquo;
+              </p>
             </div>
           </div>
 
-          {/* Card 3: Main Dashboard */}
-          <div className="hero-card absolute top-8 left-[-10px] w-full h-full bg-[#0c0c16] backdrop-blur-xl rounded-2xl p-6 z-30 border border-indigo-500/50 shadow-[0_0_30px_rgba(99,102,241,0.3)]">
-            <div className="flex items-center gap-3 mb-6 border-b border-gray-800 pb-4">
-              <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center">
-                <GraduationCap className="w-6 h-6" />
+          <div className="hero-card absolute left-4 top-4 z-20 h-full w-full translate-x-3 rotate-[5deg] transform rounded-2xl border border-[#2a3544] border-l-[3px] border-l-[#5a9a94] bg-[#0a1018]/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="text-xs font-bold tracking-[0.2em] text-[#8fb5b0]">TEAMS</span>
+              <Users className="h-6 w-6 text-[#6b7480]" strokeWidth={1.5} />
+            </div>
+            <div className="mb-6 flex -space-x-2">
+              <div className="h-8 w-8 rounded-full border-2 border-[#05080c] bg-[#3d5a73]"></div>
+              <div className="h-8 w-8 rounded-full border-2 border-[#05080c] bg-[#5a9a94]"></div>
+              <div className="h-8 w-8 rounded-full border-2 border-[#05080c] bg-[#9a6b5c]"></div>
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#05080c] bg-[#1a222c] text-[10px] font-bold text-[#c9a86c]">
+                +1
+              </div>
+            </div>
+            <div className="rounded-xl border border-[#5a9a94]/25 bg-[#5a9a94]/5 p-3">
+              <p className="text-xs leading-relaxed text-[#b8c9c6]">
+                Looking for a frontend dev for Hackathon!
+              </p>
+            </div>
+          </div>
+
+          <div className="hero-card absolute left-[-10px] top-8 z-30 h-full w-full rounded-2xl border border-[#c9a86c]/25 bg-[#080d14] p-6 shadow-[0_0_48px_rgba(201,168,108,0.12)] backdrop-blur-xl">
+            <div className="mb-6 flex items-center gap-3 border-b border-[#1a222c] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#1a3a40] to-[#0c1a1c] ring-1 ring-[#c9a86c]/30">
+                <GraduationCap className="h-6 w-6 text-[#c9a86c]" strokeWidth={1.5} />
               </div>
               <div>
-                <h3 className="font-bold text-lg">CAMPIFY</h3>
-                <p className="text-xs text-gray-400">Dashboard</p>
+                <h3 className="text-lg font-bold tracking-tight text-[#f5f1ea]">CAMPIFY</h3>
+                <p className="text-[11px] uppercase tracking-widest text-[#6b7480]">Dashboard</p>
               </div>
             </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-2 bg-white/5 rounded hover:bg-white/10 cursor-pointer">
-                <span className="text-sm">Found: Blue Drafter</span>
-                <span className="text-xs text-indigo-400">View</span>
+            <div className="space-y-2.5">
+              <div className="flex cursor-pointer items-center justify-between rounded-lg bg-[#0c1219] p-2.5 ring-1 ring-[#1a222c] transition hover:ring-[#c9a86c]/20">
+                <span className="text-sm text-[#c5cbcf]">Found: Blue Drafter</span>
+                <span className="text-xs font-semibold text-[#c9a86c]">View</span>
               </div>
-              <div className="flex items-center justify-between p-2 bg-white/5 rounded hover:bg-white/10 cursor-pointer">
-                <span className="text-sm">Smart India Hackathon</span>
-                <span className="text-xs text-green-400">Apply</span>
+              <div className="flex cursor-pointer items-center justify-between rounded-lg bg-[#0c1219] p-2.5 ring-1 ring-[#1a222c] transition hover:ring-[#5a9a94]/25">
+                <span className="text-sm text-[#c5cbcf]">Smart India Hackathon</span>
+                <span className="text-xs font-semibold text-[#8fb5b0]">Apply</span>
               </div>
-              <div className="flex items-center justify-between p-2 bg-white/5 rounded hover:bg-white/10 cursor-pointer">
-                <span className="text-sm">PYQ Papers 2024</span>
-                <span className="text-xs text-yellow-400">Download</span>
+              <div className="flex cursor-pointer items-center justify-between rounded-lg bg-[#0c1219] p-2.5 ring-1 ring-[#1a222c] transition hover:ring-[#c9a86c]/20">
+                <span className="text-sm text-[#c5cbcf]">PYQ Papers 2024</span>
+                <span className="text-xs font-semibold text-[#c9a86c]">Download</span>
               </div>
             </div>
           </div>
@@ -326,157 +365,208 @@ export default function LandingPage() {
       </section>
 
       {/* HORIZONTAL SCROLL PROBLEMS */}
-      <section id="problems" ref={horizontalSectionRef} className="h-screen overflow-hidden bg-[#0a0a0a]">
-        <div className="horizontal-container h-full flex items-center">
-
-          {/* Panel 1: Intro */}
-          <div className="problem-panel w-screen h-full flex flex-col justify-center px-10 md:px-32 border-r border-white/5 flex-shrink-0">
-            <span className="text-indigo-500 font-bold tracking-widest uppercase mb-4">The Current State</span>
-            <h2 className="text-5xl md:text-7xl font-bold leading-tight">
+      <section id="problems" ref={horizontalSectionRef} className="h-screen overflow-hidden bg-[#030609]">
+        <div className="horizontal-container flex h-full items-center">
+          <div className="problem-panel flex h-full w-screen flex-shrink-0 flex-col justify-center border-r border-[#1a222c]/80 px-10 md:px-32">
+            <span className="mb-4 text-[11px] font-bold uppercase tracking-[0.28em] text-[#c9a86c]">
+              The Current State
+            </span>
+            <h2 className="text-4xl font-semibold leading-[1.08] tracking-tight text-[#f5f1ea] md:text-6xl lg:text-7xl">
               Why is everything <br />
-              <span className="text-gray-600">so scattered?</span>
+              <span className="bg-gradient-to-r from-[#5a6b78] to-[#3d4854] bg-clip-text font-medium text-transparent">
+                so scattered?
+              </span>
             </h2>
-            <div className="mt-10 flex items-center gap-4 text-gray-400">
-              <ArrowRight className="w-6 h-6 animate-bounce" />
-              <span>Scroll right to see the chaos</span>
+            <div className="mt-12 flex items-center gap-4 text-[#7d8792]">
+              <ArrowRight className="h-6 w-6 shrink-0 animate-pulse text-[#c9a86c]" strokeWidth={1.5} />
+              <span className="text-sm font-light md:text-base">Scroll right to see the chaos</span>
             </div>
           </div>
 
-          {/* Panel 2: WhatsApp Chaos */}
-          <div className="problem-panel w-screen h-full flex flex-col justify-center px-10 md:px-32 border-r border-white/5 flex-shrink-0 bg-[#0c0c0c]">
+          <div className="problem-panel flex h-full w-screen flex-shrink-0 flex-col justify-center border-r border-[#1a222c]/80 bg-[#060a10] px-10 md:px-32">
             <div className="max-w-2xl">
-              <div className="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mb-6">
-                <Zap className="w-8 h-8 text-green-500" />
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#5a9a94]/20 bg-[#5a9a94]/10">
+                <Zap className="h-8 w-8 text-[#8fb5b0]" strokeWidth={1.5} />
               </div>
-              <h3 className="text-4xl font-bold mb-4">Notification Hell</h3>
-              <p className="text-gray-400 text-lg">"Does anyone have the Physics pdf?" buried under 500 birthday wishes. Important info gets lost instantly.</p>
+              <h3 className="mb-4 text-3xl font-semibold tracking-tight text-[#f5f1ea] md:text-4xl">
+                Notification Hell
+              </h3>
+              <p className="text-lg font-light leading-relaxed text-[#9aa3ad]">
+                &ldquo;Does anyone have the Physics pdf?&rdquo; buried under 500 birthday wishes. Important info
+                gets lost instantly.
+              </p>
             </div>
           </div>
 
-          {/* Panel 3: Missed Opportunities */}
-          <div className="problem-panel w-screen h-full flex flex-col justify-center px-10 md:px-32 flex-shrink-0 bg-[#0e0e0e]">
+          <div className="problem-panel flex h-full w-screen flex-shrink-0 flex-col justify-center bg-[#080d14] px-10 md:px-32">
             <div className="max-w-2xl">
-              <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mb-6">
-                <Calendar className="w-8 h-8 text-red-500" />
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#c9a86c]/20 bg-[#c9a86c]/10">
+                <Calendar className="h-8 w-8 text-[#c9a86c]" strokeWidth={1.5} />
               </div>
-              <h3 className="text-4xl font-bold mb-4">Missed Deadlines</h3>
-              <p className="text-gray-400 text-lg">Hackathons, Scholarships, Fests. You find out about them the day after registrations close.</p>
+              <h3 className="mb-4 text-3xl font-semibold tracking-tight text-[#f5f1ea] md:text-4xl">
+                Missed Deadlines
+              </h3>
+              <p className="text-lg font-light leading-relaxed text-[#9aa3ad]">
+                Hackathons, Scholarships, Fests. You find out about them the day after registrations close.
+              </p>
             </div>
           </div>
-
         </div>
       </section>
 
       {/* SOLUTION REVEAL */}
-      <section className="min-h-[80vh] flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-b from-black to-[#050510]">
-        <div className="solution-circle w-0 h-0 rounded-full border border-indigo-500/50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0"></div>
-        <div className="solution-circle w-0 h-0 rounded-full border border-purple-500/30 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0"></div>
+      <section className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#05080c] via-[#070f14] to-[#05080c]">
+        <div className="solution-circle pointer-events-none absolute left-1/2 top-1/2 z-0 h-0 w-0 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#c9a86c]/25"></div>
+        <div className="solution-circle pointer-events-none absolute left-1/2 top-1/2 z-0 h-0 w-0 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#5a9a94]/20"></div>
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(201,168,108,0.06)_0%,transparent_55%)]" />
 
-        <div className="z-10 text-center scale-0" id="solution-center">
-          <div className="w-24 h-24 mx-auto bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-[0_0_50px_rgba(99,102,241,0.6)] mb-6">
-            <span className="font-black text-4xl">C</span>
+        <div className="relative z-10 scale-0 text-center" id="solution-center">
+          <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1a3a40] via-[#0c1a1c] to-[#1a222c] shadow-[0_0_60px_rgba(201,168,108,0.15)] ring-1 ring-[#c9a86c]/35">
+            <span className="font-black text-4xl text-[#c9a86c]">C</span>
           </div>
-          <h2 className="text-5xl md:text-7xl font-bold mb-4">CAMPIFY</h2>
-          <p className="text-xl text-gray-300">The Operating System for your Campus.</p>
+          <h2 className="mb-3 text-5xl font-bold tracking-[-0.03em] text-[#f5f1ea] md:text-7xl">CAMPIFY</h2>
+          <p className="mx-auto max-w-md text-lg font-light text-[#9aa3ad] md:text-xl">
+            The Operating System for your Campus.
+          </p>
+          <p className="mx-auto mt-8 max-w-lg text-[10px] font-semibold uppercase tracking-[0.55em] text-[#6b7480] md:text-[11px]">
+            <span className="text-[#c9a86c]">Connect</span>
+            <span className="mx-2 text-[#2a3544]">·</span>
+            <span className="text-[#8fb5b0]">Grow</span>
+            <span className="mx-2 text-[#2a3544]">·</span>
+            <span className="text-[#c9a86c]">Share</span>
+            <span className="mx-2 text-[#2a3544]">·</span>
+            <span className="text-[#8fb5b0]">Learn</span>
+          </p>
         </div>
 
-        {/* Pillars */}
-        <div className="absolute top-[20%] opacity-0 pillar-anim translate-y-10">
-          <span className="px-4 py-2 bg-indigo-500/10 border border-indigo-500/50 rounded-full text-indigo-300 font-bold tracking-wider">CONNECT</span>
+        <div className="pillar-anim absolute top-[18%] translate-y-10 opacity-0">
+          <span className="rounded-full border border-[#c9a86c]/30 bg-[#c9a86c]/10 px-4 py-2 text-[10px] font-bold tracking-[0.2em] text-[#e8d5b8]">
+            CONNECT
+          </span>
         </div>
-        <div className="absolute bottom-[20%] opacity-0 pillar-anim translate-y-10">
-          <span className="px-4 py-2 bg-purple-500/10 border border-purple-500/50 rounded-full text-purple-300 font-bold tracking-wider">GROW</span>
+        <div className="pillar-anim absolute bottom-[18%] translate-y-10 opacity-0">
+          <span className="rounded-full border border-[#5a9a94]/30 bg-[#5a9a94]/10 px-4 py-2 text-[10px] font-bold tracking-[0.2em] text-[#b8c9c6]">
+            GROW
+          </span>
         </div>
-        <div className="absolute left-[10%] md:left-[25%] opacity-0 pillar-anim translate-y-10">
-          <span className="px-4 py-2 bg-blue-500/10 border border-blue-500/50 rounded-full text-blue-300 font-bold tracking-wider">SHARE</span>
+        <div className="pillar-anim absolute left-[8%] translate-y-10 opacity-0 md:left-[22%]">
+          <span className="rounded-full border border-[#c9a86c]/25 bg-[#0c1219] px-4 py-2 text-[10px] font-bold tracking-[0.2em] text-[#c9a86c]">
+            SHARE
+          </span>
         </div>
-        <div className="absolute right-[10%] md:right-[25%] opacity-0 pillar-anim translate-y-10">
-          <span className="px-4 py-2 bg-pink-500/10 border border-pink-500/50 rounded-full text-pink-300 font-bold tracking-wider">LEARN</span>
+        <div className="pillar-anim absolute right-[8%] translate-y-10 opacity-0 md:right-[22%]">
+          <span className="rounded-full border border-[#5a9a94]/25 bg-[#0c1219] px-4 py-2 text-[10px] font-bold tracking-[0.2em] text-[#8fb5b0]">
+            LEARN
+          </span>
         </div>
       </section>
 
       {/* STACKED CARDS */}
-      <section id="solutions" className="py-32 px-4 md:px-10 bg-black">
-        <div className="text-center mb-20">
-          <span className="text-indigo-500 font-bold uppercase tracking-widest text-sm">Introducing CAMPIFY</span>
-          <h2 className="text-4xl md:text-6xl font-bold mt-4">Order from Chaos.</h2>
+      <section id="solutions" className="bg-[#05080c] px-4 py-32 md:px-10">
+        <div className="mb-24 text-center">
+          <span className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#c9a86c]">
+            Introducing CAMPIFY
+          </span>
+          <h2 className="mt-4 text-4xl font-semibold tracking-tight text-[#f5f1ea] md:text-6xl">
+            Order from Chaos.
+          </h2>
         </div>
 
-        <div className="max-w-5xl mx-auto relative space-y-24">
-
-          {/* Card 1: Resources */}
-          <div className="stack-card sticky top-24 bg-white/5 backdrop-blur-xl rounded-3xl p-8 md:p-14 min-h-[500px] flex flex-col md:flex-row gap-10 items-center border-t border-indigo-500/30">
+        <div className="relative mx-auto max-w-5xl space-y-24">
+          <div className="stack-card sticky top-24 flex min-h-[500px] flex-col items-center gap-10 rounded-[1.75rem] border border-[#1a222c] border-t-[3px] border-t-[#c9a86c]/60 bg-[#0c1219]/80 p-8 backdrop-blur-xl md:flex-row md:p-14">
             <div className="w-full md:w-1/2">
-              <div className="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center mb-8 text-indigo-400">
-                <FileText className="w-8 h-8" />
+              <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#c9a86c]/25 bg-[#c9a86c]/10 text-[#c9a86c]">
+                <FileText className="h-8 w-8" strokeWidth={1.5} />
               </div>
-              <h3 className="text-3xl md:text-4xl font-bold mb-4">Resource Hub</h3>
-              <p className="text-gray-400 text-lg leading-relaxed">A structured library for every semester. Upload notes, get karma, become a legend.</p>
+              <h3 className="mb-4 text-3xl font-semibold tracking-tight text-[#f5f1ea] md:text-4xl">
+                Resource Hub
+              </h3>
+              <p className="text-lg font-light leading-relaxed text-[#9aa3ad]">
+                A structured library for every semester. Upload notes, get karma, become a legend.
+              </p>
             </div>
-            <div className="w-full md:w-1/2 h-64 bg-gradient-to-br from-indigo-900/20 to-black rounded-2xl border border-white/10 flex items-center justify-center">
-              <div className="bg-white/5 backdrop-blur-xl px-6 py-3 rounded-xl border border-white/10">
-                <span className="font-mono text-indigo-300">/download/sem3_notes.pdf</span>
+            <div className="flex h-64 w-full items-center justify-center rounded-2xl border border-[#2a3544] bg-gradient-to-br from-[#1a2e2c]/40 to-[#05080c] md:w-1/2">
+              <div className="rounded-xl border border-[#2a3544] bg-[#080d14]/90 px-6 py-3 backdrop-blur-md">
+                <span className="font-mono text-sm text-[#8fb5b0]">/download/sem3_notes.pdf</span>
               </div>
             </div>
           </div>
 
-          {/* Card 2: Teams */}
-          <div className="stack-card sticky top-24 bg-white/5 backdrop-blur-xl rounded-3xl p-8 md:p-14 min-h-[500px] flex flex-col md:flex-row gap-10 items-center border-t border-purple-500/30">
+          <div className="stack-card sticky top-24 flex min-h-[500px] flex-col items-center gap-10 rounded-[1.75rem] border border-[#1a222c] border-t-[3px] border-t-[#5a9a94]/50 bg-[#0c1219]/80 p-8 backdrop-blur-xl md:flex-row md:p-14">
             <div className="w-full md:w-1/2">
-              <div className="w-16 h-16 bg-purple-500/20 rounded-2xl flex items-center justify-center mb-8 text-purple-400">
-                <Users className="w-8 h-8" />
+              <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#5a9a94]/25 bg-[#5a9a94]/10 text-[#8fb5b0]">
+                <Users className="h-8 w-8" strokeWidth={1.5} />
               </div>
-              <h3 className="text-3xl md:text-4xl font-bold mb-4">Team Matchmaking</h3>
-              <p className="text-gray-400 text-lg leading-relaxed">Don't have a team for the hackathon? Filter students by skills (React, AI, Design) and connect instantly.</p>
+              <h3 className="mb-4 text-3xl font-semibold tracking-tight text-[#f5f1ea] md:text-4xl">
+                Team Matchmaking
+              </h3>
+              <p className="text-lg font-light leading-relaxed text-[#9aa3ad]">
+                Don&apos;t have a team for the hackathon? Filter students by skills (React, AI, Design) and
+                connect instantly.
+              </p>
             </div>
-            <div className="w-full md:w-1/2 h-64 bg-gradient-to-br from-purple-900/20 to-black rounded-2xl border border-white/10 flex items-center justify-center">
+            <div className="flex h-64 w-full items-center justify-center rounded-2xl border border-[#2a3544] bg-gradient-to-br from-[#0f2422]/50 to-[#05080c] md:w-1/2">
               <div className="flex -space-x-4">
-                <div className="w-12 h-12 rounded-full bg-blue-500 border-2 border-black"></div>
-                <div className="w-12 h-12 rounded-full bg-green-500 border-2 border-black"></div>
-                <div className="w-12 h-12 rounded-full bg-yellow-500 border-2 border-black flex items-center justify-center font-bold text-black text-xs">+1</div>
+                <div className="h-12 w-12 rounded-full border-2 border-[#05080c] bg-[#3d5a73]"></div>
+                <div className="h-12 w-12 rounded-full border-2 border-[#05080c] bg-[#5a9a94]"></div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#05080c] bg-[#c9a86c] text-xs font-bold text-[#0a0f16]">
+                  +1
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Card 3: Events */}
-          <div className="stack-card sticky top-24 bg-white/5 backdrop-blur-xl rounded-3xl p-8 md:p-14 min-h-[500px] flex flex-col md:flex-row gap-10 items-center border-t border-pink-500/30">
+          <div className="stack-card sticky top-24 flex min-h-[500px] flex-col items-center gap-10 rounded-[1.75rem] border border-[#1a222c] border-t-[3px] border-t-[#c9a86c]/40 bg-[#0c1219]/80 p-8 backdrop-blur-xl md:flex-row md:p-14">
             <div className="w-full md:w-1/2">
-              <div className="w-16 h-16 bg-pink-500/20 rounded-2xl flex items-center justify-center mb-8 text-pink-400">
-                <Trophy className="w-8 h-8" />
+              <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#c9a86c]/20 bg-[#1a222c]/80 text-[#c9a86c]">
+                <Calendar className="h-8 w-8" strokeWidth={1.5} />
               </div>
-              <h3 className="text-3xl md:text-4xl font-bold mb-4">One Calendar</h3>
-              <p className="text-gray-400 text-lg leading-relaxed">Every fest, workshop, and hackathon in one place. Sync it to your Google Calendar and never miss out.</p>
+              <h3 className="mb-4 text-3xl font-semibold tracking-tight text-[#f5f1ea] md:text-4xl">
+                One Calendar
+              </h3>
+              <p className="text-lg font-light leading-relaxed text-[#9aa3ad]">
+                Every fest, workshop, and hackathon in one place. Sync it to your Google Calendar and never
+                miss out.
+              </p>
             </div>
-            <div className="w-full md:w-1/2 h-64 bg-gradient-to-br from-pink-900/20 to-black rounded-2xl border border-white/10 flex items-center justify-center">
-              <div className="bg-white/5 backdrop-blur-xl px-6 py-8 rounded-xl border border-white/10 text-center">
-                <div className="text-3xl font-bold">24</div>
-                <div className="text-sm uppercase tracking-widest text-pink-400">OCTOBER</div>
+            <div className="flex h-64 w-full items-center justify-center rounded-2xl border border-[#2a3544] bg-gradient-to-br from-[#2a2218]/40 to-[#05080c] md:w-1/2">
+              <div className="rounded-xl border border-[#c9a86c]/20 bg-[#080d14]/90 px-8 py-8 text-center backdrop-blur-md">
+                <div className="text-4xl font-light tabular-nums text-[#f5f1ea]">24</div>
+                <div className="mt-1 text-xs font-semibold uppercase tracking-[0.25em] text-[#c9a86c]">
+                  October
+                </div>
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
       {/* FOOTER CTA */}
-      <section className="h-[70vh] flex flex-col justify-center items-center text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      <section className="relative flex h-[72vh] flex-col items-center justify-center overflow-hidden text-center">
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#1a222c_1px,transparent_1px),linear-gradient(to_bottom,#1a222c_1px,transparent_1px)] bg-[size:32px_32px] opacity-[0.35]" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05080c] via-transparent to-[#05080c]/80" />
 
-        <h2 className="text-5xl md:text-9xl font-bold tracking-tighter mb-10 z-10 mix-blend-difference">
-          GET IN THE <br /> LOOP.
+        <h2 className="relative z-10 mb-12 text-4xl font-semibold leading-[0.95] tracking-[-0.04em] text-[#f5f1ea] md:text-7xl lg:text-8xl">
+          GET IN THE <br />
+          <span className="bg-gradient-to-r from-[#e8d5b8] via-[#c9a86c] to-[#8fb5b0] bg-clip-text text-transparent">
+            LOOP.
+          </span>
         </h2>
 
-        <Link href="/login" className="magnet-btn relative px-12 py-5 bg-white text-black rounded-full font-bold text-xl overflow-hidden group z-10 hover:scale-105 transition duration-300">
-          <span className="relative z-10">Launch CAMPIFY</span>
-          <div className="absolute inset-0 bg-indigo-500 transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-300 ease-out"></div>
-          <span className="absolute inset-0 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">LET'S GO</span>
+        <Link
+          href="/login"
+          className="magnet-btn group relative z-10 flex min-h-[3.75rem] min-w-[14rem] items-center justify-center overflow-hidden rounded-full bg-gradient-to-b from-[#f2eadc] to-[#d8ccb8] px-12 py-5 text-xl font-semibold text-[#0a0f16] shadow-[0_8px_40px_rgba(201,168,108,0.2)] transition duration-300 hover:scale-[1.03]"
+        >
+          <span className="relative z-10 transition-opacity group-hover:opacity-0">Launch CAMPIFY</span>
+          <span className="absolute inset-0 z-20 flex items-center justify-center bg-[#1a3a40] text-base font-semibold text-[#f5f1ea] opacity-0 transition-opacity group-hover:opacity-100">
+            LET&apos;S GO
+          </span>
         </Link>
 
-        <div className="mt-20 text-gray-500 text-xs uppercase tracking-widest z-10">
+        <div className="relative z-10 mt-20 text-[10px] font-medium uppercase tracking-[0.28em] text-[#5c6570]">
           Designed for Hackathon Winners
         </div>
       </section>
-
     </div>
   );
 }

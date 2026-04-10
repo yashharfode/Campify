@@ -28,6 +28,7 @@ import Discover from '../../components/Discover';
 import Admin from '../../components/Admin';
 import Notes from '../../components/Notes';
 import LostAndFound from '../../components/LostAndFound';
+import MentorChatBubble from '../../components/MentorChatBubble';
 
 
 import toast from 'react-hot-toast';
@@ -1454,7 +1455,7 @@ const SponsoredAds = () => {
         return () => clearInterval(timer);
     }, [banners]);
 
-    if (loading) return <div className="h-48 md:h-64 bg-gray-100 rounded-2xl animate-pulse" />;
+    if (loading) return <div className="h-[22rem] md:h-[26rem] bg-gray-100 rounded-2xl animate-pulse" />;
 
     const openBannerLink = (link) => {
         if (!link) return;
@@ -1467,27 +1468,66 @@ const SponsoredAds = () => {
                 <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2"><Megaphone className="w-5 h-5 text-blue-600" /> Sponsored</h3>
                 <span className="text-xs text-gray-400 font-medium">Ads by Admin</span>
             </div>
-            <div className="relative overflow-hidden rounded-2xl h-48 md:h-64 shadow-lg border border-gray-100">
-                <div className="flex transition-transform duration-700 ease-in-out h-full" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+            <div className="relative overflow-hidden rounded-2xl shadow-lg border border-[#EEEAE1]/70 bg-[#FAF9F6]">
+                <div className="flex transition-transform duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
                     {banners.map((ad) => (
-                        <div key={ad.id} className={`min-w-full h-full relative bg-gradient-to-r ${ad.color}`}>
-                            <div className="absolute inset-0 z-20 p-6 flex flex-col justify-center items-start text-left">
-                                <div className="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full mb-3 border border-white/10 uppercase tracking-wider">{ad.badge}</div>
-                                <h3 className="text-2xl md:text-4xl font-extrabold text-white mb-2 leading-tight max-w-[80%]">{ad.title}</h3>
-                                <p className="text-blue-100 text-sm md:text-base mb-6 max-w-md">{ad.subtitle}</p>
-                                <button
-                                    onClick={() => openBannerLink(ad.link)}
-                                    className="bg-white text-gray-900 px-6 py-2.5 rounded-xl text-xs md:text-sm font-bold hover:bg-gray-100 transition shadow-xl disabled:opacity-70"
-                                    disabled={!ad.link}
-                                    title={ad.link ? 'Open banner link' : 'No link configured for this banner'}
-                                >
-                                    {ad.cta || 'Learn More'}
-                                </button>
+                        <div key={ad.id} className="min-w-full flex flex-col shrink-0">
+                            {/* Cinematic image strip — no text overlay */}
+                            <div className="relative h-48 md:h-64 w-full overflow-hidden bg-[#1C1917]">
+                                {ad.image ? (
+                                    <img src={ad.image} className="w-full h-full object-cover" alt={ad.title || ''} />
+                                ) : (
+                                    <div className="absolute inset-0 bg-gradient-to-br from-stone-800 to-stone-950" />
+                                )}
+                                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/25 to-transparent" />
                             </div>
-                            <div className="absolute inset-0 z-0"><img src={ad.image} className="w-full h-full object-cover opacity-60" alt={ad.title} /></div>
+                            {/* Attached content panel — reads as one unit with the poster */}
+                            <div className="relative border-t border-[#EEEAE1]/80 bg-gradient-to-b from-[#FAF9F6] to-white px-5 pt-5 pb-6 md:px-7 md:pt-6 md:pb-7">
+                                <div className="absolute -top-px left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D9D2C5]/60 to-transparent" aria-hidden />
+                                {ad.badge && (
+                                    <span className="inline-block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B645A] mb-2">
+                                        {ad.badge}
+                                    </span>
+                                )}
+                                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                                    <div className="md:max-w-[72%]">
+                                        <h3 className="text-xl md:text-2xl font-extrabold text-[#1C1917] leading-tight tracking-tight mb-2">
+                                            {ad.title}
+                                        </h3>
+                                        {ad.subtitle && (
+                                            <p className="text-sm md:text-[15px] text-[#5E564C] leading-relaxed max-w-2xl">
+                                                {ad.subtitle}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => openBannerLink(ad.link)}
+                                        className="inline-flex items-center justify-center self-start md:self-auto bg-[#1C1917] text-white px-6 py-2.5 rounded-xl text-xs md:text-sm font-semibold tracking-wide hover:bg-[#2A2521] transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled={!ad.link}
+                                        title={ad.link ? 'Open banner link' : 'No link configured for this banner'}
+                                    >
+                                        {ad.cta || 'Learn More'}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>
+                {/* Slide indicators */}
+                {banners.length > 1 && (
+                    <div className="flex justify-center gap-1.5 py-3 border-t border-[#EEEAE1]/70 bg-white/80">
+                        {banners.map((_, i) => (
+                            <button
+                                key={i}
+                                type="button"
+                                aria-label={`Go to slide ${i + 1}`}
+                                onClick={() => setCurrentIndex(i)}
+                                className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-6 bg-[#1C1917]' : 'w-1.5 bg-stone-300 hover:bg-stone-400'}`}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -1847,6 +1887,8 @@ export default function App() {
                 <NavBtn icon={<Compass className="w-6 h-6" />} label="Discover" active={activeTab === 'discover'} onClick={() => setActiveTab('discover')} />
                 <NavBtn icon={<User className="w-6 h-6" />} label="Profile" active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} />
             </div>
+
+            {activeTab === 'home' && <MentorChatBubble />}
         </div>
     );
 }
