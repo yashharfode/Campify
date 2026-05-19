@@ -1636,12 +1636,30 @@ export default function App() {
             fetchScholarships();
         }, []);
 
+        const [greeting, setGreeting] = useState({ text: "Hello", icon: "👋", subText: "Welcome back to Campify!" });
+
+        useEffect(() => {
+            const hour = new Date().getHours();
+            if (hour >= 5 && hour < 12) {
+                setGreeting({ text: "Good Morning", icon: "🌅", subText: "Hope you have an awesome day ahead!" });
+            } else if (hour >= 12 && hour < 17) {
+                setGreeting({ text: "Good Afternoon", icon: "☀️", subText: "Hope your day is going great!" });
+            } else if (hour >= 17 && hour < 22) {
+                setGreeting({ text: "Good Evening", icon: "🌇", subText: "Hope you are having a relaxing evening!" });
+            } else {
+                setGreeting({ text: "Good Night", icon: "🌙", subText: "Burning the midnight oil? Get some rest soon!" });
+            }
+        }, []);
+
         return (
             <div className="pb-24 pt-4 px-4 space-y-8 max-w-7xl mx-auto animate-in fade-in">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h2 className="text-gray-500 text-sm font-medium">Good Morning,</h2>
+                        <h2 className="text-gray-500 text-sm font-medium flex items-center gap-1.5">
+                            {greeting.text} {greeting.icon}
+                        </h2>
                         <h1 className="text-gray-900 text-3xl font-bold">{userData?.name?.split(' ')[0] || 'Student'} 👋</h1>
+                        <p className="text-xs text-gray-400 mt-0.5 font-medium">{greeting.subText}</p>
                     </div>
                     <div
                         className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden border border-blue-200 cursor-pointer hover:shadow-md transition"
