@@ -17,6 +17,56 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Override blue to be consistent with our accent-deep (teal) */
+  --color-blue-50: #edf5f3;
+  --color-blue-100: #dbe8e2;
+  --color-blue-200: #b9d1c5;
+  --color-blue-300: #8eb1a1;
+  --color-blue-400: #5f8d7b;
+  --color-blue-500: #427467;
+  --color-blue-600: var(--accent-deep);
+  --color-blue-700: #244a44;
+  --color-blue-800: #1b3834;
+  --color-blue-900: #142a27;
+  --color-blue-950: #0a1614;
+
+  /* Override indigo to also match our teal theme for elements styled with indigo */
+  --color-indigo-50: #edf5f3;
+  --color-indigo-100: #dbe8e2;
+  --color-indigo-200: #b9d1c5;
+  --color-indigo-300: #8eb1a1;
+  --color-indigo-400: #5f8d7b;
+  --color-indigo-500: #427467;
+  --color-indigo-600: var(--accent-deep);
+  --color-indigo-700: #244a44;
+  --color-indigo-800: #1b3834;
+  --color-indigo-900: #142a27;
+  --color-indigo-950: #0a1614;
+
+  /* Override purple to match our lilac theme */
+  --color-purple-50: #f6f5fa;
+  --color-purple-100: #ededf6;
+  --color-purple-200: #dcdcfa;
+  --color-purple-300: #bebcee;
+  --color-purple-400: #9e9bd9;
+  --color-purple-500: #837fbf;
+  --color-purple-600: var(--accent-lilac);
+  --color-purple-700: #625880;
+  --color-purple-800: #4d4466;
+  --color-purple-900: #3f3754;
+
+  /* Override orange to match our copper theme */
+  --color-orange-50: #fbf5f1;
+  --color-orange-100: #f6e8de;
+  --color-orange-200: #edceb9;
+  --color-orange-300: #e2ad8b;
+  --color-orange-400: #d58a5e;
+  --color-orange-500: #c96f3d;
+  --color-orange-600: var(--accent-copper);
+  --color-orange-700: #9c633a;
+  --color-orange-800: #7d4f30;
+  --color-orange-900: #664128;
 }
 
 body {

@@ -52,11 +52,11 @@ export default function RootLayout({ children }) {
       >
         {children}
         <Toaster
-          position="bottom-center"
+          position="top-center"
           containerStyle={{
-            bottom: '80px',
+            top: '20px',
+            zIndex: 999999,
           }}
-          containerClassName="md:!bottom-auto md:!top-4 md:!right-4"
           toastOptions={{
             duration: 3000,
             style: {

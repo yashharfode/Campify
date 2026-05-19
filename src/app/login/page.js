@@ -233,29 +233,30 @@ const AuthScreen = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
-            <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse delay-700"></div>
+        <div className="min-h-screen bg-[#f5efe5] flex items-center justify-center p-4 relative overflow-hidden">
+            {/* Soft decorative blurred circles matching the warm-beige/teal-green palette */}
+            <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-orange-600/10 rounded-full blur-3xl animate-pulse delay-700"></div>
 
-            <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 p-8 rounded-3xl w-full max-w-md shadow-2xl z-10">
+            <div className="bg-white border border-gray-200 p-8 rounded-3xl w-full max-w-md shadow-2xl z-10">
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20">
-                        <span className="text-3xl font-bold text-white">U</span>
+                    <div className="w-16 h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg shadow-blue-600/20">
+                        <span className="text-3xl font-black text-white">C</span>
                     </div>
-                    <h1 className="text-3xl font-black text-white mb-2">{mode === 'login' ? 'Welcome back' : 'Create your account'}</h1>
-                    <p className="text-slate-400">Enter your credentials to continue</p>
+                    <h1 className="text-3xl font-black text-gray-900 mb-2">{mode === 'login' ? 'Welcome back' : 'Create your account'}</h1>
+                    <p className="text-gray-500">Enter your credentials to continue</p>
                 </div>
 
-                <div className="flex gap-2 mb-6">
+                <div className="flex gap-2 mb-6 bg-gray-50 p-1 rounded-xl">
                     <button
                         onClick={() => switchMode('login')}
-                        className={`flex-1 py-2 rounded-xl font-bold text-sm ${mode === 'login' ? 'bg-white text-blue-600' : 'bg-white/10 text-white/60'}`}
+                        className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${mode === 'login' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                         Login
                     </button>
                     <button
                         onClick={() => switchMode('signup')}
-                        className={`flex-1 py-2 rounded-xl font-bold text-sm ${mode === 'signup' ? 'bg-white text-blue-600' : 'bg-white/10 text-white/60'}`}
+                        className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${mode === 'signup' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                         Sign Up
                     </button>
@@ -266,72 +267,72 @@ const AuthScreen = () => {
                         <>
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="text-slate-300 text-xs font-bold uppercase tracking-wider ml-1">First Name</label>
+                                    <label className="text-gray-600 text-xs font-bold uppercase tracking-wider ml-1">First Name</label>
                                     <input
                                         type="text"
                                         value={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
-                                        className="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white mt-1 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                                        className="w-full bg-white border border-gray-200 rounded-xl p-3 text-gray-900 mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
                                         placeholder="Alex"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-slate-300 text-xs font-bold uppercase tracking-wider ml-1">Last Name</label>
+                                    <label className="text-gray-600 text-xs font-bold uppercase tracking-wider ml-1">Last Name</label>
                                     <input
                                         type="text"
                                         value={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
-                                        className="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white mt-1 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                                        className="w-full bg-white border border-gray-200 rounded-xl p-3 text-gray-900 mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
                                         placeholder="Sharma"
                                     />
                                 </div>
                             </div>
                             <div>
-                                <label className="text-slate-300 text-xs font-bold uppercase tracking-wider ml-1">Username</label>
+                                <label className="text-gray-600 text-xs font-bold uppercase tracking-wider ml-1">Username</label>
                                 <input
                                     type="text"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    className="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white mt-1 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                                    className="w-full bg-white border border-gray-200 rounded-xl p-3 text-gray-900 mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
                                     placeholder="uniqueusername"
                                 />
-                                <p className="text-[10px] text-slate-400 mt-1">3-20 chars (letters, numbers, ., _, -)</p>
+                                <p className="text-[10px] text-gray-400 mt-1">3-20 chars (letters, numbers, ., _, -)</p>
                             </div>
                         </>
                     )}
 
                     <div>
-                        <label className="text-slate-300 text-xs font-bold uppercase tracking-wider ml-1">Email</label>
+                        <label className="text-gray-600 text-xs font-bold uppercase tracking-wider ml-1">Email</label>
                         <input
                             type="email"
                             required
                             placeholder="alex@college.edu"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white mt-1 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder:text-slate-600"
+                            className="w-full bg-white border border-gray-200 rounded-xl p-3 text-gray-900 mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition placeholder:text-gray-400"
                         />
                     </div>
 
                     <div>
-                        <label className="text-slate-300 text-xs font-bold uppercase tracking-wider ml-1">Password</label>
+                        <label className="text-gray-600 text-xs font-bold uppercase tracking-wider ml-1">Password</label>
                         <input
                             type="password"
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white mt-1 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder:text-slate-600"
+                            className="w-full bg-white border border-gray-200 rounded-xl p-3 text-gray-900 mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition placeholder:text-gray-400"
                         />
                     </div>
 
                     {mode === 'signup' && (
                         <div>
-                            <label className="text-slate-300 text-xs font-bold uppercase tracking-wider ml-1">Confirm Password</label>
+                            <label className="text-gray-600 text-xs font-bold uppercase tracking-wider ml-1">Confirm Password</label>
                             <input
                                 type="password"
                                 required
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white mt-1 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder:text-slate-600"
+                                className="w-full bg-white border border-gray-200 rounded-xl p-3 text-gray-900 mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition placeholder:text-gray-400"
                             />
                         </div>
                     )}
@@ -344,7 +345,7 @@ const AuthScreen = () => {
                                     setForgotPasswordEmail(email);
                                     setForgotPasswordOpen(true);
                                 }}
-                                className="text-xs font-bold text-blue-400 hover:text-blue-300 transition"
+                                className="text-xs font-bold text-blue-600 hover:text-blue-700 transition"
                             >
                                 Forgot password?
                             </button>
@@ -354,21 +355,21 @@ const AuthScreen = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/25 transition-all transform active:scale-95 flex items-center justify-center gap-2"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/10 transition-all transform active:scale-95 flex items-center justify-center gap-2"
                     >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (mode === 'login' ? 'Login Securely' : 'Create Account')}
                     </button>
                 </form>
 
-                <div className="my-4 flex items-center gap-2 text-slate-500 text-xs">
-                    <div className="flex-1 h-px bg-slate-700"></div>
+                <div className="my-4 flex items-center gap-2 text-gray-400 text-xs">
+                    <div className="flex-1 h-px bg-gray-200"></div>
                     OR
-                    <div className="flex-1 h-px bg-slate-700"></div>
+                    <div className="flex-1 h-px bg-gray-200"></div>
                 </div>
 
                 <button
                     onClick={handleGoogleAuth}
-                    className="w-full border border-slate-600 text-white font-bold py-3 rounded-xl hover:bg-white/5 transition flex items-center justify-center gap-3"
+                    className="w-full border border-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-50 transition flex items-center justify-center gap-3 bg-white"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.61 20.083H42V20H24v8h11.303C34.125 31.617 29.598 35 24 35c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C33.659 5.009 29.082 3 24 3 12.955 3 4 11.955 4 23s8.955 20 20 20c11.045 0 20-8.955 20-20 0-1.341-.138-2.651-.39-3.917z" /><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 16.077 18.961 13 24 13c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C33.659 5.009 29.082 3 24 3c-7.938 0-14.68 4.632-17.694 11.691z" /><path fill="#4CAF50" d="M24 43c5.522 0 10.508-2.115 14.167-5.564l-6.506-5.506C29.64 34.318 26.929 35 24 35c-5.564 0-10.279-3.559-11.957-8.483l-6.6 5.086C8.434 38.419 15.62 43 24 43z" /><path fill="#1976D2" d="M43.61 20.083H42V20H24v8h11.303C34.732 31.135 30.251 35 24 35c-5.564 0-10.279-3.559-11.957-8.483l-6.6 5.086C8.434 38.419 15.62 43 24 43c11.045 0 20-8.955 20-20 0-1.341-.138-2.651-.39-3.917z" /></svg>
                     {mode === 'login' ? 'Continue with Google' : 'Sign up with Google'}
@@ -651,7 +652,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
             {/* Header Blue Card */}
             <div className="bg-blue-600 pt-8 pb-20 px-6 rounded-b-[3rem] relative shadow-lg">
                 <div className="flex justify-between items-start text-white mb-4 max-w-2xl mx-auto">
-                    <Settings className="w-6 h-6 cursor-pointer hover:rotate-90 transition opacity-80 hover:opacity-100" />
+                    <Settings className="w-6 h-6 cursor-pointer hover:rotate-90 transition opacity-80 hover:opacity-100" onClick={() => setIsEditing(prev => !prev)} />
                     <div className="bg-white/20 backdrop-blur-md p-2 rounded-full cursor-pointer hover:bg-white/30 transition">
                         <ShieldCheck className="w-5 h-5" />
                     </div>
@@ -1411,13 +1412,13 @@ const SettingsItem = ({ icon, label, color = "text-gray-700", onClick }) => (
 );
 
 const DesktopNavLink = ({ icon, label, active, onClick }) => (
-    <button onClick={onClick} className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all ${active ? 'bg-blue-600 text-white shadow-md' : 'text-gray-500 hover:bg-gray-100'}`}>
+    <button onClick={onClick} className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all ${active ? 'bg-blue-600 text-white shadow-md' : 'text-gray-500 hover:bg-blue-50 hover:text-blue-600'}`}>
         {icon} {label}
     </button>
 );
 
 const NavBtn = ({ icon, label, active, onClick }) => (
-    <button onClick={onClick} className={`flex flex-col items-center gap-1 transition-all ${active ? 'text-blue-600 -translate-y-1' : 'text-gray-400 hover:text-gray-600'}`}>
+    <button onClick={onClick} className={`flex flex-col items-center gap-1 transition-all ${active ? 'text-blue-600 -translate-y-1' : 'text-gray-400 hover:text-blue-600'}`}>
         {icon}
         <span className="text-[10px] font-bold">{label}</span>
     </button>
@@ -1860,7 +1861,7 @@ export default function App() {
             {/* Desktop Header */}
             <div className="hidden md:flex items-center justify-between px-8 py-4 bg-white border-b border-gray-200 sticky top-0 z-50">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab('home')}>
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">U</div>
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">C</div>
                     <h1 className="text-xl font-bold text-gray-900">CAMPIFY</h1>
                 </div>
                 <div className="flex items-center gap-8">
@@ -1869,6 +1870,7 @@ export default function App() {
                     <DesktopNavLink icon={<FileText className="w-5 h-5" />} label="Notes" active={activeTab === 'notes'} onClick={() => setActiveTab('notes')} />
                     <DesktopNavLink icon={<Users className="w-5 h-5" />} label="Teams" active={activeTab === 'teams'} onClick={() => setActiveTab('teams')} />
                     <DesktopNavLink icon={<Compass className="w-5 h-5" />} label="Discover" active={activeTab === 'discover'} onClick={() => setActiveTab('discover')} />
+                    <DesktopNavLink icon={<Package className="w-5 h-5" />} label="Lost & Found" active={activeTab === 'lost'} onClick={() => setActiveTab('lost')} />
                 </div>
                 <div className="flex items-center gap-4 cursor-pointer" onClick={() => setActiveTab('profile')}>
                     <div className="flex items-center gap-2 hover:bg-gray-50 p-1.5 rounded-lg transition">
