@@ -274,7 +274,7 @@ export default function Notes({ user, userData }) {
         <div className="min-h-screen bg-background pb-24 pt-4 px-3 md:px-4 max-w-7xl mx-auto">
             {/* Header */}
             <div className="mb-6">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-200 flex items-center gap-3 mb-2">
+                <h1 className="text-2xl md:text-3xl font-bold text-text-main flex items-center gap-3 mb-2">
                     <GraduationCap className="w-7 h-7 md:w-8 md:h-8 text-[#0f4c52]" />
                     Study Notes
                 </h1>
@@ -282,11 +282,11 @@ export default function Notes({ user, userData }) {
             </div>
             
             {/* Tabs */}
-            <div className="bg-[#121212]/90 rounded-xl border border-gray-800 p-1 mb-6 flex gap-2 overflow-x-auto">
+            <div className="bg-surface-base/90 rounded-xl border border-border-strong p-1 mb-6 flex gap-2 overflow-x-auto">
                 <button
                     onClick={() => setActiveTab('all')}
                     className={`min-w-[120px] flex-1 px-3 md:px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 ${
-                        activeTab === 'all' ? 'bg-[#2D5A27] text-white' : 'text-gray-400 hover:bg-surface-2'
+                        activeTab === 'all' ? 'bg-brand-accent text-white' : 'text-text-muted hover:bg-surface-2'
                     }`}
                 >
                     <BookOpen className="w-4 h-4" /> All Notes
@@ -294,7 +294,7 @@ export default function Notes({ user, userData }) {
                 <button
                     onClick={() => setActiveTab('my-notes')}
                     className={`min-w-[120px] flex-1 px-3 md:px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 ${
-                        activeTab === 'my-notes' ? 'bg-[#2D5A27] text-white' : 'text-gray-400 hover:bg-surface-2'
+                        activeTab === 'my-notes' ? 'bg-brand-accent text-white' : 'text-text-muted hover:bg-surface-2'
                     }`}
                 >
                     <FileText className="w-4 h-4" /> My Notes
@@ -302,7 +302,7 @@ export default function Notes({ user, userData }) {
                 <button
                     onClick={() => setActiveTab('upload')}
                     className={`min-w-[132px] flex-1 px-3 md:px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 ${
-                        activeTab === 'upload' ? 'bg-[#2D5A27] text-white' : 'text-gray-400 hover:bg-surface-2'
+                        activeTab === 'upload' ? 'bg-brand-accent text-white' : 'text-text-muted hover:bg-surface-2'
                     }`}
                 >
                     <Upload className="w-4 h-4" /> Upload Note
@@ -314,7 +314,7 @@ export default function Notes({ user, userData }) {
                 <div className="flex flex-col lg:flex-row gap-6">
                     {/* Mobile Sidebar Toggle */}
                     <button 
-                        className="lg:hidden w-full bg-[#121212] border border-gray-800 text-gray-200 p-3 rounded-xl font-bold flex justify-between items-center shadow-sm"
+                        className="lg:hidden w-full bg-surface-base border border-border-strong text-text-main p-3 rounded-xl font-bold flex justify-between items-center shadow-sm"
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     >
                         <span className="flex items-center gap-2"><Filter className="w-5 h-5"/> Filter Notes</span>
@@ -323,25 +323,25 @@ export default function Notes({ user, userData }) {
 
                     {/* Sidebar / Filters */}
                     <div className={`lg:w-64 flex-shrink-0 space-y-4 ${isSidebarOpen ? 'block' : 'hidden lg:block'}`}>
-                        <div className="bg-[#121212] border border-gray-800 rounded-xl p-5 sticky top-24 shadow-sm">
+                        <div className="bg-surface-base border border-border-strong rounded-xl p-5 sticky top-24 shadow-sm">
                             <div className="mb-6 relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
                                 <input
                                     type="text"
                                     placeholder="Search notes..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent text-sm"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-surface-elevated border border-gray-300 text-text-main rounded-lg focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent text-sm"
                                 />
                             </div>
 
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Branch</label>
+                                    <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Branch</label>
                                     <select
                                         value={filterBranch}
                                         onChange={handleFilterBranchChange}
-                                        className="w-full bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
+                                        className="w-full bg-surface-elevated border border-gray-300 text-text-main rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
                                     >
                                         <option value="All">All Branches</option>
                                         {Object.keys(categories).map(branch => (
@@ -351,12 +351,12 @@ export default function Notes({ user, userData }) {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Semester</label>
+                                    <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Semester</label>
                                     <select
                                         value={filterSem}
                                         onChange={handleFilterSemChange}
                                         disabled={filterBranch === 'All'}
-                                        className="w-full bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27] disabled:opacity-50"
+                                        className="w-full bg-surface-elevated border border-gray-300 text-text-main rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27] disabled:opacity-50"
                                     >
                                         <option value="All">All Semesters</option>
                                         {availableFilterSems.map(sem => (
@@ -366,12 +366,12 @@ export default function Notes({ user, userData }) {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Subject</label>
+                                    <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Subject</label>
                                     <select
                                         value={filterSubject}
                                         onChange={(e) => setFilterSubject(e.target.value)}
                                         disabled={filterSem === 'All'}
-                                        className="w-full bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27] disabled:opacity-50"
+                                        className="w-full bg-surface-elevated border border-gray-300 text-text-main rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27] disabled:opacity-50"
                                     >
                                         <option value="All">All Subjects</option>
                                         {availableFilterSubjects.map(sub => (
@@ -381,11 +381,11 @@ export default function Notes({ user, userData }) {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Unit</label>
+                                    <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Unit</label>
                                     <select
                                         value={filterUnit}
                                         onChange={(e) => setFilterUnit(e.target.value)}
-                                        className="w-full bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
+                                        className="w-full bg-surface-elevated border border-gray-300 text-text-main rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
                                     >
                                         {UNITS.map(unit => (
                                             <option key={unit} value={unit}>{unit}</option>
@@ -399,22 +399,22 @@ export default function Notes({ user, userData }) {
                     {/* Notes Grid */}
                     <div className="flex-1">
                         {loading ? (
-                            <div className="flex flex-col items-center justify-center h-64 bg-[#121212] border border-gray-800 rounded-xl shadow-sm">
+                            <div className="flex flex-col items-center justify-center h-64 bg-surface-base border border-border-strong rounded-xl shadow-sm">
                                 <Loader2 className="w-10 h-10 animate-spin text-[#0f4c52] mb-4" />
                                 <p className="text-gray-500 font-bold tracking-wide">Loading notes...</p>
                             </div>
                         ) : filteredNotes.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-64 bg-[#121212] border border-gray-800 rounded-xl shadow-sm">
+                            <div className="flex flex-col items-center justify-center h-64 bg-surface-base border border-border-strong rounded-xl shadow-sm">
                                 <FileText className="w-16 h-16 text-gray-300 mb-4" />
                                 <p className="text-gray-500 font-bold text-lg">No notes found</p>
-                                <p className="text-gray-400 text-sm">Try adjusting your filters.</p>
+                                <p className="text-text-muted text-sm">Try adjusting your filters.</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                                 {filteredNotes.map(note => (
-                                    <div key={note.id} className="bg-[#121212] rounded-xl border border-gray-800 overflow-hidden hover:shadow-md transition group flex flex-col h-full">
+                                    <div key={note.id} className="bg-surface-base rounded-xl border border-border-strong overflow-hidden hover:shadow-md transition group flex flex-col h-full">
                                         {/* Cover Image */}
-                                        <div className="h-32 bg-gray-900 overflow-hidden relative border-b border-gray-800 aspect-video w-full">
+                                        <div className="h-32 bg-gray-900 overflow-hidden relative border-b border-border-strong aspect-video w-full">
                                             {note.coverImage ? (
                                                 <img src={getOptimizedImageUrl(note.coverImage, '16:9')} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt={note.title} />
                                             ) : (
@@ -423,7 +423,7 @@ export default function Notes({ user, userData }) {
                                                 </div>
                                             )}
                                             <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
-                                                <span className="bg-[#2D5A27] text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                                                <span className="bg-brand-accent text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
                                                     {note.semester}
                                                 </span>
                                                 {note.unit !== 'All Units' && (
@@ -439,19 +439,19 @@ export default function Notes({ user, userData }) {
                                                 <span className="text-[10px] font-black text-[#0f4c52] uppercase tracking-wider mb-1 block">
                                                     {note.branch}
                                                 </span>
-                                                <h3 className="font-bold text-gray-200 text-base leading-tight mb-1 line-clamp-2">{note.title}</h3>
-                                                <p className="text-gray-400 text-xs font-semibold">{note.subject}</p>
+                                                <h3 className="font-bold text-text-main text-base leading-tight mb-1 line-clamp-2">{note.title}</h3>
+                                                <p className="text-text-muted text-xs font-semibold">{note.subject}</p>
                                             </div>
                                             
                                             <p className="text-sm text-gray-500 mb-4 line-clamp-2 flex-1">{note.description || 'No description provided.'}</p>
                                             
-                                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-800">
+                                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-border-strong">
                                                 <div className="flex items-center gap-1.5">
                                                     <span className="text-xs text-gray-500 font-medium truncate max-w-[100px]">By {note.uploadedByName}</span>
                                                 </div>
                                                 <button
                                                     onClick={() => handleDownload(note)}
-                                                    className="bg-[#2D5A27] hover:bg-[#397032] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                                                    className="bg-brand-accent hover:bg-brand-accent-hover text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
                                                 >
                                                     <LinkIcon className="w-3.5 h-3.5" /> Open
                                                 </button>
@@ -469,12 +469,12 @@ export default function Notes({ user, userData }) {
             {activeTab === 'my-notes' && (
                 <div>
                     {myNotes.length === 0 ? (
-                         <div className="flex flex-col items-center justify-center py-12 bg-[#121212] border border-gray-800 rounded-xl shadow-sm">
+                         <div className="flex flex-col items-center justify-center py-12 bg-surface-base border border-border-strong rounded-xl shadow-sm">
                              <FileText className="w-16 h-16 text-gray-300 mb-4" />
                              <p className="text-gray-500 font-bold text-lg mb-4">You haven't uploaded any notes yet.</p>
                              <button
                                  onClick={() => setActiveTab('upload')}
-                                 className="bg-[#2D5A27] text-white px-6 py-2.5 rounded-lg font-bold hover:bg-[#397032] transition shadow-md"
+                                 className="bg-brand-accent text-white px-6 py-2.5 rounded-lg font-bold hover:bg-brand-accent-hover transition shadow-md"
                              >
                                  Upload Your First Note
                              </button>
@@ -482,9 +482,9 @@ export default function Notes({ user, userData }) {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {myNotes.map(note => (
-                                <div key={note.id} className="bg-[#121212] rounded-xl border border-gray-800 overflow-hidden hover:shadow-md transition flex flex-col shadow-sm">
+                                <div key={note.id} className="bg-surface-base rounded-xl border border-border-strong overflow-hidden hover:shadow-md transition flex flex-col shadow-sm">
                                     {/* Cover Image */}
-                                    <div className="h-28 bg-gray-900 overflow-hidden relative border-b border-gray-800 aspect-video w-full">
+                                    <div className="h-28 bg-gray-900 overflow-hidden relative border-b border-border-strong aspect-video w-full">
                                         {note.coverImage ? (
                                             <img src={getOptimizedImageUrl(note.coverImage, '16:9')} className="w-full h-full object-cover" alt={note.title} />
                                         ) : (
@@ -501,14 +501,14 @@ export default function Notes({ user, userData }) {
                                             <span className="text-[10px] font-black text-[#0f4c52] uppercase tracking-wider mb-1 block">
                                                 {note.semester} • {note.unit}
                                             </span>
-                                            <h3 className="font-bold text-gray-200 text-sm leading-tight mb-1 line-clamp-1">{note.title}</h3>
+                                            <h3 className="font-bold text-text-main text-sm leading-tight mb-1 line-clamp-1">{note.title}</h3>
                                             <p className="text-gray-500 text-xs font-medium line-clamp-1">{note.subject}</p>
                                         </div>
                                         
                                         {note.status === 'approved' && (
                                             <button
                                                 onClick={() => handleDownload(note)}
-                                                className="mt-auto w-full bg-gray-900 hover:bg-gray-200 text-gray-300 px-3 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 border border-gray-800"
+                                                className="mt-auto w-full bg-gray-900 hover:bg-gray-200 text-gray-300 px-3 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 border border-border-strong"
                                             >
                                                 <LinkIcon className="w-3.5 h-3.5" /> Open Drive Link
                                             </button>
@@ -523,13 +523,13 @@ export default function Notes({ user, userData }) {
 
             {/* Upload Tab */}
             {activeTab === 'upload' && (
-                <div className="bg-[#121212] rounded-2xl border border-gray-800 p-6 md:p-8 max-w-2xl mx-auto shadow-md">
-                    <h2 className="text-2xl font-bold text-gray-200 mb-2">Upload Study Note</h2>
+                <div className="bg-surface-base rounded-2xl border border-border-strong p-6 md:p-8 max-w-2xl mx-auto shadow-md">
+                    <h2 className="text-2xl font-bold text-text-main mb-2">Upload Study Note</h2>
                     <p className="text-gray-500 text-sm mb-8">Share your materials. All uploads are reviewed before publishing.</p>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="block text-sm font-bold text-gray-400 mb-2">Title *</label>
+                            <label className="block text-sm font-bold text-text-muted mb-2">Title *</label>
                             <input
                                 required
                                 type="text"
@@ -541,7 +541,7 @@ export default function Notes({ user, userData }) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-400 mb-2">Description</label>
+                            <label className="block text-sm font-bold text-text-muted mb-2">Description</label>
                             <textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -552,14 +552,14 @@ export default function Notes({ user, userData }) {
                         </div>
 
                         {/* Hierarchical Selection */}
-                        <div className="bg-[#1A1A1A] p-5 rounded-xl border border-gray-800 space-y-4">
-                            <h3 className="text-sm font-bold text-gray-200 flex items-center gap-2 mb-2">
+                        <div className="bg-surface-elevated p-5 rounded-xl border border-border-strong space-y-4">
+                            <h3 className="text-sm font-bold text-text-main flex items-center gap-2 mb-2">
                                 <GraduationCap className="w-4 h-4 text-[#0f4c52]" /> Categorization
                             </h3>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Branch *</label>
+                                    <label className="block text-xs font-bold text-text-muted uppercase mb-1">Branch *</label>
                                     <select
                                         required
                                         value={formData.branch}
@@ -572,7 +572,7 @@ export default function Notes({ user, userData }) {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Semester *</label>
+                                    <label className="block text-xs font-bold text-text-muted uppercase mb-1">Semester *</label>
                                     <select
                                         required
                                         value={formData.semester}
@@ -586,7 +586,7 @@ export default function Notes({ user, userData }) {
                                 </div>
                                 <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Subject *</label>
+                                        <label className="block text-xs font-bold text-text-muted uppercase mb-1">Subject *</label>
                                         <select
                                             required
                                             value={formData.subject}
@@ -599,7 +599,7 @@ export default function Notes({ user, userData }) {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Unit</label>
+                                        <label className="block text-xs font-bold text-text-muted uppercase mb-1">Unit</label>
                                         <select
                                             value={formData.unit}
                                             onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
@@ -615,7 +615,7 @@ export default function Notes({ user, userData }) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-400 mb-2">Google Drive Link *</label>
+                            <label className="block text-sm font-bold text-text-muted mb-2">Google Drive Link *</label>
                             <input
                                 required
                                 type="url"
@@ -628,22 +628,22 @@ export default function Notes({ user, userData }) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-400 mb-2">Cover Image (Optional)</label>
+                            <label className="block text-sm font-bold text-text-muted mb-2">Cover Image (Optional)</label>
                             <div
                                 onClick={() => coverImageInputRef.current?.click()}
-                                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-[#2D5A27] hover:bg-[#1A1A1A] transition group"
+                                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-[#2D5A27] hover:bg-surface-elevated transition group"
                             >
                                 {formData.coverImage ? (
                                     <div className="space-y-3">
-                                        <img src={getOptimizedImageUrl(formData.coverImage, '16:9')} className="w-full h-40 object-cover rounded-lg mx-auto border border-gray-800" alt="Cover preview" />
+                                        <img src={getOptimizedImageUrl(formData.coverImage, '16:9')} className="w-full h-40 object-cover rounded-lg mx-auto border border-border-strong" alt="Cover preview" />
                                         <p className="text-xs text-green-600 font-bold">✓ Cover image attached</p>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center">
                                         <div className="w-12 h-12 rounded-full bg-gray-900 flex items-center justify-center mb-3 group-hover:scale-110 transition">
-                                            <ImageIcon className="w-6 h-6 text-gray-400" />
+                                            <ImageIcon className="w-6 h-6 text-text-muted" />
                                         </div>
-                                        <p className="text-sm font-bold text-gray-400">Click to upload preview image</p>
+                                        <p className="text-sm font-bold text-text-muted">Click to upload preview image</p>
                                         <p className="text-xs text-gray-500 mt-1">16:9 ratio recommended (Max 500KB)</p>
                                     </div>
                                 )}
@@ -657,7 +657,7 @@ export default function Notes({ user, userData }) {
                             </div>
                         </div>
 
-                        <div className="bg-[#242424] border border-[#333] rounded-lg p-4">
+                        <div className="bg-surface-highlight border border-[#333] rounded-lg p-4">
                             <div className="flex items-start gap-2">
                                 <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                                 <div className="text-sm text-blue-900">
@@ -670,7 +670,7 @@ export default function Notes({ user, userData }) {
                         <button
                             type="submit"
                             disabled={uploading || categoriesLoading || !formData.subject}
-                            className="w-full bg-[#2D5A27] hover:bg-[#397032] text-white px-6 py-4 rounded-xl font-bold transition disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 text-base shadow-md hover:shadow-lg"
+                            className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white px-6 py-4 rounded-xl font-bold transition disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 text-base shadow-md hover:shadow-lg"
                         >
                             {uploading ? (
                                 <>

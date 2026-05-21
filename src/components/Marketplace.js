@@ -17,7 +17,7 @@ const isAdminUser = (email) => ADMIN_EMAILS.includes(email);
 
 // Skeleton Loader Component
 const SkeletonCard = () => (
-    <div className="bg-[#121212] p-3 md:p-4 rounded-2xl shadow-sm border border-gray-800 flex flex-col h-full animate-pulse">
+    <div className="bg-surface-base p-3 md:p-4 rounded-2xl shadow-sm border border-border-strong flex flex-col h-full animate-pulse">
         <div className="h-40 rounded-xl bg-gray-200 mb-3"></div>
         <div className="h-4 bg-gray-200 rounded mb-2"></div>
         <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
@@ -101,7 +101,7 @@ const ProductCard = ({ item, user, onWishlistToggle, isWishlisted, onReport, isO
     return (
         <div
             onClick={onClick}
-            className={`bg-[#121212] p-3 md:p-4 rounded-2xl shadow-sm border border-gray-800 flex flex-col h-full group hover:shadow-md transition-all cursor-pointer ${isOutOfStock ? 'opacity-75' : ''}`}
+            className={`bg-surface-base p-3 md:p-4 rounded-2xl shadow-sm border border-border-strong flex flex-col h-full group hover:shadow-md transition-all cursor-pointer ${isOutOfStock ? 'opacity-75' : ''}`}
         >
             <div className="rounded-xl overflow-hidden bg-gray-900 mb-3 relative aspect-[4/3] w-full">
                 <ProductImage
@@ -123,7 +123,7 @@ const ProductCard = ({ item, user, onWishlistToggle, isWishlisted, onReport, isO
                             e.stopPropagation();
                             onWishlistToggle(item.id);
                         }}
-                        className={`absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition ${isWishlisted ? 'bg-red-500/90 text-white' : 'bg-[#121212]/80 text-gray-400 hover:bg-[#121212]'
+                        className={`absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition ${isWishlisted ? 'bg-red-500/90 text-white' : 'bg-surface-base/80 text-text-muted hover:bg-surface-base'
                             }`}
                     >
                         <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
@@ -131,7 +131,7 @@ const ProductCard = ({ item, user, onWishlistToggle, isWishlisted, onReport, isO
                 )}
             </div>
 
-            <h4 className="font-bold text-gray-200 text-sm line-clamp-2 mb-auto">{item.title}</h4>
+            <h4 className="font-bold text-text-main text-sm line-clamp-2 mb-auto">{item.title}</h4>
 
             <div className="mt-3 pt-3 border-t border-gray-50">
                 <div className="flex items-center justify-between mb-2">
@@ -171,7 +171,7 @@ const ProductCard = ({ item, user, onWishlistToggle, isWishlisted, onReport, isO
                                         e.stopPropagation();
                                         onReport(item);
                                     }}
-                                    className="text-gray-500 bg-[#1A1A1A] p-1.5 rounded-lg hover:bg-gray-900 transition"
+                                    className="text-gray-500 bg-surface-elevated p-1.5 rounded-lg hover:bg-gray-900 transition"
                                 >
                                     <Flag className="w-4 h-4" />
                                 </button>
@@ -331,34 +331,34 @@ export default function Marketplace({ user, userData, setActiveTab, setChatTarge
     return (
         <div className="animate-in fade-in pb-24 pt-4 px-4 max-w-7xl mx-auto">
             {/* Header */}
-            <div className="sticky top-0 bg-[#1A1A1A] z-20 pb-4 pt-2 -mx-4 px-4">
+            <div className="sticky top-0 bg-surface-elevated z-20 pb-4 pt-2 -mx-4 px-4">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-gray-200 text-2xl font-bold">Campus Market</h2>
+                    <h2 className="text-text-main text-2xl font-bold">Campus Market</h2>
                     <div className="flex gap-2">
                         <button
                             onClick={() => setIsMyListingsOpen(true)}
-                            className="bg-[#121212] p-2 rounded-full shadow-sm border border-gray-800 hover:bg-[#1A1A1A] transition"
+                            className="bg-surface-base p-2 rounded-full shadow-sm border border-border-strong hover:bg-surface-elevated transition"
                         >
-                            <ShoppingBag className="w-5 h-5 text-gray-400" />
+                            <ShoppingBag className="w-5 h-5 text-text-muted" />
                         </button>
                         <button
                             onClick={() => setShowFilters(!showFilters)}
-                            className="bg-[#121212] p-2 rounded-full shadow-sm border border-gray-800 hover:bg-[#1A1A1A] transition"
+                            className="bg-surface-base p-2 rounded-full shadow-sm border border-border-strong hover:bg-surface-elevated transition"
                         >
-                            <SlidersHorizontal className="w-5 h-5 text-gray-400" />
+                            <SlidersHorizontal className="w-5 h-5 text-text-muted" />
                         </button>
                     </div>
                 </div>
 
                 {/* Search */}
                 <div className="relative mb-4">
-                    <Search className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
+                    <Search className="absolute left-3 top-3.5 text-text-muted w-5 h-5" />
                     <input
                         type="text"
                         placeholder="Search books, drafters..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full bg-[#121212] border border-gray-800 rounded-xl py-3 pl-10 pr-4 text-sm shadow-sm focus:outline-none focus:border-blue-500"
+                        className="w-full bg-surface-base border border-border-strong rounded-xl py-3 pl-10 pr-4 text-sm shadow-sm focus:outline-none focus:border-blue-500"
                     />
                 </div>
 
@@ -368,7 +368,7 @@ export default function Marketplace({ user, userData, setActiveTab, setChatTarge
                         <button
                             key={cat}
                             onClick={() => setFilter(cat)}
-                            className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${filter === cat ? 'bg-blue-600 text-white shadow-lg' : 'bg-[#121212] text-gray-400 border border-gray-800 hover:bg-gray-900'}`}
+                            className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${filter === cat ? 'bg-blue-600 text-white shadow-lg' : 'bg-surface-base text-text-muted border border-border-strong hover:bg-gray-900'}`}
                         >
                             {cat}
                         </button>
@@ -377,13 +377,13 @@ export default function Marketplace({ user, userData, setActiveTab, setChatTarge
 
                 {/* Advanced Filters */}
                 {showFilters && (
-                    <div className="bg-[#121212] p-4 rounded-xl border border-gray-800 mb-4 space-y-4">
+                    <div className="bg-surface-base p-4 rounded-xl border border-border-strong mb-4 space-y-4">
                         <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Sort By</label>
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
-                                className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-2 text-sm outline-none focus:border-blue-500"
+                                className="w-full bg-surface-elevated border border-border-strong rounded-lg p-2 text-sm outline-none focus:border-blue-500"
                             >
                                 <option value="newest">Newest First</option>
                                 <option value="price-low">Price: Low to High</option>
@@ -398,14 +398,14 @@ export default function Marketplace({ user, userData, setActiveTab, setChatTarge
                                     placeholder="Min"
                                     value={priceRange.min}
                                     onChange={(e) => setPriceRange({ ...priceRange, min: Number(e.target.value) || 0 })}
-                                    className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-2 text-sm outline-none focus:border-blue-500"
+                                    className="w-full bg-surface-elevated border border-border-strong rounded-lg p-2 text-sm outline-none focus:border-blue-500"
                                 />
                                 <input
                                     type="number"
                                     placeholder="Max"
                                     value={priceRange.max}
                                     onChange={(e) => setPriceRange({ ...priceRange, max: Number(e.target.value) || 1000000 })}
-                                    className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-2 text-sm outline-none focus:border-blue-500"
+                                    className="w-full bg-surface-elevated border border-border-strong rounded-lg p-2 text-sm outline-none focus:border-blue-500"
                                 />
                             </div>
                         </div>
@@ -417,7 +417,7 @@ export default function Marketplace({ user, userData, setActiveTab, setChatTarge
             {loading ? (
                 <SkeletonGrid />
             ) : filteredAndSortedItems.length === 0 ? (
-                <div className="text-center py-20 text-gray-400">
+                <div className="text-center py-20 text-text-muted">
                     <ShoppingBag className="w-16 h-16 mx-auto mb-4 opacity-20" />
                     <p>No items found. Be the first to sell!</p>
                 </div>
@@ -637,8 +637,8 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-[#121212] rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-                <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#1A1A1A]">
+            <div className="bg-surface-base rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+                <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
                     <h3 className="font-bold text-lg text-gray-300">{editingItem ? 'Edit Listing' : 'Create Listing'}</h3>
                     <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
                 </div>
@@ -646,7 +646,7 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
                 <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
                     <div
                         onClick={() => fileInputRef.current.click()}
-                        className="border-2 border-dashed border-gray-300 rounded-xl h-32 flex flex-col items-center justify-center text-gray-400 hover:bg-[#1A1A1A] transition cursor-pointer relative overflow-hidden"
+                        className="border-2 border-dashed border-gray-300 rounded-xl h-32 flex flex-col items-center justify-center text-text-muted hover:bg-surface-elevated transition cursor-pointer relative overflow-hidden"
                     >
                         {formData.image && formData.image.trim() !== '' ? (
                             <img src={getOptimizedImageUrl(formData.image, '4:3')} className="w-full h-full object-cover" alt="Preview" />
@@ -668,7 +668,7 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
                                 key={t}
                                 type="button"
                                 onClick={() => setFormData({ ...formData, type: t })}
-                                className={`text-xs font-bold py-2 rounded-md transition ${formData.type === t ? 'bg-[#121212] shadow text-blue-600' : 'text-gray-500 hover:text-gray-400'}`}
+                                className={`text-xs font-bold py-2 rounded-md transition ${formData.type === t ? 'bg-surface-base shadow text-blue-600' : 'text-gray-500 hover:text-text-muted'}`}
                             >
                                 {t}
                             </button>
@@ -677,21 +677,21 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
 
                     <div>
                         <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Title</label>
-                        <input required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-3 text-sm outline-none focus:border-blue-500" placeholder="e.g. Drafter" />
+                        <input required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500" placeholder="e.g. Drafter" />
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
                         <div className="col-span-1">
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Price (₹)</label>
-                            <input type="number" required value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-3 text-sm outline-none focus:border-blue-500" placeholder="0" />
+                            <input type="number" required value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500" placeholder="0" />
                         </div>
                         <div className="col-span-1">
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Quantity</label>
-                            <input type="number" min="1" required value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-3 text-sm outline-none focus:border-blue-500" placeholder="1" />
+                            <input type="number" min="1" required value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })} className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500" placeholder="1" />
                         </div>
                         <div className="col-span-1">
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Category</label>
-                            <select value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-3 text-sm outline-none focus:border-blue-500">
+                            <select value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500">
                                 <option>Electronics</option><option>Books</option><option>Stationery</option><option>Other</option>
                             </select>
                         </div>
@@ -703,7 +703,7 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
                             value={formData.description}
                             onChange={e => setFormData({ ...formData, description: e.target.value })}
                             rows="3"
-                            className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-3 text-sm outline-none focus:border-blue-500 resize-none"
+                            className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500 resize-none"
                             placeholder="Describe your item..."
                         />
                     </div>
@@ -718,7 +718,7 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
                                 type="text"
                                 value={formData.meetupLocation}
                                 onChange={e => setFormData({ ...formData, meetupLocation: e.target.value })}
-                                className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-3 text-sm outline-none focus:border-blue-500"
+                                className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500"
                                 placeholder="e.g. Library Entrance, Cafeteria, Main Gate"
                             />
                             <button
@@ -772,22 +772,22 @@ const MyListingsModal = ({ isOpen, onClose, listings, onDelete, onEdit }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-[#121212] rounded-2xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-                <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#1A1A1A]">
+            <div className="bg-surface-base rounded-2xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+                <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
                     <h3 className="font-bold text-lg text-gray-300">My Listings ({listings.length})</h3>
                     <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
                 </div>
 
                 <div className="p-6 overflow-y-auto">
                     {listings.length === 0 ? (
-                        <div className="text-center py-12 text-gray-400">
+                        <div className="text-center py-12 text-text-muted">
                             <ShoppingBag className="w-16 h-16 mx-auto mb-4 opacity-20" />
                             <p>You haven't posted any listings yet.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {listings.map((item) => (
-                                <div key={item.id} className="bg-[#1A1A1A] p-4 rounded-xl border border-gray-800">
+                                <div key={item.id} className="bg-surface-elevated p-4 rounded-xl border border-border-strong">
                                     <div className="flex gap-4">
                                         <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0 aspect-square">
                                             {item.image && item.image.trim() !== '' ? (
@@ -799,7 +799,7 @@ const MyListingsModal = ({ isOpen, onClose, listings, onDelete, onEdit }) => {
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h4 className="font-bold text-gray-200 text-sm mb-1 line-clamp-2">{item.title}</h4>
+                                            <h4 className="font-bold text-text-main text-sm mb-1 line-clamp-2">{item.title}</h4>
                                             <p className="text-blue-600 font-bold text-lg mb-2">₹{item.price}</p>
                                             <div className="flex gap-2">
                                                 <button
@@ -846,17 +846,17 @@ const ReportModal = ({ isOpen, onClose, onSubmit, item }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-[#121212] rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-                <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#1A1A1A]">
+            <div className="bg-surface-base rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+                <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
                     <h3 className="font-bold text-lg text-gray-300">Report Item</h3>
                     <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    <p className="text-sm text-gray-400 mb-4">Why are you reporting "{item.title}"?</p>
+                    <p className="text-sm text-text-muted mb-4">Why are you reporting "{item.title}"?</p>
                     <div className="space-y-2">
                         {reasons.map((r) => (
-                            <label key={r} className="flex items-center gap-3 p-3 border border-gray-800 rounded-lg cursor-pointer hover:bg-[#1A1A1A] transition">
+                            <label key={r} className="flex items-center gap-3 p-3 border border-border-strong rounded-lg cursor-pointer hover:bg-surface-elevated transition">
                                 <input
                                     type="radio"
                                     name="reason"
@@ -865,7 +865,7 @@ const ReportModal = ({ isOpen, onClose, onSubmit, item }) => {
                                     onChange={(e) => setReason(e.target.value)}
                                     className="w-4 h-4 text-blue-600"
                                 />
-                                <span className="text-sm font-medium text-gray-400">{r}</span>
+                                <span className="text-sm font-medium text-text-muted">{r}</span>
                             </label>
                         ))}
                     </div>
@@ -1011,7 +1011,7 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in overflow-y-auto">
-            <div className="bg-[#121212] rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl my-8">
+            <div className="bg-surface-base rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl my-8">
                 <div className="relative">
                     {item.image && item.image.trim() !== '' ? (
                         <div className="h-64 md:h-80 bg-gray-900 overflow-hidden">
@@ -1022,11 +1022,11 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
                             <ShoppingBag className="w-24 h-24 text-white/30" />
                         </div>
                     )}
-                    <button onClick={onClose} className="absolute top-4 right-4 bg-[#121212]/90 backdrop-blur-md p-2 rounded-full hover:bg-[#121212] transition shadow-lg z-10">
-                        <X className="w-5 h-5 text-gray-400" />
+                    <button onClick={onClose} className="absolute top-4 right-4 bg-surface-base/90 backdrop-blur-md p-2 rounded-full hover:bg-surface-base transition shadow-lg z-10">
+                        <X className="w-5 h-5 text-text-muted" />
                     </button>
-                    <button onClick={handleShare} className="absolute top-4 right-16 bg-[#121212]/90 backdrop-blur-md p-2 rounded-full hover:bg-[#121212] transition shadow-lg z-10">
-                        <Share2 className="w-5 h-5 text-gray-400" />
+                    <button onClick={handleShare} className="absolute top-4 right-16 bg-surface-base/90 backdrop-blur-md p-2 rounded-full hover:bg-surface-base transition shadow-lg z-10">
+                        <Share2 className="w-5 h-5 text-text-muted" />
                     </button>
                     <span className={`absolute top-4 left-4 text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-md text-white ${typeColors[item.type] || 'bg-blue-500/80'}`}>
                         {item.type}
@@ -1034,14 +1034,14 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
                 </div>
                 <div className="p-6 md:p-8 overflow-y-auto max-h-[calc(90vh-20rem)]">
                     <div className="mb-6">
-                        <h1 className="text-3xl md:text-4xl font-black text-gray-200 mb-3">{item.title}</h1>
+                        <h1 className="text-3xl md:text-4xl font-black text-text-main mb-3">{item.title}</h1>
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <span className="text-blue-600 font-bold text-3xl">₹{item.price}</span>
                                 <span className="text-gray-500 text-sm">Category: {item.category}</span>
                             </div>
                             {!isOwner && (
-                                <button onClick={() => onWishlistToggle(item.id)} className={`p-2 rounded-full transition ${isWishlisted ? 'bg-red-100 text-red-600' : 'bg-gray-900 text-gray-400 hover:bg-gray-200'}`}>
+                                <button onClick={() => onWishlistToggle(item.id)} className={`p-2 rounded-full transition ${isWishlisted ? 'bg-red-100 text-red-600' : 'bg-gray-900 text-text-muted hover:bg-gray-200'}`}>
                                     <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
                                 </button>
                             )}
@@ -1049,12 +1049,12 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
                     </div>
                     {item.description && (
                         <div className="mb-6">
-                            <h2 className="text-xl font-bold text-gray-200 mb-3">Description</h2>
-                            <p className="text-gray-400 leading-relaxed whitespace-pre-wrap">{item.description}</p>
+                            <h2 className="text-xl font-bold text-text-main mb-3">Description</h2>
+                            <p className="text-text-muted leading-relaxed whitespace-pre-wrap">{item.description}</p>
                         </div>
                     )}
-                    <div className="bg-[#1A1A1A] rounded-2xl p-6 mb-6">
-                        <h2 className="text-xl font-bold text-gray-200 mb-4">Seller Information</h2>
+                    <div className="bg-surface-elevated rounded-2xl p-6 mb-6">
+                        <h2 className="text-xl font-bold text-text-main mb-4">Seller Information</h2>
                         {loadingProfile ? (
                             <div className="flex items-center gap-4">
                                 <div className="w-16 h-16 rounded-full bg-gray-200 animate-pulse"></div>
@@ -1070,7 +1070,7 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <h3 className="font-bold text-gray-200 text-lg">{item.sellerName}</h3>
+                                        <h3 className="font-bold text-text-main text-lg">{item.sellerName}</h3>
                                         {item.sellerEmail && (item.sellerEmail.endsWith('@jec.ac.in') || item.sellerEmail.endsWith('@college.edu')) && (
                                             <CheckCircle2 className="w-5 h-5 text-blue-600" />
                                         )}
@@ -1081,12 +1081,12 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
                                             <span className="text-sm font-bold text-yellow-700">Trust Score: {trustScore}</span>
                                         </div>
                                         <Shield className="w-4 h-4 text-green-600" />
-                                        <span className="text-sm text-gray-400">Verified Seller</span>
+                                        <span className="text-sm text-text-muted">Verified Seller</span>
                                     </div>
                                     {sellerProfile?.skills && (
                                         <div className="flex flex-wrap gap-2 mt-2">
                                             {sellerProfile.skills.split(',').slice(0, 3).map((skill, i) => (
-                                                <span key={i} className="px-2 py-1 bg-[#121212] text-gray-400 rounded-full text-xs font-bold border border-gray-800">
+                                                <span key={i} className="px-2 py-1 bg-surface-base text-text-muted rounded-full text-xs font-bold border border-border-strong">
                                                     {skill.trim()}
                                                 </span>
                                             ))}
@@ -1101,8 +1101,8 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
                             <div className="flex items-start gap-3">
                                 <MapPin className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
                                 <div className="flex-1">
-                                    <h3 className="font-bold text-gray-200 mb-2">Safe Meet-up Location</h3>
-                                    <p className="text-gray-400 mb-3">{item.meetupLocation}</p>
+                                    <h3 className="font-bold text-text-main mb-2">Safe Meet-up Location</h3>
+                                    <p className="text-text-muted mb-3">{item.meetupLocation}</p>
                                     {(item.meetupLat && item.meetupLng) ? (
                                         <div className="space-y-3">
                                             <div className="w-full h-48 rounded-lg overflow-hidden border-2 border-blue-300">
@@ -1146,13 +1146,13 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
                                                 setActiveTab('chat');
                                             }
                                         }}
-                                        className="flex-1 bg-[#121212] border-2 border-blue-600 text-blue-600 font-bold py-4 rounded-xl hover:bg-blue-50 transition flex items-center justify-center gap-2 text-lg"
+                                        className="flex-1 bg-surface-base border-2 border-blue-600 text-blue-600 font-bold py-4 rounded-xl hover:bg-blue-50 transition flex items-center justify-center gap-2 text-lg"
                                     >
                                         <MessageCircle className="w-5 h-5" />
                                         Contact Seller
                                     </button>
                                 )}
-                                <button onClick={() => onReport(item)} className="px-4 bg-gray-900 text-gray-400 font-bold py-4 rounded-xl hover:bg-gray-200 transition">
+                                <button onClick={() => onReport(item)} className="px-4 bg-gray-900 text-text-muted font-bold py-4 rounded-xl hover:bg-gray-200 transition">
                                     <Flag className="w-5 h-5" />
                                 </button>
                             </>
@@ -1266,8 +1266,8 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-[#121212] rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
-                <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#1A1A1A]">
+            <div className="bg-surface-base rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+                <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
                     <h3 className="font-bold text-lg text-gray-300">
                         {step === 1 && 'Select Payment Method'}
                         {step === 2 && 'Confirm Order'}
@@ -1280,17 +1280,17 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
                     {/* Step 1: Payment Method Selection */}
                     {step === 1 && (
                         <div className="space-y-4">
-                            <div className="bg-[#1A1A1A] rounded-xl p-4 mb-4">
+                            <div className="bg-surface-elevated rounded-xl p-4 mb-4">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-gray-400 font-medium">{item.title}</span>
+                                    <span className="text-text-muted font-medium">{item.title}</span>
                                     <span className="text-blue-600 font-bold text-lg">₹{item.price}</span>
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-3">Choose Payment Method</label>
+                                <label className="block text-sm font-bold text-text-muted mb-3">Choose Payment Method</label>
                                 <div className="space-y-3">
-                                    <label className="flex items-center gap-3 p-4 border-2 border-gray-800 rounded-xl cursor-pointer hover:border-blue-500 transition">
+                                    <label className="flex items-center gap-3 p-4 border-2 border-border-strong rounded-xl cursor-pointer hover:border-blue-500 transition">
                                         <input
                                             type="radio"
                                             name="payment"
@@ -1299,14 +1299,14 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
                                             onChange={(e) => setPaymentMethod(e.target.value)}
                                             className="w-5 h-5 text-blue-600"
                                         />
-                                        <CreditCard className="w-5 h-5 text-gray-400" />
+                                        <CreditCard className="w-5 h-5 text-text-muted" />
                                         <div className="flex-1">
-                                            <div className="font-bold text-gray-200">Cash on Delivery</div>
+                                            <div className="font-bold text-text-main">Cash on Delivery</div>
                                             <div className="text-xs text-gray-500">Pay when you meet the seller</div>
                                         </div>
                                     </label>
 
-                                    <label className="flex items-center gap-3 p-4 border-2 border-gray-800 rounded-xl cursor-pointer hover:border-blue-500 transition">
+                                    <label className="flex items-center gap-3 p-4 border-2 border-border-strong rounded-xl cursor-pointer hover:border-blue-500 transition">
                                         <input
                                             type="radio"
                                             name="payment"
@@ -1315,9 +1315,9 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
                                             onChange={(e) => setPaymentMethod(e.target.value)}
                                             className="w-5 h-5 text-blue-600"
                                         />
-                                        <QrCode className="w-5 h-5 text-gray-400" />
+                                        <QrCode className="w-5 h-5 text-text-muted" />
                                         <div className="flex-1">
-                                            <div className="font-bold text-gray-200">UPI / QR Pay</div>
+                                            <div className="font-bold text-text-main">UPI / QR Pay</div>
                                             <div className="text-xs text-gray-500">Pay via UPI before meeting</div>
                                         </div>
                                     </label>
@@ -1328,9 +1328,9 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
                                 <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
                                     <div className="text-xs font-bold text-blue-700 uppercase mb-2">Seller UPI ID</div>
                                     <div className="font-mono text-lg font-bold text-blue-900 mb-3">{sellerProfile.upiId}</div>
-                                    <div className="bg-[#121212] p-4 rounded-lg border border-blue-200 flex items-center justify-center">
+                                    <div className="bg-surface-base p-4 rounded-lg border border-blue-200 flex items-center justify-center">
                                         <div className="text-center">
-                                            <QrCode className="w-24 h-24 text-gray-400 mx-auto mb-2" />
+                                            <QrCode className="w-24 h-24 text-text-muted mx-auto mb-2" />
                                             <div className="text-xs text-gray-500">QR Code Placeholder</div>
                                         </div>
                                     </div>
@@ -1356,24 +1356,24 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
                     {/* Step 2: Confirmation */}
                     {step === 2 && (
                         <div className="space-y-4">
-                            <div className="bg-[#1A1A1A] rounded-xl p-4">
-                                <h4 className="font-bold text-gray-200 mb-3">Order Summary</h4>
+                            <div className="bg-surface-elevated rounded-xl p-4">
+                                <h4 className="font-bold text-text-main mb-3">Order Summary</h4>
                                 <div className="space-y-2 text-sm">
                                     <div className="flex justify-between">
-                                        <span className="text-gray-400">Item:</span>
+                                        <span className="text-text-muted">Item:</span>
                                         <span className="font-bold">{item.title}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-400">Price:</span>
+                                        <span className="text-text-muted">Price:</span>
                                         <span className="font-bold">₹{item.price}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-400">Payment:</span>
+                                        <span className="text-text-muted">Payment:</span>
                                         <span className="font-bold">{paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI / QR Pay'}</span>
                                     </div>
                                     {item.meetupLocation && (
                                         <div className="flex justify-between">
-                                            <span className="text-gray-400">Meet-up:</span>
+                                            <span className="text-text-muted">Meet-up:</span>
                                             <span className="font-bold text-xs">{item.meetupLocation}</span>
                                         </div>
                                     )}
@@ -1383,7 +1383,7 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => setStep(1)}
-                                    className="flex-1 bg-gray-200 text-gray-400 font-bold py-3 rounded-xl hover:bg-gray-300 transition"
+                                    className="flex-1 bg-gray-200 text-text-muted font-bold py-3 rounded-xl hover:bg-gray-300 transition"
                                 >
                                     Back
                                 </button>
@@ -1414,7 +1414,7 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
                             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
                                 <CheckCircle className="w-10 h-10 text-green-600" />
                             </div>
-                            <h3 className="text-2xl font-black text-gray-200">Order Confirmed!</h3>
+                            <h3 className="text-2xl font-black text-text-main">Order Confirmed!</h3>
 
                             <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
                                 <div className="text-xs font-bold text-blue-700 uppercase mb-3">Your Delivery OTP</div>
@@ -1514,8 +1514,8 @@ const MapPickerModal = ({ isOpen, onClose, onSelect, initialLocation }) => {
 
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-[#121212] rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
-                <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#1A1A1A]">
+            <div className="bg-surface-base rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
+                <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
                     <h3 className="font-bold text-lg text-gray-300">Pick Location on Map</h3>
                     <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
                 </div>
@@ -1523,36 +1523,36 @@ const MapPickerModal = ({ isOpen, onClose, onSelect, initialLocation }) => {
                 <div className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-120px)]">
                     <div className="space-y-3">
                         <div>
-                            <label className="block text-sm font-bold text-gray-400 mb-2">Location Name</label>
+                            <label className="block text-sm font-bold text-text-muted mb-2">Location Name</label>
                             <input
                                 type="text"
                                 value={locationName}
                                 onChange={(e) => setLocationName(e.target.value)}
-                                className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-3 text-sm outline-none focus:border-blue-500"
+                                className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500"
                                 placeholder="e.g. Library Entrance, Cafeteria"
                             />
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-2">Latitude</label>
+                                <label className="block text-sm font-bold text-text-muted mb-2">Latitude</label>
                                 <input
                                     type="number"
                                     step="any"
                                     value={coordinates.lat || ''}
                                     onChange={(e) => setCoordinates({ ...coordinates, lat: parseFloat(e.target.value) || null })}
-                                    className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-3 text-sm outline-none focus:border-blue-500"
+                                    className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500"
                                     placeholder="28.6139"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-2">Longitude</label>
+                                <label className="block text-sm font-bold text-text-muted mb-2">Longitude</label>
                                 <input
                                     type="number"
                                     step="any"
                                     value={coordinates.lng || ''}
                                     onChange={(e) => setCoordinates({ ...coordinates, lng: parseFloat(e.target.value) || null })}
-                                    className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-3 text-sm outline-none focus:border-blue-500"
+                                    className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500"
                                     placeholder="77.2090"
                                 />
                             </div>
@@ -1579,21 +1579,21 @@ const MapPickerModal = ({ isOpen, onClose, onSelect, initialLocation }) => {
                             </button>
                         </div>
 
-                        <div className="border-t border-gray-800 pt-3">
-                            <label className="block text-sm font-bold text-gray-400 mb-2">Or Search Location</label>
+                        <div className="border-t border-border-strong pt-3">
+                            <label className="block text-sm font-bold text-text-muted mb-2">Or Search Location</label>
                             <div className="flex gap-2">
                                 <input
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleSearchLocation()}
-                                    className="flex-1 bg-[#1A1A1A] border border-gray-800 rounded-lg p-3 text-sm outline-none focus:border-blue-500"
+                                    className="flex-1 bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500"
                                     placeholder="Search for a place..."
                                 />
                                 <button
                                     type="button"
                                     onClick={handleSearchLocation}
-                                    className="bg-gray-200 hover:bg-gray-300 text-gray-400 font-bold px-4 rounded-lg transition"
+                                    className="bg-gray-200 hover:bg-gray-300 text-text-muted font-bold px-4 rounded-lg transition"
                                 >
                                     Search
                                 </button>
@@ -1601,8 +1601,8 @@ const MapPickerModal = ({ isOpen, onClose, onSelect, initialLocation }) => {
                         </div>
 
                         {coordinates.lat && coordinates.lng && (
-                            <div className="border-t border-gray-800 pt-3">
-                                <label className="block text-sm font-bold text-gray-400 mb-2">Preview Map</label>
+                            <div className="border-t border-border-strong pt-3">
+                                <label className="block text-sm font-bold text-text-muted mb-2">Preview Map</label>
                                 <div className="w-full h-64 rounded-lg overflow-hidden border-2 border-blue-300">
                                     <iframe
                                         width="100%"
@@ -1618,10 +1618,10 @@ const MapPickerModal = ({ isOpen, onClose, onSelect, initialLocation }) => {
                         )}
                     </div>
 
-                    <div className="flex gap-3 pt-4 border-t border-gray-800">
+                    <div className="flex gap-3 pt-4 border-t border-border-strong">
                         <button
                             onClick={onClose}
-                            className="flex-1 bg-gray-200 text-gray-400 font-bold py-3 rounded-lg hover:bg-gray-300 transition"
+                            className="flex-1 bg-gray-200 text-text-muted font-bold py-3 rounded-lg hover:bg-gray-300 transition"
                         >
                             Cancel
                         </button>

@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import OverviewDashboard from './admin/OverviewDashboard';
+import EventCommandCenter from './admin/EventCommandCenter';
 import {
     Plus, Edit2, Trash2, Save, X, Shield, Lock,
     Calendar, Users, Clock, Tag, AlertCircle, CheckCircle, FileText, Download, XCircle,
-    UserPlus, Loader2, MessageSquare, Hash, Check, Image as ImageIcon, MapPin
+    UserPlus, Loader2, MessageSquare, Hash, Check, Image as ImageIcon, MapPin, LayoutDashboard, Tent, Megaphone, User, BookOpen, List, Package, GraduationCap, UserCog, MessageCircle, Menu, Search, Bell, MenuIcon, ChevronRight
 } from 'lucide-react';
 import { collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp, collectionGroup } from 'firebase/firestore';
 import { db, appId } from '../lib/firebase';
@@ -21,7 +23,7 @@ const ADMIN_EMAILS = [
 const isAdminUser = (email) => ADMIN_EMAILS.includes(email);
 
 export default function Admin({ user, userData, setActiveTab: setAppTab, setTargetClubId }) {
-    const [activeTab, setActiveTab] = useState('events'); // 'events' or 'users'
+    const [activeTab, setActiveTab] = useState('overview'); // 'events' or 'users'
     const [users, setUsers] = useState([]);
     const [usersLoading, setUsersLoading] = useState(true);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -31,6 +33,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAddingEvent, setIsAddingEvent] = useState(false);
+    const [selectedManageEvent, setSelectedManageEvent] = useState(null);
     const [editingEvent, setEditingEvent] = useState(null);
     const [formData, setFormData] = useState({
         title: '',
@@ -654,6 +657,37 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
         }
     };
 
+    
+    const downloadEventParticipants = async (eventId, eventTitle) => {
+        try {
+            // Check subcollection 'participants' for the event
+            const participantsRef = collection(db, 'artifacts', appId, 'events', eventId, 'participants');
+            const snap = await getDocs(participantsRef);
+            let csv = "Name,Email,Registered At\n";
+            if (snap.empty) {
+                toast.error('No participants found for this event.');
+                return;
+            }
+            snap.forEach(doc => {
+                const data = doc.data();
+                const name = data.name || 'Unknown';
+                const email = data.email || 'Unknown';
+                const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleString() : 'N/A';
+                csv += `"${name}","${email}","${date}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${eventTitle.replace(/\s+/g, '_')}_participants.csv`;
+            a.click();
+            toast.success('Downloaded participants CSV');
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error('Failed to export participants');
+        }
+    };
+
     const handleRevokeAdmin = async (adminId, adminEmail) => {
         // Prevent self-deletion
         if (adminEmail === user.email) {
@@ -870,13 +904,13 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
     // If not admin, show access denied
     if (!isAdmin) {
         return (
-            <div className="min-h-screen bg-[#1A1A1A] flex items-center justify-center p-6">
+            <div className="min-h-screen bg-surface-elevated flex items-center justify-center p-6">
                 <div className="text-center max-w-md">
                     <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <Lock className="w-10 h-10 text-red-600" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-200 mb-3">Access Denied</h2>
-                    <p className="text-gray-400 mb-6">You don't have permission to access the Admin Panel.</p>
+                    <h2 className="text-2xl font-bold text-text-main mb-3">Access Denied</h2>
+                    <p className="text-text-muted mb-6">You don't have permission to access the Admin Panel.</p>
                     <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
                         <div className="flex items-start gap-3">
                             <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
@@ -892,110 +926,76 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#eef5f1] to-[#f7f1e7] pb-24 px-3 md:px-6 pt-4 md:pt-6 max-w-7xl mx-auto">
-
-            {/* Header */}
-            <div className="mb-8">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-[#2D5A27] flex items-center justify-center">
-                            <Shield className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-2xl md:text-4xl font-black text-gray-200">Quantum Control</h1>
-                            <p className="text-sm md:text-base text-gray-400">Manage events and users</p>
-                        </div>
-                    </div>
-                    {activeTab === 'events' && (
-                        <button
-                            onClick={() => setIsAddingEvent(true)}
-                            className="w-full md:w-auto bg-[#2D5A27] hover:bg-[#386d31] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2"
-                        >
-                            <Plus className="w-5 h-5" /> Add Event
-                        </button>
-                    )}
-                    {activeTab === 'banners' && (
-                        <button
-                            onClick={() => setIsAddingBanner(true)}
-                            className="w-full md:w-auto bg-[#2D5A27] hover:bg-[#386d31] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2"
-                        >
-                            <Plus className="w-5 h-5" /> Add Banner
-                        </button>
-                    )}
-                </div>
-
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                    {/* Admin Badge */}
-                    <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full border border-green-200">
+                <div className="flex h-screen bg-surface-base overflow-hidden">
+            {/* Sidebar */}
+            <aside className="w-64 bg-surface-elevated border-r border-border-strong hidden md:flex flex-col">
+                <div className="p-6 pb-2">
+                    <h1 className="text-2xl font-black text-text-main flex items-center gap-2">
+                        <Shield className="w-6 h-6 text-brand-accent" />
+                        Quantum
+                    </h1>
+                    <div className="mt-4 inline-flex items-center gap-2 bg-brand-accent/10 text-brand-accent px-3 py-1.5 rounded-full border border-brand-accent/20">
                         <CheckCircle className="w-4 h-4" />
-                        <span className="text-sm font-bold">Logged in as Admin</span>
-                    </div>
-
-                    {/* Tabs */}
-                    <div className="w-full md:w-auto flex bg-[#121212] p-1 rounded-xl border border-gray-800 shadow-sm overflow-x-auto">
-                        <button
-                            onClick={() => setActiveTab('clubs')}
-                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'clubs' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
-                        >
-                            Clubs
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('events')}
-                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'events' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
-                        >
-                            Events
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('users')}
-                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'users' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
-                        >
-                            Users ({users.length})
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('banners')}
-                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'banners' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
-                        >
-                            Banners
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('notes')}
-                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'notes' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
-                        >
-                            Notes
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('notes_categories')}
-                            className={`min-w-[140px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'notes_categories' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
-                        >
-                            Notes Categories
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('lostfound')}
-                            className={`min-w-[120px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'lostfound' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
-                        >
-                            Lost & Found
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('scholarships')}
-                            className={`min-w-[128px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'scholarships' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
-                        >
-                            Scholarships
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('admins')}
-                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'admins' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
-                        >
-                            Admins
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('chat_groups')}
-                            className={`min-w-[120px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'chat_groups' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
-                        >
-                            Chat Groups
-                        </button>
+                        <span className="text-xs font-bold">Admin Privileges</span>
                     </div>
                 </div>
-            </div>
+                <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                    {[
+                        { id: 'overview', label: 'Overview', icon: <LayoutDashboard className="w-5 h-5" /> },
+                        { id: 'clubs', label: 'Clubs', icon: <Tent className="w-5 h-5" /> },
+                        { id: 'events', label: 'Events', icon: <Megaphone className="w-5 h-5" /> },
+                        { id: 'users', label: 'Users', icon: <User className="w-5 h-5" /> },
+                        { id: 'banners', label: 'Banners', icon: <ImageIcon className="w-5 h-5" /> },
+                        { id: 'notes', label: 'Notes', icon: <BookOpen className="w-5 h-5" /> },
+                        { id: 'notes_categories', label: 'Notes Categories', icon: <List className="w-5 h-5" /> },
+                        { id: 'lostfound', label: 'Lost & Found', icon: <Package className="w-5 h-5" /> },
+                        { id: 'scholarships', label: 'Scholarships', icon: <GraduationCap className="w-5 h-5" /> },
+                        { id: 'admins', label: 'Admins', icon: <UserCog className="w-5 h-5" /> },
+                        { id: 'chat_groups', label: 'Chat Groups', icon: <MessageCircle className="w-5 h-5" /> }
+                    ].map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition ${activeTab === tab.id ? 'bg-brand-accent text-white shadow-md' : 'text-text-muted hover:bg-surface-highlight hover:text-text-main'}`}
+                        >
+                            {tab.icon}
+                            {tab.label}
+                        </button>
+                    ))}
+                </nav>
+            </aside>
+
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                {/* Topbar */}
+                <header className="h-16 bg-surface-elevated border-b border-border-strong flex items-center justify-between px-6 z-10 shrink-0">
+                    <div className="flex items-center gap-4 flex-1">
+                        <Search className="w-5 h-5 text-text-muted" />
+                        <input type="text" placeholder="Search across platform..." className="bg-transparent border-none text-sm text-text-main focus:outline-none w-full max-w-md placeholder-text-muted" />
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <button className="p-2 text-text-muted hover:text-text-main hover:bg-surface-highlight rounded-full transition">
+                            <Bell className="w-5 h-5" />
+                        </button>
+                        <div className="h-6 w-px bg-border-strong mx-2"></div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setIsAddingEvent(true)}
+                                className="bg-brand-accent hover:bg-brand-accent/90 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-2"
+                            >
+                                <Plus className="w-4 h-4" /> Create Event
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                {/* Content Area */}
+                <main className="flex-1 overflow-y-auto p-6 relative">
+                    
+                    {/* Overview Tab */}
+                    {activeTab === 'overview' && (
+                        <OverviewDashboard users={users} events={events} notes={notes} />
+                    )}
 
             {/* Clubs Management Tab */}
             {activeTab === 'clubs' && (
@@ -1007,29 +1007,29 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
             {/* Add/Edit Event Form */}
             {isAddingEvent && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className="bg-[#121212] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-                        <div className="p-6 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-[#121212] z-10">
-                            <h3 className="font-bold text-xl text-gray-200">
+                    <div className="bg-surface-base rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+                        <div className="p-6 border-b border-border-strong flex justify-between items-center sticky top-0 bg-surface-base z-10">
+                            <h3 className="font-bold text-xl text-text-main">
                                 {editingEvent ? 'Edit Event' : 'Add New Event'}
                             </h3>
                             <button onClick={handleCancel}>
-                                <X className="w-6 h-6 text-gray-500 hover:text-gray-400" />
+                                <X className="w-6 h-6 text-gray-500 hover:text-text-muted" />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             {/* Image Upload */}
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-2">Event Image</label>
+                                <label className="block text-sm font-bold text-text-muted mb-2">Event Image</label>
                                 <div
                                     onClick={() => fileInputRef.current.click()}
-                                    className="border-2 border-dashed border-gray-700 bg-[#242424] text-white rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 transition relative overflow-hidden"
+                                    className="border-2 border-dashed border-border-subtle bg-surface-highlight text-white rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 transition relative overflow-hidden"
                                 >
                                     {formData.image ? (
                                         <img src={getOptimizedImageUrl(formData.image, '16:9')} className="w-full h-full object-contain" alt="Preview" />
                                     ) : (
                                         <>
-                                            <ImageIcon className="w-10 h-10 text-gray-400 mb-2" />
+                                            <ImageIcon className="w-10 h-10 text-text-muted mb-2" />
                                             <span className="text-sm text-gray-500">Click to upload image</span>
                                         </>
                                     )}
@@ -1048,22 +1048,22 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-400 mb-2">Event Title *</label>
+                                    <label className="block text-sm font-bold text-text-muted mb-2">Event Title *</label>
                                     <input
                                         required
                                         value={formData.title}
                                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., Hackathon Night"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-400 mb-2">Event Type *</label>
+                                    <label className="block text-sm font-bold text-text-muted mb-2">Event Type *</label>
                                     <input
                                         required
                                         value={formData.type}
                                         onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., Workshop, Competition"
                                     />
                                 </div>
@@ -1071,45 +1071,45 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-400 mb-2">Date & Time *</label>
+                                    <label className="block text-sm font-bold text-text-muted mb-2">Date & Time *</label>
                                     <input
                                         required
                                         value={formData.date}
                                         onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., Dec 5, 3 PM"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-400 mb-2">Location *</label>
+                                    <label className="block text-sm font-bold text-text-muted mb-2">Location *</label>
                                     <input
                                         required
                                         value={formData.location}
                                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., CS Lab 301"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-2">Description</label>
+                                <label className="block text-sm font-bold text-text-muted mb-2">Description</label>
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     rows="3"
-                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent resize-none"
+                                    className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent resize-none"
                                     placeholder="Event description..."
                                 />
                             </div>
 
                             <div className="grid grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-400 mb-2">Category</label>
+                                    <label className="block text-sm font-bold text-text-muted mb-2">Category</label>
                                     <select
                                         value={formData.category}
                                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                     >
                                         <option>Tech</option>
                                         <option>Arts</option>
@@ -1119,11 +1119,11 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-400 mb-2">Color</label>
+                                    <label className="block text-sm font-bold text-text-muted mb-2">Color</label>
                                     <select
                                         value={formData.color}
                                         onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                     >
                                         <option value="blue">Blue</option>
                                         <option value="orange">Orange</option>
@@ -1134,12 +1134,12 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-400 mb-2">Attendees</label>
+                                    <label className="block text-sm font-bold text-text-muted mb-2">Attendees</label>
                                     <input
                                         type="number"
                                         value={formData.attendees}
                                         onChange={(e) => setFormData({ ...formData, attendees: e.target.value })}
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="0"
                                     />
                                 </div>
@@ -1151,15 +1151,15 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                     id="featured"
                                     checked={formData.featured}
                                     onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                                    className="w-4 h-4 text-[#2D5A27] rounded focus:ring-2 focus:ring-[#2D5A27]"
+                                    className="w-4 h-4 text-brand-accent rounded focus:ring-2 focus:ring-[#2D5A27]"
                                 />
-                                <label htmlFor="featured" className="text-sm font-bold text-gray-400">Mark as Featured Event</label>
+                                <label htmlFor="featured" className="text-sm font-bold text-text-muted">Mark as Featured Event</label>
                             </div>
 
                             <div className="flex gap-3 pt-4">
                                 <button
                                     type="submit"
-                                    className="flex-1 bg-[#2D5A27] hover:bg-[#386d31] text-white py-3 rounded-xl font-bold hover:shadow-lg transition"
+                                    className="flex-1 bg-brand-accent hover:bg-[#386d31] text-white py-3 rounded-xl font-bold hover:shadow-lg transition"
                                 >
                                     <Save className="w-5 h-5 inline mr-2" />
                                     {editingEvent ? 'Update Event' : 'Add Event'}
@@ -1167,7 +1167,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                 <button
                                     type="button"
                                     onClick={handleCancel}
-                                    className="px-6 bg-gray-200 text-gray-400 rounded-xl font-bold hover:bg-gray-300 transition"
+                                    className="px-6 bg-gray-200 text-text-muted rounded-xl font-bold hover:bg-gray-300 transition"
                                 >
                                     Cancel
                                 </button>
@@ -1180,13 +1180,13 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
             {/* Add/Edit Banner Modal */}
             {isAddingBanner && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#121212] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-800">
-                        <div className="p-6 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-[#121212] z-10">
-                            <h3 className="font-bold text-xl text-gray-200">
+                    <div className="bg-surface-base rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-border-strong">
+                        <div className="p-6 border-b border-border-strong flex justify-between items-center sticky top-0 bg-surface-base z-10">
+                            <h3 className="font-bold text-xl text-text-main">
                                 {editingBanner ? 'Edit Banner' : 'Add New Banner'}
                             </h3>
                             <button onClick={() => { setIsAddingBanner(false); setEditingBanner(null); }}>
-                                <X className="w-6 h-6 text-gray-500 hover:text-gray-400" />
+                                <X className="w-6 h-6 text-gray-500 hover:text-text-muted" />
                             </button>
                         </div>
 
@@ -1197,14 +1197,14 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                     <label className="block text-sm font-bold text-gray-300 mb-2">Desktop Banner Image *</label>
                                     <div
                                         onClick={() => desktopBannerFileInputRef.current.click()}
-                                        className="border-2 border-dashed border-gray-700 rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:border-[#2D5A27] transition relative overflow-hidden bg-[#1A1A1A]"
+                                        className="border-2 border-dashed border-border-subtle rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:border-[#2D5A27] transition relative overflow-hidden bg-surface-elevated"
                                     >
                                         {bannerFormData.desktopImage || bannerFormData.image ? (
                                             <img src={getOptimizedImageUrl(bannerFormData.desktopImage || bannerFormData.image, '16:9')} className="w-full h-full object-contain" alt="Preview" />
                                         ) : (
                                             <>
                                                 <ImageIcon className="w-10 h-10 text-gray-500 mb-2" />
-                                                <span className="text-sm text-gray-400">Click to upload</span>
+                                                <span className="text-sm text-text-muted">Click to upload</span>
                                             </>
                                         )}
                                         <input
@@ -1223,14 +1223,14 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                     <label className="block text-sm font-bold text-gray-300 mb-2">Mobile Banner Image *</label>
                                     <div
                                         onClick={() => mobileBannerFileInputRef.current.click()}
-                                        className="border-2 border-dashed border-gray-700 rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:border-[#2D5A27] transition relative overflow-hidden bg-[#1A1A1A]"
+                                        className="border-2 border-dashed border-border-subtle rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:border-[#2D5A27] transition relative overflow-hidden bg-surface-elevated"
                                     >
                                         {bannerFormData.mobileImage ? (
                                             <img src={getOptimizedImageUrl(bannerFormData.mobileImage, '16:9')} className="w-full h-full object-contain" alt="Preview" />
                                         ) : (
                                             <>
                                                 <ImageIcon className="w-10 h-10 text-gray-500 mb-2" />
-                                                <span className="text-sm text-gray-400">Click to upload</span>
+                                                <span className="text-sm text-text-muted">Click to upload</span>
                                             </>
                                         )}
                                         <input
@@ -1249,22 +1249,22 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-400 mb-2">Title *</label>
+                                    <label className="block text-sm font-bold text-text-muted mb-2">Title *</label>
                                     <input
                                         required
                                         value={bannerFormData.title}
                                         onChange={(e) => setBannerFormData({ ...bannerFormData, title: e.target.value })}
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., Hackathon 2025"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-400 mb-2">Subtitle *</label>
+                                    <label className="block text-sm font-bold text-text-muted mb-2">Subtitle *</label>
                                     <input
                                         required
                                         value={bannerFormData.subtitle}
                                         onChange={(e) => setBannerFormData({ ...bannerFormData, subtitle: e.target.value })}
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., Win big prizes!"
                                     />
                                 </div>
@@ -1272,21 +1272,21 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-400 mb-2">CTA Text</label>
+                                    <label className="block text-sm font-bold text-text-muted mb-2">CTA Text</label>
                                     <input
                                         value={bannerFormData.cta}
                                         onChange={(e) => setBannerFormData({ ...bannerFormData, cta: e.target.value })}
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., Register Now"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-400 mb-2">CTA Link</label>
+                                    <label className="block text-sm font-bold text-text-muted mb-2">CTA Link</label>
                                     <input
                                         type="url"
                                         value={bannerFormData.link}
                                         onChange={(e) => setBannerFormData({ ...bannerFormData, link: e.target.value })}
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="https://example.com/register"
                                     />
                                 </div>
@@ -1294,22 +1294,22 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-400 mb-2">Badge Text</label>
+                                    <label className="block text-sm font-bold text-text-muted mb-2">Badge Text</label>
                                     <input
                                         value={bannerFormData.badge}
                                         onChange={(e) => setBannerFormData({ ...bannerFormData, badge: e.target.value })}
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., FEATURED"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-2">Gradient Color</label>
+                                <label className="block text-sm font-bold text-text-muted mb-2">Gradient Color</label>
                                 <select
                                     value={bannerFormData.color}
                                     onChange={(e) => setBannerFormData({ ...bannerFormData, color: e.target.value })}
-                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
+                                    className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                 >
                                     <option value="from-blue-900 to-slate-900">Blue Night</option>
                                     <option value="from-purple-900 to-indigo-900">Purple Haze</option>
@@ -1322,7 +1322,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                             <div className="flex gap-3 pt-4">
                                 <button
                                     type="submit"
-                                    className="flex-1 bg-[#2D5A27] hover:bg-[#386d31] text-white py-3 rounded-xl font-bold hover:shadow-lg transition"
+                                    className="flex-1 bg-brand-accent hover:bg-[#386d31] text-white py-3 rounded-xl font-bold hover:shadow-lg transition"
                                 >
                                     <Save className="w-5 h-5 inline mr-2" />
                                     {editingBanner ? 'Update Banner' : 'Add Banner'}
@@ -1330,7 +1330,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                 <button
                                     type="button"
                                     onClick={() => { setIsAddingBanner(false); setEditingBanner(null); }}
-                                    className="px-6 bg-gray-200 text-gray-400 rounded-xl font-bold hover:bg-gray-300 transition"
+                                    className="px-6 bg-gray-200 text-text-muted rounded-xl font-bold hover:bg-gray-300 transition"
                                 >
                                     Cancel
                                 </button>
@@ -1343,7 +1343,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
             {/* User Detail Modal */}
             {isUserModalOpen && selectedUser && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className="bg-[#121212] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95">
+                    <div className="bg-surface-base rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95">
                         <div className="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600">
                             <button
                                 onClick={() => setIsUserModalOpen(false)}
@@ -1358,40 +1358,40 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                     {selectedUser.profileImage ? (
                                         <img src={selectedUser.profileImage} className="w-full h-full object-cover" alt={selectedUser.name} />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gray-900 text-gray-400">
+                                        <div className="w-full h-full flex items-center justify-center bg-gray-900 text-text-muted">
                                             <Users className="w-12 h-12" />
                                         </div>
                                     )}
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-200 mt-2">{selectedUser.name}</h3>
+                                <h3 className="text-xl font-bold text-text-main mt-2">{selectedUser.name}</h3>
                                 <p className="text-blue-600 font-medium text-sm">@{selectedUser.username || 'username'}</p>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4 text-center">
-                                    <div className="bg-[#1A1A1A] p-3 rounded-xl">
+                                    <div className="bg-surface-elevated p-3 rounded-xl">
                                         <p className="text-xs text-gray-500 uppercase font-bold">Branch</p>
-                                        <p className="font-bold text-gray-200">{selectedUser.branch || 'N/A'}</p>
+                                        <p className="font-bold text-text-main">{selectedUser.branch || 'N/A'}</p>
                                     </div>
-                                    <div className="bg-[#1A1A1A] p-3 rounded-xl">
+                                    <div className="bg-surface-elevated p-3 rounded-xl">
                                         <p className="text-xs text-gray-500 uppercase font-bold">Year</p>
-                                        <p className="font-bold text-gray-200">{selectedUser.year || 'N/A'}</p>
+                                        <p className="font-bold text-text-main">{selectedUser.year || 'N/A'}</p>
                                     </div>
                                 </div>
 
                                 <div>
                                     <p className="text-xs text-gray-500 uppercase font-bold mb-1">Email</p>
-                                    <p className="text-gray-200 text-sm font-medium">{selectedUser.email}</p>
+                                    <p className="text-text-main text-sm font-medium">{selectedUser.email}</p>
                                 </div>
 
                                 <div>
                                     <p className="text-xs text-gray-500 uppercase font-bold mb-1">Bio</p>
-                                    <p className="text-gray-400 text-sm bg-[#1A1A1A] p-3 rounded-xl">{selectedUser.bio || 'No bio available.'}</p>
+                                    <p className="text-text-muted text-sm bg-surface-elevated p-3 rounded-xl">{selectedUser.bio || 'No bio available.'}</p>
                                 </div>
 
                                 <div className="pt-2">
                                     <p className="text-xs text-gray-500 uppercase font-bold mb-2">Visibility</p>
-                                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${selectedUser.isVisibleInTeams !== false ? 'bg-green-100 text-green-700' : 'bg-gray-900 text-gray-400'}`}>
+                                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${selectedUser.isVisibleInTeams !== false ? 'bg-green-100 text-green-700' : 'bg-gray-900 text-text-muted'}`}>
                                         {selectedUser.isVisibleInTeams !== false ? <CheckCircle className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
                                         {selectedUser.isVisibleInTeams !== false ? 'Visible in Teams' : 'Hidden from Teams'}
                                     </div>
@@ -1405,8 +1405,8 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
             {/* Content Area */}
             {activeTab === 'events' ? (
                 /* Events List */
-                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
-                    <h2 className="text-xl font-bold text-gray-200 mb-4">All Events ({events.length})</h2>
+                <div className="bg-surface-base rounded-2xl shadow-lg border border-border-strong p-6">
+                    <h2 className="text-xl font-bold text-text-main mb-4">All Events ({events.length})</h2>
 
                     {loading ? (
                         <div className="text-center py-12">
@@ -1421,7 +1421,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                     ) : (
                         <div className="space-y-4">
                             {events.map(event => (
-                                <div key={event.id} className="border border-gray-800 rounded-xl p-4 flex items-center gap-4 hover:shadow-md transition">
+                                <div key={event.id} className="border border-border-strong rounded-xl p-4 flex items-center gap-4 hover:shadow-md transition">
                                     {event.image && (
                                         <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-900">
                                             <img src={getOptimizedImageUrl(event.image, '16:9')} alt={event.title} className="w-full h-full object-cover" />
@@ -1430,17 +1430,17 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                     <div className="flex-1">
                                         <div className="flex items-start justify-between mb-2">
                                             <div>
-                                                <h3 className="font-bold text-gray-200 text-lg">{event.title}</h3>
+                                                <h3 className="font-bold text-text-main text-lg">{event.title}</h3>
                                                 <div className="flex gap-2 mt-1">
                                                     <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">{event.type}</span>
-                                                    <span className="text-xs bg-gray-900 text-gray-400 px-2 py-1 rounded-full font-bold">{event.category}</span>
+                                                    <span className="text-xs bg-gray-900 text-text-muted px-2 py-1 rounded-full font-bold">{event.category}</span>
                                                     {event.featured && (
                                                         <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-bold">Featured</span>
                                                     )}
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex gap-4 text-sm text-gray-400">
+                                        <div className="flex gap-4 text-sm text-text-muted">
                                             <span className="flex items-center gap-1">
                                                 <Clock className="w-4 h-4" /> {event.date}
                                             </span>
@@ -1463,6 +1463,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                         >
                                             {event.isRegistrationOpen !== false ? 'Open' : 'Closed'}
                                         </button>
+                                        <button onClick={() => setSelectedManageEvent(event)} className="px-3 py-1.5 bg-brand-accent/20 text-brand-accent hover:bg-brand-accent hover:text-white rounded-lg text-sm font-bold transition flex items-center gap-2" title="Command Center"><Users className="w-4 h-4" /> Manage</button>
                                         <button
                                             onClick={() => handleEdit(event)}
                                             className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
@@ -1483,8 +1484,8 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                 </div>
             ) : activeTab === 'banners' ? (
                 /* Banners List */
-                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
-                    <h2 className="text-xl font-bold text-gray-200 mb-4">Homepage Banners ({banners.length})</h2>
+                <div className="bg-surface-base rounded-2xl shadow-lg border border-border-strong p-6">
+                    <h2 className="text-xl font-bold text-text-main mb-4">Homepage Banners ({banners.length})</h2>
 
                     {bannersLoading ? (
                         <div className="text-center py-12">
@@ -1504,7 +1505,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                         <img src={getOptimizedImageUrl(banner.image, '16:9')} alt={banner.title} className="absolute inset-0 w-full h-full object-cover opacity-50" />
                                     )}
                                     <div className="absolute inset-0 p-6 flex flex-col justify-center text-white z-10">
-                                        <span className="text-xs font-bold bg-[#121212]/20 backdrop-blur-md px-2 py-1 rounded-full self-start mb-2">{banner.badge}</span>
+                                        <span className="text-xs font-bold bg-surface-base/20 backdrop-blur-md px-2 py-1 rounded-full self-start mb-2">{banner.badge}</span>
                                         <h3 className="text-2xl font-bold mb-1">{banner.title}</h3>
                                         <p className="text-sm opacity-90 mb-4">{banner.subtitle}</p>
                                         <button
@@ -1513,7 +1514,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                                     window.open(banner.link, '_blank', 'noopener,noreferrer');
                                                 }
                                             }}
-                                            className="bg-[#121212] text-gray-200 px-4 py-2 rounded-lg text-xs font-bold self-start disabled:opacity-70"
+                                            className="bg-surface-base text-text-main px-4 py-2 rounded-lg text-xs font-bold self-start disabled:opacity-70"
                                             disabled={!banner.link}
                                             title={banner.link ? 'Open CTA link' : 'Add CTA link to make this clickable'}
                                         >
@@ -1521,7 +1522,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                         </button>
                                     </div>
                                     <div className="absolute top-4 right-4 flex gap-2 z-20">
-                                        <button onClick={() => handleEditBanner(banner)} className="p-2 bg-[#121212]/20 hover:bg-[#121212]/30 rounded-full backdrop-blur-md text-white transition">
+                                        <button onClick={() => handleEditBanner(banner)} className="p-2 bg-surface-base/20 hover:bg-surface-base/30 rounded-full backdrop-blur-md text-white transition">
                                             <Edit2 className="w-4 h-4" />
                                         </button>
                                         <button onClick={() => handleDeleteBanner(banner.id)} className="p-2 bg-red-500/20 hover:bg-red-500/40 rounded-full backdrop-blur-md text-white transition">
@@ -1535,31 +1536,31 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                 </div>
             ) : activeTab === 'notes' ? (
                 /* Notes Review */
-                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
+                <div className="bg-surface-base rounded-2xl shadow-lg border border-border-strong p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
-                        <h2 className="text-xl font-bold text-gray-200">Notes Management ({notes.length})</h2>
+                        <h2 className="text-xl font-bold text-text-main">Notes Management ({notes.length})</h2>
                         <div className="flex gap-2 bg-gray-900 rounded-lg p-1 overflow-x-auto">
                             <button
                                 onClick={() => setNotesFilter('all')}
-                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'all' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'all' ? 'bg-surface-base text-text-main shadow' : 'text-text-muted'}`}
                             >
                                 All
                             </button>
                             <button
                                 onClick={() => setNotesFilter('pending')}
-                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'pending' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'pending' ? 'bg-surface-base text-text-main shadow' : 'text-text-muted'}`}
                             >
                                 Pending
                             </button>
                             <button
                                 onClick={() => setNotesFilter('approved')}
-                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'approved' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'approved' ? 'bg-surface-base text-text-main shadow' : 'text-text-muted'}`}
                             >
                                 Approved
                             </button>
                             <button
                                 onClick={() => setNotesFilter('rejected')}
-                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'rejected' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'rejected' ? 'bg-surface-base text-text-main shadow' : 'text-text-muted'}`}
                             >
                                 Rejected
                             </button>
@@ -1579,15 +1580,15 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                     ) : (
                         <div className="space-y-4">
                             {notes.filter(n => notesFilter === 'all' || n.status === notesFilter).map(note => (
-                                <div key={note.id} className="border border-gray-800 rounded-xl p-4 hover:shadow-md transition">
+                                <div key={note.id} className="border border-border-strong rounded-xl p-4 hover:shadow-md transition">
                                     <div className="flex items-start gap-4">
                                         <div className="w-16 h-16 bg-gray-900 rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <FileText className="w-8 h-8 text-gray-400" />
+                                            <FileText className="w-8 h-8 text-text-muted" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between mb-2">
                                                 <div>
-                                                    <h3 className="font-bold text-gray-200 text-lg mb-1">{note.title}</h3>
+                                                    <h3 className="font-bold text-text-main text-lg mb-1">{note.title}</h3>
                                                     <div className="flex gap-2 mb-2">
                                                         <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">
                                                             {note.subject}
@@ -1610,7 +1611,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                                     </div>
                                                 </div>
                                             </div>
-                                            <p className="text-sm text-gray-400 mb-2 line-clamp-2">{note.description || 'No description'}</p>
+                                            <p className="text-sm text-text-muted mb-2 line-clamp-2">{note.description || 'No description'}</p>
                                             <div className="flex gap-4 text-xs text-gray-500 mb-3">
                                                 <span>Uploaded by: {note.uploadedByName}</span>
                                                 <span>File: {note.fileName}</span>
@@ -1636,7 +1637,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                                 )}
                                                 <button
                                                     onClick={() => handleDeleteNote(note.id)}
-                                                    className="px-3 py-2 bg-gray-900 hover:bg-gray-200 text-gray-400 rounded-lg text-sm transition ml-auto"
+                                                    className="px-3 py-2 bg-gray-900 hover:bg-gray-200 text-text-muted rounded-lg text-sm transition ml-auto"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -1650,21 +1651,21 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                 </div>
             ) : activeTab === 'notes_categories' ? (
                 /* Notes Categories Management */
-                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
-                    <h2 className="text-xl font-bold text-gray-200 mb-6">Manage Notes Categories</h2>
+                <div className="bg-surface-base rounded-2xl shadow-lg border border-border-strong p-6">
+                    <h2 className="text-xl font-bold text-text-main mb-6">Manage Notes Categories</h2>
                     
-                    <form onSubmit={handleAddCategory} className="bg-[#1A1A1A] rounded-xl p-6 mb-8 border border-gray-800">
+                    <form onSubmit={handleAddCategory} className="bg-surface-elevated rounded-xl p-6 mb-8 border border-border-strong">
                         <h3 className="font-bold text-gray-300 mb-4 flex items-center gap-2">
-                            <Plus className="w-5 h-5 text-[#2D5A27]" />
+                            <Plus className="w-5 h-5 text-brand-accent" />
                             Add Missing Subject
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-2">Branch</label>
+                                <label className="block text-sm font-bold text-text-muted mb-2">Branch</label>
                                 <select
                                     value={categoryFormData.branch}
                                     onChange={(e) => setCategoryFormData({ ...categoryFormData, branch: e.target.value })}
-                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27] mb-2"
+                                    className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27] mb-2"
                                 >
                                     {Object.keys(notesCategories).map(branch => (
                                         <option key={branch} value={branch}>{branch}</option>
@@ -1677,16 +1678,16 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                         value={categoryFormData.customBranch}
                                         onChange={(e) => setCategoryFormData({ ...categoryFormData, customBranch: e.target.value })}
                                         placeholder="Enter new branch name..."
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27]"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27]"
                                     />
                                 )}
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-2">Semester</label>
+                                <label className="block text-sm font-bold text-text-muted mb-2">Semester</label>
                                 <select
                                     value={categoryFormData.semester}
                                     onChange={(e) => setCategoryFormData({ ...categoryFormData, semester: e.target.value })}
-                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27] mb-2"
+                                    className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27] mb-2"
                                 >
                                     {['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6', 'Sem 7', 'Sem 8'].map(sem => (
                                         <option key={sem} value={sem}>{sem}</option>
@@ -1699,23 +1700,23 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                         value={categoryFormData.customSemester}
                                         onChange={(e) => setCategoryFormData({ ...categoryFormData, customSemester: e.target.value })}
                                         placeholder="e.g. Sem 9"
-                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27]"
+                                        className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27]"
                                     />
                                 )}
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-2">New Subject Name</label>
+                                <label className="block text-sm font-bold text-text-muted mb-2">New Subject Name</label>
                                 <input
                                     required
                                     type="text"
                                     value={categoryFormData.subject}
                                     onChange={(e) => setCategoryFormData({ ...categoryFormData, subject: e.target.value })}
                                     placeholder="e.g. Advanced AI"
-                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27]"
+                                    className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27]"
                                 />
                             </div>
                         </div>
-                        <button type="submit" className="mt-4 bg-[#2D5A27] hover:bg-[#386d31] text-white px-6 py-2 rounded-lg font-bold transition">
+                        <button type="submit" className="mt-4 bg-brand-accent hover:bg-[#386d31] text-white px-6 py-2 rounded-lg font-bold transition">
                             Add Subject
                         </button>
                     </form>
@@ -1725,19 +1726,19 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                     ) : (
                         <div className="space-y-6">
                             {Object.entries(notesCategories).map(([branch, semesters]) => (
-                                <div key={branch} className="border border-gray-800 rounded-xl overflow-hidden">
-                                    <div className="bg-[#1A1A1A] px-4 py-3 border-b border-gray-800">
-                                        <h4 className="font-black text-gray-200">{branch}</h4>
+                                <div key={branch} className="border border-border-strong rounded-xl overflow-hidden">
+                                    <div className="bg-surface-elevated px-4 py-3 border-b border-border-strong">
+                                        <h4 className="font-black text-text-main">{branch}</h4>
                                     </div>
                                     <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                         {Object.entries(semesters).map(([sem, subjects]) => (
-                                            <div key={sem} className="bg-[#121212] border border-gray-800 shadow-sm rounded-lg p-3">
-                                                <h5 className="font-bold text-[#2D5A27] text-sm mb-2">{sem}</h5>
-                                                <ul className="text-sm text-gray-400 space-y-1">
+                                            <div key={sem} className="bg-surface-base border border-border-strong shadow-sm rounded-lg p-3">
+                                                <h5 className="font-bold text-brand-accent text-sm mb-2">{sem}</h5>
+                                                <ul className="text-sm text-text-muted space-y-1">
                                                     {subjects.map((sub, idx) => (
-                                                        <li key={idx} className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-[#2D5A27]"></div>{sub}</li>
+                                                        <li key={idx} className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-brand-accent"></div>{sub}</li>
                                                     ))}
-                                                    {subjects.length === 0 && <li className="text-gray-400 italic">No subjects added</li>}
+                                                    {subjects.length === 0 && <li className="text-text-muted italic">No subjects added</li>}
                                                 </ul>
                                             </div>
                                         ))}
@@ -1749,28 +1750,28 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                 </div>
             ) : activeTab === 'lostfound' ? (
                 /* Lost & Found Management */
-                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
+                <div className="bg-surface-base rounded-2xl shadow-lg border border-border-strong p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-200">Lost & Found Items</h2>
+                        <h2 className="text-2xl font-bold text-text-main">Lost & Found Items</h2>
                         <div className="flex gap-2 bg-gray-900 p-1 rounded-lg">
-                            <button onClick={() => setLostFoundFilter('all')} className={`px-3 py-1 text-xs font-bold rounded transition ${lostFoundFilter === 'all' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}>All</button>
-                            <button onClick={() => setLostFoundFilter('pending')} className={`px-3 py-1 text-xs font-bold rounded transition ${lostFoundFilter === 'pending' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}>Pending</button>
-                            <button onClick={() => setLostFoundFilter('approved')} className={`px-3 py-1 text-xs font-bold rounded transition ${lostFoundFilter === 'approved' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}>Approved</button>
+                            <button onClick={() => setLostFoundFilter('all')} className={`px-3 py-1 text-xs font-bold rounded transition ${lostFoundFilter === 'all' ? 'bg-surface-base text-text-main shadow' : 'text-text-muted'}`}>All</button>
+                            <button onClick={() => setLostFoundFilter('pending')} className={`px-3 py-1 text-xs font-bold rounded transition ${lostFoundFilter === 'pending' ? 'bg-surface-base text-text-main shadow' : 'text-text-muted'}`}>Pending</button>
+                            <button onClick={() => setLostFoundFilter('approved')} className={`px-3 py-1 text-xs font-bold rounded transition ${lostFoundFilter === 'approved' ? 'bg-surface-base text-text-main shadow' : 'text-text-muted'}`}>Approved</button>
                         </div>
                     </div>
                     {lostFoundLoading ? (
-                        <div className="text-center py-12"><Loader2 className="w-12 h-12 animate-spin text-[#2D5A27] mx-auto mb-4" /><p className="text-gray-500">Loading...</p></div>
+                        <div className="text-center py-12"><Loader2 className="w-12 h-12 animate-spin text-brand-accent mx-auto mb-4" /><p className="text-gray-500">Loading...</p></div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {lostFoundItems.filter(item => lostFoundFilter === 'all' || item.status === lostFoundFilter).map(item => (
-                                <div key={item.id} className="bg-[#1A1A1A] rounded-xl p-4 border border-gray-800">
+                                <div key={item.id} className="bg-surface-elevated rounded-xl p-4 border border-border-strong">
                                     {item.image && <img src={getOptimizedImageUrl(item.image, '4:3')} className="w-full h-32 object-cover rounded-lg mb-3" alt={item.itemName} />}
                                     <div className="flex items-center gap-2 mb-2">
                                         <span className={`text-xs font-bold px-2 py-1 rounded-full ${item.type === 'lost' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>{item.type.toUpperCase()}</span>
                                         <span className={`text-xs font-bold px-2 py-1 rounded-full ${item.status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>{item.status}</span>
                                     </div>
-                                    <h3 className="font-bold text-gray-200 mb-1">{item.itemName}</h3>
-                                    <p className="text-xs text-gray-400 mb-2 line-clamp-2">{item.description}</p>
+                                    <h3 className="font-bold text-text-main mb-1">{item.itemName}</h3>
+                                    <p className="text-xs text-text-muted mb-2 line-clamp-2">{item.description}</p>
                                     <p className="text-xs text-gray-500 mb-2">📍 {item.location} • 📅 {new Date(item.date).toLocaleDateString()}</p>
                                     <p className="text-xs text-gray-500 mb-3">👤 {item.postedByName}</p>
                                     <div className="flex gap-2">
@@ -1786,53 +1787,53 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                 </div>
             ) : activeTab === 'scholarships' ? (
                 /* Scholarship Management */
-                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
+                <div className="bg-surface-base rounded-2xl shadow-lg border border-border-strong p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-200">Scholarships</h2>
+                        <h2 className="text-2xl font-bold text-text-main">Scholarships</h2>
                         {!isAddingScholarship && (
-                            <button onClick={() => setIsAddingScholarship(true)} className="bg-[#2D5A27] hover:bg-[#386d31] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition flex items-center gap-2">
+                            <button onClick={() => setIsAddingScholarship(true)} className="bg-brand-accent hover:bg-[#386d31] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition flex items-center gap-2">
                                 <Plus className="w-5 h-5" /> Add Scholarship
                             </button>
                         )}
                     </div>
 
                     {isAddingScholarship && (
-                        <div className="bg-[#1A1A1A] rounded-xl p-6 mb-6 border border-gray-800">
-                            <h3 className="font-bold text-gray-200 mb-4">{editingScholarship ? 'Edit Scholarship' : 'Add New Scholarship'}</h3>
+                        <div className="bg-surface-elevated rounded-xl p-6 mb-6 border border-border-strong">
+                            <h3 className="font-bold text-text-main mb-4">{editingScholarship ? 'Edit Scholarship' : 'Add New Scholarship'}</h3>
                             <div className="grid grid-cols-2 gap-4">
-                                <input type="text" placeholder="Title *" value={scholarshipFormData.title} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, title: e.target.value })} className="border border-gray-700 bg-[#242424] text-white rounded-lg p-3" />
-                                <input type="text" placeholder="Provider" value={scholarshipFormData.provider} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, provider: e.target.value })} className="border border-gray-700 bg-[#242424] text-white rounded-lg p-3" />
-                                <input type="text" placeholder="Amount (₹50,000)" value={scholarshipFormData.amount} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, amount: e.target.value })} className="border border-gray-700 bg-[#242424] text-white rounded-lg p-3" />
-                                <input type="date" placeholder="Deadline" value={scholarshipFormData.deadline} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, deadline: e.target.value })} className="border border-gray-700 bg-[#242424] text-white rounded-lg p-3" />
-                                <input type="url" placeholder="Website URL" value={scholarshipFormData.website} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, website: e.target.value })} className="col-span-2 border border-gray-700 bg-[#242424] text-white rounded-lg p-3" />
-                                <textarea placeholder="Description" value={scholarshipFormData.description} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, description: e.target.value })} className="col-span-2 border border-gray-700 bg-[#242424] text-white rounded-lg p-3" rows="2"></textarea>
-                                <textarea placeholder="Eligibility Criteria" value={scholarshipFormData.eligibility} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, eligibility: e.target.value })} className="col-span-2 border border-gray-700 bg-[#242424] text-white rounded-lg p-3" rows="2"></textarea>
+                                <input type="text" placeholder="Title *" value={scholarshipFormData.title} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, title: e.target.value })} className="border border-border-subtle bg-surface-highlight text-white rounded-lg p-3" />
+                                <input type="text" placeholder="Provider" value={scholarshipFormData.provider} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, provider: e.target.value })} className="border border-border-subtle bg-surface-highlight text-white rounded-lg p-3" />
+                                <input type="text" placeholder="Amount (₹50,000)" value={scholarshipFormData.amount} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, amount: e.target.value })} className="border border-border-subtle bg-surface-highlight text-white rounded-lg p-3" />
+                                <input type="date" placeholder="Deadline" value={scholarshipFormData.deadline} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, deadline: e.target.value })} className="border border-border-subtle bg-surface-highlight text-white rounded-lg p-3" />
+                                <input type="url" placeholder="Website URL" value={scholarshipFormData.website} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, website: e.target.value })} className="col-span-2 border border-border-subtle bg-surface-highlight text-white rounded-lg p-3" />
+                                <textarea placeholder="Description" value={scholarshipFormData.description} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, description: e.target.value })} className="col-span-2 border border-border-subtle bg-surface-highlight text-white rounded-lg p-3" rows="2"></textarea>
+                                <textarea placeholder="Eligibility Criteria" value={scholarshipFormData.eligibility} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, eligibility: e.target.value })} className="col-span-2 border border-border-subtle bg-surface-highlight text-white rounded-lg p-3" rows="2"></textarea>
                             </div>
                             <div className="flex gap-2 mt-4">
                                 <button onClick={handleAddScholarship} className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition">
                                     {editingScholarship ? 'Update' : 'Save'}
                                 </button>
-                                <button onClick={() => { setIsAddingScholarship(false); setEditingScholarship(null); setScholarshipFormData({ title: '', description: '', amount: '', deadline: '', eligibility: '', website: '', provider: '' }); }} className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-400 rounded-lg font-bold transition">Cancel</button>
+                                <button onClick={() => { setIsAddingScholarship(false); setEditingScholarship(null); setScholarshipFormData({ title: '', description: '', amount: '', deadline: '', eligibility: '', website: '', provider: '' }); }} className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-text-muted rounded-lg font-bold transition">Cancel</button>
                             </div>
                         </div>
                     )}
 
                     {scholarshipsLoading ? (
-                        <div className="text-center py-12"><Loader2 className="w-12 h-12 animate-spin text-[#2D5A27] mx-auto mb-4" /><p className="text-gray-500">Loading...</p></div>
+                        <div className="text-center py-12"><Loader2 className="w-12 h-12 animate-spin text-brand-accent mx-auto mb-4" /><p className="text-gray-500">Loading...</p></div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {scholarships.map(scholarship => (
                                 <div key={scholarship.id} className="bg-gradient-to-br from-[#1A1A1A] to-[#242424] rounded-xl p-4 border border-[#333]">
-                                    <h3 className="font-bold text-gray-200 mb-2">{scholarship.title}</h3>
-                                    <p className="text-sm text-gray-400 mb-2">{scholarship.provider}</p>
-                                    <p className="text-xs text-gray-400 mb-2 line-clamp-2">{scholarship.description}</p>
-                                    <div className="space-y-1 text-xs text-gray-400 mb-3">
+                                    <h3 className="font-bold text-text-main mb-2">{scholarship.title}</h3>
+                                    <p className="text-sm text-text-muted mb-2">{scholarship.provider}</p>
+                                    <p className="text-xs text-text-muted mb-2 line-clamp-2">{scholarship.description}</p>
+                                    <div className="space-y-1 text-xs text-text-muted mb-3">
                                         <p>💰 {scholarship.amount}</p>
                                         <p>📅 Deadline: {new Date(scholarship.deadline).toLocaleDateString()}</p>
                                         <p className="line-clamp-1">✓ {scholarship.eligibility}</p>
                                     </div>
                                     {scholarship.website && (
-                                        <a href={scholarship.website} target="_blank" rel="noopener noreferrer" className="text-xs text-[#2D5A27] hover:underline mb-2 block">Visit Website →</a>
+                                        <a href={scholarship.website} target="_blank" rel="noopener noreferrer" className="text-xs text-brand-accent hover:underline mb-2 block">Visit Website →</a>
                                     )}
                                     <div className="flex gap-2 mt-3">
                                         <button onClick={() => handleEditScholarship(scholarship)} className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
@@ -1849,18 +1850,18 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                 </div>
             ) : activeTab === 'admins' ? (
                 /* Admin Management */
-                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
+                <div className="bg-surface-base rounded-2xl shadow-lg border border-border-strong p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-200 flex items-center gap-2">
-                            <Shield className="w-6 h-6 text-[#2D5A27]" />
+                        <h2 className="text-2xl font-bold text-text-main flex items-center gap-2">
+                            <Shield className="w-6 h-6 text-brand-accent" />
                             Admin Management
                         </h2>
                     </div>
 
                     {/* Add Admin Form */}
                     <div className="bg-gradient-to-r from-[#1A1A1A] to-[#242424] border border-[#333] rounded-xl p-6 mb-6">
-                        <h3 className="font-bold text-gray-200 mb-4 flex items-center gap-2">
-                            <UserPlus className="w-5 h-5 text-[#2D5A27]" />
+                        <h3 className="font-bold text-text-main mb-4 flex items-center gap-2">
+                            <UserPlus className="w-5 h-5 text-brand-accent" />
                             Grant Admin Access
                         </h3>
                         <div className="flex gap-3">
@@ -1870,67 +1871,67 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                 value={newAdminEmail}
                                 onChange={(e) => setNewAdminEmail(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleGrantAdmin()}
-                                className="flex-1 border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2D5A27]"
+                                className="flex-1 border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2D5A27]"
                             />
                             <button
                                 onClick={handleGrantAdmin}
-                                className="px-6 py-3 bg-[#2D5A27] hover:bg-[#386d31] text-white rounded-lg font-bold hover:shadow-lg transition flex items-center gap-2"
+                                className="px-6 py-3 bg-brand-accent hover:bg-[#386d31] text-white rounded-lg font-bold hover:shadow-lg transition flex items-center gap-2"
                             >
                                 <Plus className="w-5 h-5" />
                                 Grant Access
                             </button>
                         </div>
-                        <p className="text-xs text-gray-400 mt-2">
+                        <p className="text-xs text-text-muted mt-2">
                             💡 Tip: Enter the full email address of the user you want to make an admin
                         </p>
                     </div>
 
                     {/* Current Admins List */}
                     <div>
-                        <h3 className="font-bold text-gray-200 mb-4 flex items-center gap-2">
-                            <Users className="w-5 h-5 text-gray-400" />
+                        <h3 className="font-bold text-text-main mb-4 flex items-center gap-2">
+                            <Users className="w-5 h-5 text-text-muted" />
                             Current Admins ({admins.length + 2})
                         </h3>
 
                         {adminsLoading ? (
                             <div className="text-center py-8">
-                                <Loader2 className="w-8 h-8 animate-spin text-[#2D5A27] mx-auto mb-4" />
+                                <Loader2 className="w-8 h-8 animate-spin text-brand-accent mx-auto mb-4" />
                                 <p className="text-gray-500">Loading admins...</p>
                             </div>
                         ) : (
                             <div className="space-y-3">
                                 {/* Hardcoded Super Admins (Protected) */}
-                                <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between">
+                                <div className="bg-surface-elevated border border-brand-accent rounded-xl p-4 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold">SA</div>
+                                        <div className="w-10 h-10 rounded-full bg-brand-accent flex items-center justify-center text-white font-bold">SA</div>
                                         <div>
-                                            <p className="font-bold text-gray-200">{ADMIN_EMAILS[0]}</p>
-                                            <p className="text-xs text-gray-400">Super Admin (Protected)</p>
+                                            <p className="font-bold text-text-main">{ADMIN_EMAILS[0]}</p>
+                                            <p className="text-xs text-text-muted">Super Admin (Protected)</p>
                                         </div>
                                     </div>
-                                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Protected</span>
+                                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-brand-accent/20 text-brand-accent border border-brand-accent/30">Protected</span>
                                 </div>
 
-                                <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between">
+                                <div className="bg-surface-elevated border border-brand-accent rounded-xl p-4 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold">SA</div>
+                                        <div className="w-10 h-10 rounded-full bg-brand-accent flex items-center justify-center text-white font-bold">SA</div>
                                         <div>
-                                            <p className="font-bold text-gray-200">{ADMIN_EMAILS[1]}</p>
-                                            <p className="text-xs text-gray-400">Super Admin (Protected)</p>
+                                            <p className="font-bold text-text-main">{ADMIN_EMAILS[1]}</p>
+                                            <p className="text-xs text-text-muted">Super Admin (Protected)</p>
                                         </div>
                                     </div>
-                                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Protected</span>
+                                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-brand-accent/20 text-brand-accent border border-brand-accent/30">Protected</span>
                                 </div>
 
                                 {/* Dynamic Admins from Database */}
                                 {admins.map((admin) => (
-                                    <div key={admin.id} className="bg-[#121212] border border-gray-800 rounded-xl p-4 flex items-center justify-between hover:shadow-md transition">
+                                    <div key={admin.id} className="bg-surface-base border border-border-strong rounded-xl p-4 flex items-center justify-between hover:shadow-md transition">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-[#2D5A27]/20 flex items-center justify-center text-[#2D5A27] font-bold">
+                                            <div className="w-10 h-10 rounded-full bg-brand-accent/20 flex items-center justify-center text-brand-accent font-bold">
                                                 {admin.email[0].toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-gray-200">{admin.email}</p>
+                                                <p className="font-bold text-text-main">{admin.email}</p>
                                                 <p className="text-xs text-gray-500">
                                                     Added by {admin.grantedBy} •{' '}
                                                     {admin.grantedAt?.seconds ? new Date(admin.grantedAt.seconds * 1000).toLocaleDateString() : 'N/A'}
@@ -1948,7 +1949,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                 ))}
 
                                 {admins.length === 0 && (
-                                    <div className="text-center py-8 text-gray-400 bg-[#1A1A1A] rounded-xl border border-dashed border-gray-700 bg-[#242424] text-white">
+                                    <div className="text-center py-8 text-text-muted bg-surface-elevated rounded-xl border border-dashed border-border-subtle bg-surface-highlight text-white">
                                         <Shield className="w-12 h-12 mx-auto mb-2 opacity-20" />
                                         <p className="text-sm font-medium">No additional admins yet</p>
                                         <p className="text-xs mt-1">Use the form above to grant admin access</p>
@@ -1960,45 +1961,45 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                 </div>
             ) : activeTab === 'chat_groups' ? (
                 /* Chat Groups Management */
-                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
-                    <h2 className="text-2xl font-bold text-gray-200 mb-6 flex items-center gap-2">
-                        <MessageSquare className="w-6 h-6 text-[#2D5A27]" />
+                <div className="bg-surface-base rounded-2xl shadow-lg border border-border-strong p-6">
+                    <h2 className="text-2xl font-bold text-text-main mb-6 flex items-center gap-2">
+                        <MessageSquare className="w-6 h-6 text-brand-accent" />
                         Chat Groups Management
                     </h2>
 
                     {/* Create New Group Form */}
                     <form onSubmit={handleCreateChatGroup} className="bg-gradient-to-r from-[#1A1A1A] to-[#242424] border border-[#333] rounded-xl p-6 mb-8">
-                        <h3 className="font-bold text-gray-200 mb-4 flex items-center gap-2">
-                            <Plus className="w-5 h-5 text-[#2D5A27]" />
+                        <h3 className="font-bold text-text-main mb-4 flex items-center gap-2">
+                            <Plus className="w-5 h-5 text-brand-accent" />
                             Create New Public Channel
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-2">Channel Name</label>
+                                <label className="block text-sm font-bold text-text-muted mb-2">Channel Name</label>
                                 <input
                                     required
                                     type="text"
                                     value={newChatGroupName}
                                     onChange={(e) => setNewChatGroupName(e.target.value)}
-                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2D5A27]"
+                                    className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2D5A27]"
                                     placeholder="e.g. Competitive Programming"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-2">Description</label>
+                                <label className="block text-sm font-bold text-text-muted mb-2">Description</label>
                                 <input
                                     required
                                     type="text"
                                     value={newChatGroupDesc}
                                     onChange={(e) => setNewChatGroupDesc(e.target.value)}
-                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2D5A27]"
+                                    className="w-full border border-border-subtle bg-surface-highlight text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2D5A27]"
                                     placeholder="What is this channel about?"
                                 />
                             </div>
                         </div>
                         <button
                             type="submit"
-                            className="bg-[#2D5A27] hover:bg-[#386d31] text-white px-6 py-2 rounded-lg font-bold hover:shadow-lg transition"
+                            className="bg-brand-accent hover:bg-[#386d31] text-white px-6 py-2 rounded-lg font-bold hover:shadow-lg transition"
                         >
                             Create Channel
                         </button>
@@ -2006,9 +2007,9 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
 
                     {/* Pending Requests */}
                     <div className="mb-8">
-                        <h3 className="font-bold text-gray-200 mb-4">Pending Requests</h3>
+                        <h3 className="font-bold text-text-main mb-4">Pending Requests</h3>
                         {chatGroupsLoading ? (
-                            <div className="text-center py-4"><Loader2 className="w-6 h-6 animate-spin text-[#2D5A27] mx-auto" /></div>
+                            <div className="text-center py-4"><Loader2 className="w-6 h-6 animate-spin text-brand-accent mx-auto" /></div>
                         ) : chatGroups.filter(g => g.status === 'pending').length === 0 ? (
                             <p className="text-gray-500 text-sm">No pending requests.</p>
                         ) : (
@@ -2016,8 +2017,8 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                 {chatGroups.filter(g => g.status === 'pending').map(group => (
                                     <div key={group.id} className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                         <div>
-                                            <p className="font-bold text-gray-200">{group.name}</p>
-                                            <p className="text-sm text-gray-400">{group.description}</p>
+                                            <p className="font-bold text-text-main">{group.name}</p>
+                                            <p className="text-sm text-text-muted">{group.description}</p>
                                         </div>
                                         <div className="flex gap-2">
                                             <button onClick={() => handleApproveChatGroup(group.id)} className="px-4 py-2 bg-green-100 text-green-700 font-bold rounded-lg text-sm hover:bg-green-200 transition">Approve</button>
@@ -2031,18 +2032,18 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
 
                     {/* Active Channels */}
                     <div>
-                        <h3 className="font-bold text-gray-200 mb-4">Active Public Channels</h3>
+                        <h3 className="font-bold text-text-main mb-4">Active Public Channels</h3>
                         {chatGroupsLoading ? (
-                            <div className="text-center py-4"><Loader2 className="w-6 h-6 animate-spin text-[#2D5A27] mx-auto" /></div>
+                            <div className="text-center py-4"><Loader2 className="w-6 h-6 animate-spin text-brand-accent mx-auto" /></div>
                         ) : chatGroups.filter(g => g.status === 'active' && g.type === 'group').length === 0 ? (
                             <p className="text-gray-500 text-sm">No active channels.</p>
                         ) : (
                             <div className="space-y-3">
                                 {chatGroups.filter(g => g.status === 'active' && g.type === 'group').map(group => (
-                                    <div key={group.id} className="bg-[#121212] border border-gray-800 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div key={group.id} className="bg-surface-base border border-border-strong rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                         <div>
-                                            <p className="font-bold text-gray-200">{group.name}</p>
-                                            <p className="text-sm text-gray-400">{group.description}</p>
+                                            <p className="font-bold text-text-main">{group.name}</p>
+                                            <p className="text-sm text-text-muted">{group.description}</p>
                                         </div>
                                         <button onClick={() => handleRejectChatGroup(group.id)} className="px-3 py-1.5 bg-red-50 text-red-600 text-sm font-bold rounded hover:bg-red-100 transition">Delete</button>
                                     </div>
@@ -2053,8 +2054,8 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                 </div>
             ) : (
                 /* Users List */
-                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
-                    <h2 className="text-xl font-bold text-gray-200 mb-4">All Users ({users.length})</h2>
+                <div className="bg-surface-base rounded-2xl shadow-lg border border-border-strong p-6">
+                    <h2 className="text-xl font-bold text-text-main mb-4">All Users ({users.length})</h2>
 
                     {usersLoading ? (
                         <div className="text-center py-12">
@@ -2070,23 +2071,23 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                         <>
                             <div className="md:hidden space-y-3">
                                 {users.map(user => (
-                                    <div key={user.id} className="border border-gray-800 rounded-xl p-4 bg-[#1A1A1A]">
+                                    <div key={user.id} className="border border-border-strong rounded-xl p-4 bg-surface-elevated">
                                         <div className="flex items-center gap-3 mb-3">
                                             <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
                                                 {user.profileImage ? (
                                                     <img src={user.profileImage} className="w-full h-full object-cover" alt={user.name} />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center bg-[#2D5A27]/20 text-[#2D5A27] font-bold">
+                                                    <div className="w-full h-full flex items-center justify-center bg-brand-accent/20 text-brand-accent font-bold">
                                                         {user.name ? user.name[0] : 'U'}
                                                     </div>
                                                 )}
                                             </div>
                                             <div className="min-w-0">
-                                                <p className="font-bold text-gray-200 text-sm truncate">{user.name}</p>
+                                                <p className="font-bold text-text-main text-sm truncate">{user.name}</p>
                                                 <p className="text-xs text-gray-500 truncate">@{user.username || 'username'}</p>
                                             </div>
                                         </div>
-                                        <div className="space-y-1 text-xs text-gray-400 mb-3">
+                                        <div className="space-y-1 text-xs text-text-muted mb-3">
                                             <p className="truncate">Email: {user.email}</p>
                                             <p>Branch/Year: {user.branch || '-'} / {user.year || '-'}</p>
                                         </div>
@@ -2096,7 +2097,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                                     <CheckCircle className="w-3 h-3" /> Visible
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-900 text-gray-400 text-xs font-bold">
+                                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-900 text-text-muted text-xs font-bold">
                                                     <Lock className="w-3 h-3" /> Hidden
                                                 </span>
                                             )}
@@ -2106,7 +2107,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                                         setSelectedUser(user);
                                                         setIsUserModalOpen(true);
                                                     }}
-                                                    className="text-[#2D5A27] hover:text-indigo-800 font-bold text-xs"
+                                                    className="text-brand-accent hover:text-indigo-800 font-bold text-xs"
                                                 >
                                                     View
                                                 </button>
@@ -2125,7 +2126,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                             <div className="hidden md:block overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="border-b border-gray-800">
+                                    <tr className="border-b border-border-strong">
                                         <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase">User</th>
                                         <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase">Branch/Year</th>
                                         <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase">Email</th>
@@ -2135,36 +2136,36 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                 </thead>
                                 <tbody>
                                     {users.map(user => (
-                                        <tr key={user.id} className="border-b border-gray-50 hover:bg-[#1A1A1A] transition">
+                                        <tr key={user.id} className="border-b border-gray-50 hover:bg-surface-elevated transition">
                                             <td className="py-3 px-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
                                                         {user.profileImage ? (
                                                             <img src={user.profileImage} className="w-full h-full object-cover" alt={user.name} />
                                                         ) : (
-                                                            <div className="w-full h-full flex items-center justify-center bg-[#2D5A27]/20 text-[#2D5A27] font-bold">
+                                                            <div className="w-full h-full flex items-center justify-center bg-brand-accent/20 text-brand-accent font-bold">
                                                                 {user.name ? user.name[0] : 'U'}
                                                             </div>
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <p className="font-bold text-gray-200 text-sm">{user.name}</p>
+                                                        <p className="font-bold text-text-main text-sm">{user.name}</p>
                                                         <p className="text-xs text-gray-500">@{user.username || 'username'}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="py-3 px-4">
-                                                <p className="text-sm text-gray-400">{user.branch || '-'}</p>
+                                                <p className="text-sm text-text-muted">{user.branch || '-'}</p>
                                                 <p className="text-xs text-gray-500">{user.year || '-'}</p>
                                             </td>
-                                            <td className="py-3 px-4 text-sm text-gray-400">{user.email}</td>
+                                            <td className="py-3 px-4 text-sm text-text-muted">{user.email}</td>
                                             <td className="py-3 px-4">
                                                 {user.isVisibleInTeams !== false ? (
                                                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">
                                                         <CheckCircle className="w-3 h-3" /> Visible
                                                     </span>
                                                 ) : (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-900 text-gray-400 text-xs font-bold">
+                                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-900 text-text-muted text-xs font-bold">
                                                         <Lock className="w-3 h-3" /> Hidden
                                                     </span>
                                                 )}
@@ -2176,7 +2177,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                                             setSelectedUser(user);
                                                             setIsUserModalOpen(true);
                                                         }}
-                                                        className="text-[#2D5A27] hover:text-indigo-800 font-bold text-xs"
+                                                        className="text-brand-accent hover:text-indigo-800 font-bold text-xs"
                                                     >
                                                         View Profile
                                                     </button>
@@ -2198,8 +2199,14 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                     )}
                 </div>
             )}
+                    {selectedManageEvent && (
+                        <EventCommandCenter 
+                            event={selectedManageEvent} 
+                            onClose={() => setSelectedManageEvent(null)} 
+                        />
+                    )}
+                </main>
+            </div>
         </div>
     );
 }
-
-

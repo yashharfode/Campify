@@ -17,7 +17,7 @@ const isAdminUser = (email) => ADMIN_EMAILS.includes(email);
 
 // Skeleton Loader Component
 const SkeletonCard = () => (
-    <div className="bg-[#121212] p-6 rounded-2xl border border-[#E8E4D9] flex flex-col h-full animate-pulse">
+    <div className="bg-surface-base p-6 rounded-2xl border border-border-strong flex flex-col h-full animate-pulse">
         <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 rounded-full bg-gray-200"></div>
             <div className="flex-1">
@@ -30,7 +30,7 @@ const SkeletonCard = () => (
             <div className="h-6 bg-gray-200 rounded-full w-20"></div>
             <div className="h-6 bg-gray-200 rounded-full w-20"></div>
         </div>
-        <div className="mt-auto pt-4 border-t border-gray-800">
+        <div className="mt-auto pt-4 border-t border-border-strong">
             <div className="flex gap-2">
                 <div className="h-9 bg-gray-200 rounded-lg flex-1"></div>
                 <div className="h-9 bg-gray-200 rounded-lg flex-1"></div>
@@ -49,12 +49,12 @@ const SkeletonGrid = () => (
 // Skill Tag Component with colors
 const SkillTag = ({ skill, index }) => {
     const colors = [
-        'bg-[#FAF9F6] text-[#3E3933] border-[#E8E4D9]',
-        'bg-[#F6F2E9] text-[#4C463E] border-[#E8E4D9]',
-        'bg-[#F2EFE7] text-[#3E3933] border-[#E8E4D9]',
-        'bg-[#F8F4EC] text-[#4C463E] border-[#E8E4D9]',
-        'bg-[#F4F1E8] text-[#3E3933] border-[#E8E4D9]',
-        'bg-[#F7F3EA] text-[#4C463E] border-[#E8E4D9]',
+        'bg-surface-elevated text-text-main border-border-strong',
+        'bg-surface-highlight text-text-muted border-border-strong',
+        'bg-surface-highlight text-text-main border-border-strong',
+        'bg-surface-highlight text-text-muted border-border-strong',
+        'bg-surface-highlight text-text-main border-border-strong',
+        'bg-surface-highlight text-text-muted border-border-strong',
     ];
     const colorClass = colors[index % colors.length];
 
@@ -73,7 +73,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
     const isAvailable = profile.status !== 'busy'; // Default to available if not set
 
     return (
-        <div className="bg-[#121212] p-6 rounded-2xl border border-[#E8E4D9] flex flex-col h-full hover:shadow-md transition-all hover:scale-[1.01] relative group">
+        <div className="bg-surface-base p-6 rounded-2xl border border-border-strong flex flex-col h-full hover:shadow-md transition-all hover:scale-[1.01] relative group">
             {isAdmin && (
                 <button
                     onClick={(e) => {
@@ -103,12 +103,12 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-bold text-gray-200 text-lg truncate">{profile.name || 'Student'}</h3>
+                        <h3 className="font-bold text-text-main text-lg truncate">{profile.name || 'Student'}</h3>
                         {profile.email && (profile.email.endsWith('@jec.ac.in') || profile.email.endsWith('@college.edu')) && (
-                            <CheckCircle2 className="w-4 h-4 text-[#1C1917] flex-shrink-0" />
+                            <CheckCircle2 className="w-4 h-4 text-gray-300 flex-shrink-0" />
                         )}
                     </div>
-                    <p className="text-gray-400 text-sm font-medium">{profile.branch || 'Branch'} • {profile.year || 'Year'}</p>
+                    <p className="text-text-muted text-sm font-medium">{profile.branch || 'Branch'} • {profile.year || 'Year'}</p>
                     <div className="mt-1 flex items-center gap-2">
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isAvailable
                             ? 'bg-green-100 text-green-700'
@@ -122,7 +122,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
 
             {/* Bio */}
             {profile.bio && (
-                <p className="text-gray-400 text-sm mb-4 line-clamp-2">{profile.bio}</p>
+                <p className="text-text-muted text-sm mb-4 line-clamp-2">{profile.bio}</p>
             )}
 
             {/* Skills */}
@@ -132,7 +132,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
                         <SkillTag key={index} skill={skill} index={index} />
                     ))}
                     {remainingSkills > 0 && (
-                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-900 text-gray-400 border border-gray-800">
+                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-900 text-text-muted border border-border-strong">
                             +{remainingSkills}
                         </span>
                     )}
@@ -142,15 +142,15 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
             {/* Spotlight Projects */}
             {profile.projects && profile.projects.filter(p => p.title || p.description || p.link).length > 0 && (
                 <div className="mb-4">
-                    <p className="text-xs uppercase text-gray-400 font-bold mb-1">Spotlight</p>
+                    <p className="text-xs uppercase text-text-muted font-bold mb-1">Spotlight</p>
                     <div className="space-y-2">
                         {profile.projects.filter(p => p.title || p.description || p.link).slice(0, 2).map((project, index) => (
-                            <div key={index} className="bg-[#FAF9F6] border border-[#E8E4D9] rounded-xl p-2 text-xs text-[#3E3933] font-semibold flex justify-between items-center">
+                            <div key={index} className="bg-surface-elevated border border-border-strong rounded-xl p-2 text-xs text-text-main font-semibold flex justify-between items-center">
                                 <span className="truncate pr-2">{project.title || 'Untitled Project'}</span>
                                 {project.link && (
                                     <button
                                         onClick={() => window.open(project.link, '_blank')}
-                                        className="text-[#1C1917] font-bold text-[10px]"
+                                        className="text-gray-300 font-bold text-[10px]"
                                     >
                                         View
                                     </button>
@@ -162,16 +162,16 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
             )}
 
             {/* Action Buttons */}
-            <div className="mt-auto pt-4 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="mt-auto pt-4 border-t border-border-strong grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                     onClick={() => onInvite(profile)}
-                    className="flex items-center justify-center gap-2 bg-[#1C1917] hover:bg-[#2A2521] text-white px-4 py-2.5 rounded-xl text-sm font-bold transition"
+                    className="flex items-center justify-center gap-2 bg-surface-elevated hover:bg-surface-elevated-hover text-white px-4 py-2.5 rounded-xl text-sm font-bold transition"
                 >
                     <Mail className="w-4 h-4" /> Invite
                 </button>
                 <button
                     onClick={() => onViewProfile(profile)}
-                    className="flex items-center justify-center gap-2 bg-gray-900/5 hover:bg-gray-900/10 text-gray-200 px-4 py-2.5 rounded-xl text-sm font-bold transition"
+                    className="flex items-center justify-center gap-2 bg-gray-900/5 hover:bg-gray-900/10 text-text-main px-4 py-2.5 rounded-xl text-sm font-bold transition"
                 >
                     <User className="w-4 h-4" /> View Profile
                 </button>
@@ -181,7 +181,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
                             if (profile.github) window.open(profile.github, '_blank');
                             else if (profile.linkedin) window.open(profile.linkedin, '_blank');
                         }}
-                        className="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-200 text-gray-400 px-4 py-2.5 rounded-xl text-sm font-bold transition sm:col-span-2"
+                        className="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-200 text-text-muted px-4 py-2.5 rounded-xl text-sm font-bold transition sm:col-span-2"
                     >
                         <ExternalLink className="w-4 h-4" /> Portfolio
                     </button>
@@ -364,11 +364,11 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
     return (
         <div className="animate-in fade-in pb-24 pt-4 px-4 max-w-7xl mx-auto">
             {/* Hero Banner */}
-            <div className="relative overflow-hidden rounded-3xl mb-8 bg-[#121212] p-8 md:p-12 border border-[#E8E4D9]">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,#F4F1E8,transparent_35%),radial-gradient(circle_at_80%_10%,#F8F5ED,transparent_30%)]"></div>
+            <div className="relative overflow-hidden rounded-3xl mb-8 bg-surface-base p-8 md:p-12 border border-border-strong">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,var(--color-glow-primary),transparent_35%),radial-gradient(circle_at_80%_10%,var(--color-glow-secondary),transparent_30%)]"></div>
                 <div className="relative z-10">
-                    <h1 className="text-4xl md:text-5xl font-black mb-3 text-[#1C1917]">Build Your Dream Team 🚀</h1>
-                    <p className="text-[#5E564C] text-lg md:text-xl mb-8 max-w-2xl">
+                    <h1 className="text-4xl md:text-5xl font-black mb-3 text-gray-300">Build Your Dream Team 🚀</h1>
+                    <p className="text-text-muted text-lg md:text-xl mb-8 max-w-2xl">
                         Find the perfect developer, designer, or pitcher for your next Hackathon.
                     </p>
 
@@ -377,8 +377,8 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
                         <button
                             onClick={() => setActiveView('profiles')}
                             className={`px-6 py-2.5 rounded-xl font-bold transition ${activeView === 'profiles'
-                                ? 'bg-[#1C1917] text-white shadow-lg'
-                                : 'bg-[#FAF9F6] text-[#5E564C] hover:bg-[#F2EEE5] border border-[#E8E4D9]'
+                                ? 'bg-surface-elevated text-white shadow-lg'
+                                : 'bg-surface-elevated text-text-muted hover:bg-[#F2EEE5] border border-border-strong'
                                 }`}
                         >
                             <Users className="w-4 h-4 inline mr-2" /> Find Members
@@ -386,8 +386,8 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
                         <button
                             onClick={() => setActiveView('teamPosts')}
                             className={`px-6 py-2.5 rounded-xl font-bold transition ${activeView === 'teamPosts'
-                                ? 'bg-[#1C1917] text-white shadow-lg'
-                                : 'bg-[#FAF9F6] text-[#5E564C] hover:bg-[#F2EEE5] border border-[#E8E4D9]'
+                                ? 'bg-surface-elevated text-white shadow-lg'
+                                : 'bg-surface-elevated text-text-muted hover:bg-[#F2EEE5] border border-border-strong'
                                 }`}
                         >
                             <Briefcase className="w-4 h-4 inline mr-2" /> Team Posts ({teamPosts.length})
@@ -398,23 +398,23 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
                     {activeView === 'profiles' && (
                         <>
                             <div className="relative mb-6">
-                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-muted w-5 h-5" />
                                 <input
                                     type="text"
                                     placeholder="Search by Skills (e.g., React, Figma) or Name..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    className="w-full bg-[#FAF9F6] border border-[#E8E4D9] rounded-2xl py-4 pl-12 pr-4 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#D9D2C5] text-lg"
+                                    className="w-full bg-surface-elevated border border-border-strong rounded-2xl py-4 pl-12 pr-4 text-text-main placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                                 />
                             </div>
 
                             {/* Toggle Switch */}
-                            <div className="flex items-center gap-3 bg-[#FAF9F6] rounded-xl px-4 py-3 w-fit border border-[#E8E4D9]">
+                            <div className="flex items-center gap-3 bg-surface-elevated rounded-xl px-4 py-3 w-fit border border-border-strong">
                                 <ToggleRight
                                     className={`w-6 h-6 cursor-pointer transition ${showAvailableOnly ? 'text-green-300' : 'text-gray-300'}`}
                                     onClick={() => setShowAvailableOnly(!showAvailableOnly)}
                                 />
-                                <span className="text-[#3E3933] font-bold text-sm">Show only Available Students</span>
+                                <span className="text-text-main font-bold text-sm">Show only Available Students</span>
                             </div>
                         </>
                     )}
@@ -429,7 +429,7 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
                     ) : filteredProfiles.length === 0 ? (
                         <div className="text-center py-20">
                             <Users className="w-24 h-24 mx-auto mb-6 text-gray-300 opacity-50" />
-                            <h3 className="text-2xl font-bold text-gray-400 mb-2">No profiles found</h3>
+                            <h3 className="text-2xl font-bold text-text-muted mb-2">No profiles found</h3>
                             <p className="text-gray-500">
                                 {search ? "Try adjusting your search or filters" : "Be the first to create a profile!"}
                             </p>
@@ -461,11 +461,11 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
                     ) : teamPosts.length === 0 ? (
                         <div className="text-center py-20">
                             <Briefcase className="w-24 h-24 mx-auto mb-6 text-gray-300 opacity-50" />
-                            <h3 className="text-2xl font-bold text-gray-400 mb-2">No team posts yet</h3>
+                            <h3 className="text-2xl font-bold text-text-muted mb-2">No team posts yet</h3>
                             <p className="text-gray-500 mb-4">Be the first to create a team post!</p>
                             <button
                                 onClick={() => setIsCreateTeamModalOpen(true)}
-                                className="bg-[#1C1917] text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition"
+                                className="bg-surface-elevated text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition"
                             >
                                 Create Team Post
                             </button>
@@ -493,7 +493,7 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
             {/* Create Team FAB */}
             <button
                 onClick={() => setIsCreateTeamModalOpen(true)}
-                className="fixed bottom-24 right-6 md:bottom-10 md:right-10 bg-[#1C1917] text-white p-4 rounded-full shadow-xl hover:scale-110 transition active:scale-95 z-30 flex items-center gap-2 pr-6"
+                className="fixed bottom-24 right-6 md:bottom-10 md:right-10 bg-surface-elevated text-white p-4 rounded-full shadow-xl hover:scale-110 transition active:scale-95 z-30 flex items-center gap-2 pr-6"
             >
                 <Plus className="w-6 h-6" /> <span className="hidden md:block font-bold">Create Team Post</span>
             </button>
@@ -558,7 +558,7 @@ const TeamPostCard = ({ post, user, onClick, isAdmin, onDelete }) => {
     return (
         <div
             onClick={onClick}
-            className="bg-[#121212] p-6 rounded-2xl border border-[#E8E4D9] flex flex-col h-full hover:shadow-md transition-all cursor-pointer relative group"
+            className="bg-surface-base p-6 rounded-2xl border border-border-strong flex flex-col h-full hover:shadow-md transition-all cursor-pointer relative group"
         >
             {(isAdmin || user?.uid === post.createdBy) && (
                 <button
@@ -578,15 +578,15 @@ const TeamPostCard = ({ post, user, onClick, isAdmin, onDelete }) => {
                 </div>
             )}
             <div className="flex-1">
-                <h3 className="font-bold text-gray-200 text-xl mb-2">{post.teamName}</h3>
-                <p className="text-[#1C1917] font-semibold text-sm mb-3">{post.projectName}</p>
-                <p className="text-gray-400 text-sm mb-4 line-clamp-3">{post.description}</p>
+                <h3 className="font-bold text-text-main text-xl mb-2">{post.teamName}</h3>
+                <p className="text-gray-300 font-semibold text-sm mb-3">{post.projectName}</p>
+                <p className="text-text-muted text-sm mb-4 line-clamp-3">{post.description}</p>
                 {post.rolesNeeded && post.rolesNeeded.length > 0 && (
                     <div className="mb-4">
                         <p className="text-xs font-bold text-gray-500 uppercase mb-2">Roles Needed:</p>
                         <div className="flex flex-wrap gap-2">
                             {post.rolesNeeded.map((role, index) => (
-                                <span key={index} className="px-3 py-1 bg-[#FAF9F6] text-[#3E3933] rounded-full text-xs font-bold border border-[#E8E4D9]">
+                                <span key={index} className="px-3 py-1 bg-surface-elevated text-text-main rounded-full text-xs font-bold border border-border-strong">
                                     {role}
                                 </span>
                             ))}
@@ -594,7 +594,7 @@ const TeamPostCard = ({ post, user, onClick, isAdmin, onDelete }) => {
                     </div>
                 )}
             </div>
-            <div className="pt-4 border-t border-gray-800 mt-4">
+            <div className="pt-4 border-t border-border-strong mt-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
@@ -604,7 +604,7 @@ const TeamPostCard = ({ post, user, onClick, isAdmin, onDelete }) => {
                                 className="w-full h-full object-cover"
                             />
                         </div>
-                        <span className="text-xs text-gray-400 font-medium">{post.createdByName}</span>
+                        <span className="text-xs text-text-muted font-medium">{post.createdByName}</span>
                     </div>
                     {post.createdBy === user?.uid && (
                         <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">Your Post</span>
@@ -699,8 +699,8 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-[#121212] rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-                <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#1A1A1A]">
+            <div className="bg-surface-base rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+                <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
                     <h3 className="font-bold text-lg text-gray-300">Create Team Post</h3>
                     <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
                 </div>
@@ -711,7 +711,7 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
                         <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Team Image (Optional)</label>
                         <div
                             onClick={() => fileInputRef.current.click()}
-                            className="border-2 border-dashed border-gray-300 rounded-xl h-32 flex flex-col items-center justify-center text-gray-400 hover:bg-[#1A1A1A] transition cursor-pointer relative overflow-hidden"
+                            className="border-2 border-dashed border-gray-300 rounded-xl h-32 flex flex-col items-center justify-center text-text-muted hover:bg-surface-elevated transition cursor-pointer relative overflow-hidden"
                         >
                             {formData.image ? (
                                 <img src={getOptimizedImageUrl(formData.image, '16:9')} className="w-full h-full object-cover" alt="Preview" />
@@ -731,7 +731,7 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
                             required
                             value={formData.teamName}
                             onChange={(e) => setFormData({ ...formData, teamName: e.target.value })}
-                            className="w-full bg-[#FAF9F6] border border-[#E8E4D9] rounded-lg p-3 text-sm outline-none focus:border-[#CFC6B7]"
+                            className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-border-strong"
                             placeholder="e.g., Code Warriors"
                         />
                     </div>
@@ -742,7 +742,7 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
                             required
                             value={formData.projectName}
                             onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
-                            className="w-full bg-[#FAF9F6] border border-[#E8E4D9] rounded-lg p-3 text-sm outline-none focus:border-[#CFC6B7]"
+                            className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-border-strong"
                             placeholder="e.g., Statewide Hackathon 2025"
                         />
                     </div>
@@ -754,7 +754,7 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             rows="4"
-                            className="w-full bg-[#FAF9F6] border border-[#E8E4D9] rounded-lg p-3 text-sm outline-none focus:border-[#CFC6B7] resize-none"
+                            className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-border-strong resize-none"
                             placeholder="Describe your project and what you're looking for..."
                         />
                     </div>
@@ -765,7 +765,7 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
                             <button
                                 type="button"
                                 onClick={handleAddRole}
-                                className="text-[#1C1917] text-xs font-bold hover:text-[#2A2521]"
+                                className="text-gray-300 text-xs font-bold hover:text-gray-300-hover"
                             >
                                 + Add Role
                             </button>
@@ -776,7 +776,7 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
                                     <input
                                         value={role}
                                         onChange={(e) => handleRoleChange(index, e.target.value)}
-                                        className="flex-1 bg-[#FAF9F6] border border-[#E8E4D9] rounded-lg p-3 text-sm outline-none focus:border-[#CFC6B7]"
+                                        className="flex-1 bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-border-strong"
                                         placeholder="e.g., Need 1 UI Designer"
                                     />
                                     {formData.roles.length > 1 && (
@@ -796,7 +796,7 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="w-full bg-[#1C1917] hover:bg-[#2A2521] text-white font-bold py-3 rounded-xl shadow-lg transition flex justify-center"
+                        className="w-full bg-surface-elevated hover:bg-surface-elevated-hover text-white font-bold py-3 rounded-xl shadow-lg transition flex justify-center"
                     >
                         {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Team Post"}
                     </button>
@@ -813,13 +813,13 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
 
     return (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-4">
-            <div className="bg-[#121212] rounded-3xl max-w-4xl w-full shadow-2xl overflow-hidden">
-                <div className="flex justify-between items-center p-6 border-b border-gray-800">
+            <div className="bg-surface-base rounded-3xl max-w-4xl w-full shadow-2xl overflow-hidden">
+                <div className="flex justify-between items-center p-6 border-b border-border-strong">
                     <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-gray-400">Profile Preview</p>
-                        <h3 className="text-2xl font-black text-gray-200">{profile.name || 'Student'}</h3>
+                        <p className="text-xs uppercase tracking-[0.3em] text-text-muted">Profile Preview</p>
+                        <h3 className="text-2xl font-black text-text-main">{profile.name || 'Student'}</h3>
                     </div>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-400">
+                    <button onClick={onClose} className="text-gray-500 hover:text-text-muted">
                         <X className="w-6 h-6" />
                     </button>
                 </div>
@@ -836,7 +836,7 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                             <div>
                                 <p className="text-sm font-semibold text-gray-500">{profile.branch || 'Branch'} • {profile.year || 'Year'}</p>
                                 <div className="mt-2 flex flex-wrap gap-2">
-                                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#FAF9F6] text-[#3E3933] border border-[#E8E4D9]">
+                                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-surface-elevated text-text-main border border-border-strong">
                                         {profile.status === 'busy' ? 'Currently Busy' : 'Open to Work'}
                                     </span>
                                     {profile.email && (profile.email.endsWith('@jec.ac.in') || profile.email.endsWith('@college.edu')) && (
@@ -846,17 +846,17 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                             </div>
                         </div>
                         {profile.bio && (
-                            <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-4">
-                                <p className="text-xs font-bold text-gray-400 uppercase mb-2">About</p>
-                                <p className="text-sm text-gray-400 whitespace-pre-wrap">{profile.bio}</p>
+                            <div className="bg-surface-elevated border border-border-strong rounded-2xl p-4">
+                                <p className="text-xs font-bold text-text-muted uppercase mb-2">About</p>
+                                <p className="text-sm text-text-muted whitespace-pre-wrap">{profile.bio}</p>
                             </div>
                         )}
                         {profile.skills && (
                             <div>
-                                <p className="text-xs uppercase font-bold text-gray-400 mb-2">Skills</p>
+                                <p className="text-xs uppercase font-bold text-text-muted mb-2">Skills</p>
                                 <div className="flex flex-wrap gap-2">
                                     {profile.skills.split(',').map((skill, index) => (
-                                        <span key={index} className="px-3 py-1 rounded-full text-xs font-bold bg-gray-900 text-gray-400">
+                                        <span key={index} className="px-3 py-1 rounded-full text-xs font-bold bg-gray-900 text-text-muted">
                                             {skill.trim()}
                                         </span>
                                     ))}
@@ -875,7 +875,7 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                             {profile.linkedin && (
                                 <button
                                     onClick={() => window.open(profile.linkedin, '_blank')}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FAF9F6] text-[#3E3933] font-bold text-sm border border-[#E8E4D9]"
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-elevated text-text-main font-bold text-sm border border-border-strong"
                                 >
                                     <Linkedin className="w-4 h-4" /> LinkedIn
                                 </button>
@@ -899,10 +899,10 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                     </div>
                     <div className="space-y-5">
                         <div className="flex items-center justify-between">
-                            <p className="text-xs uppercase font-bold text-gray-400">Showcase</p>
+                            <p className="text-xs uppercase font-bold text-text-muted">Showcase</p>
                             <button
                                 onClick={onInvite}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1C1917] text-white font-bold text-sm shadow-lg"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-elevated text-white font-bold text-sm shadow-lg"
                             >
                                 <Send className="w-4 h-4" /> Invite to Team
                             </button>
@@ -910,16 +910,16 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                         <div className="space-y-4">
                             {projects.length > 0 ? (
                                 projects.map((project, index) => (
-                                    <div key={index} className="border border-gray-800 rounded-2xl p-4 bg-[#121212]/80">
-                                        <p className="text-xs font-bold text-gray-400 uppercase">Project #{index + 1}</p>
-                                        <h4 className="text-lg font-bold text-gray-200 mt-1">{project.title || 'Untitled Project'}</h4>
+                                    <div key={index} className="border border-border-strong rounded-2xl p-4 bg-surface-base/80">
+                                        <p className="text-xs font-bold text-text-muted uppercase">Project #{index + 1}</p>
+                                        <h4 className="text-lg font-bold text-text-main mt-1">{project.title || 'Untitled Project'}</h4>
                                         {project.description && (
-                                            <p className="text-sm text-gray-400 mt-1">{project.description}</p>
+                                            <p className="text-sm text-text-muted mt-1">{project.description}</p>
                                         )}
                                         {project.link && (
                                             <button
                                                 onClick={() => window.open(project.link, '_blank')}
-                                                className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-[#1C1917]"
+                                                className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-gray-300"
                                             >
                                                 <LinkIcon className="w-4 h-4" /> Open Project
                                             </button>
@@ -927,7 +927,7 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                                     </div>
                                 ))
                             ) : (
-                                <div className="border border-dashed border-gray-800 rounded-2xl p-6 text-center text-gray-400 text-sm">
+                                <div className="border border-dashed border-border-strong rounded-2xl p-6 text-center text-text-muted text-sm">
                                     No showcased projects yet.
                                 </div>
                             )}
@@ -956,8 +956,8 @@ const InviteModal = ({ isOpen, onClose, profile, onSend }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-[#121212] rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-                <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#1A1A1A]">
+            <div className="bg-surface-base rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+                <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
                     <h3 className="font-bold text-lg text-gray-300">Invite {profile.name}</h3>
                     <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
                 </div>
@@ -969,7 +969,7 @@ const InviteModal = ({ isOpen, onClose, profile, onSend }) => {
                             required
                             value={projectName}
                             onChange={(e) => setProjectName(e.target.value)}
-                            className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-3 text-sm outline-none focus:border-blue-500"
+                            className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500"
                             placeholder="e.g., Statewide Hackathon 2025"
                         />
                     </div>
@@ -978,7 +978,7 @@ const InviteModal = ({ isOpen, onClose, profile, onSend }) => {
                     </p>
                     <button
                         type="submit"
-                        className="w-full bg-[#1C1917] hover:bg-[#2A2521] text-white font-bold py-3 rounded-xl shadow-lg transition"
+                        className="w-full bg-surface-elevated hover:bg-surface-elevated-hover text-white font-bold py-3 rounded-xl shadow-lg transition"
                     >
                         Send Invitation
                     </button>
@@ -1144,7 +1144,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in overflow-y-auto">
-            <div className="bg-[#121212] rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl my-8">
+            <div className="bg-surface-base rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl my-8">
                 {/* Header with Image */}
                 <div className="relative">
                     {post.image ? (
@@ -1158,15 +1158,15 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                     )}
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 bg-[#121212]/90 backdrop-blur-md p-2 rounded-full hover:bg-[#121212] transition shadow-lg"
+                        className="absolute top-4 right-4 bg-surface-base/90 backdrop-blur-md p-2 rounded-full hover:bg-surface-base transition shadow-lg"
                     >
-                        <X className="w-5 h-5 text-gray-400" />
+                        <X className="w-5 h-5 text-text-muted" />
                     </button>
                     <button
                         onClick={handleShare}
-                        className="absolute top-4 right-16 bg-[#121212]/90 backdrop-blur-md p-2 rounded-full hover:bg-[#121212] transition shadow-lg"
+                        className="absolute top-4 right-16 bg-surface-base/90 backdrop-blur-md p-2 rounded-full hover:bg-surface-base transition shadow-lg"
                     >
-                        <Share2 className="w-5 h-5 text-gray-400" />
+                        <Share2 className="w-5 h-5 text-text-muted" />
                     </button>
                 </div>
 
@@ -1176,8 +1176,8 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                     <div className="mb-6">
                         <div className="flex items-start justify-between mb-3">
                             <div className="flex-1">
-                                <h1 className="text-3xl md:text-4xl font-black text-gray-200 mb-2">{post.teamName}</h1>
-                                <div className="flex items-center gap-3 text-[#1C1917] font-bold text-lg">
+                                <h1 className="text-3xl md:text-4xl font-black text-text-main mb-2">{post.teamName}</h1>
+                                <div className="flex items-center gap-3 text-gray-300 font-bold text-lg">
                                     <Briefcase className="w-5 h-5" />
                                     <span>{post.projectName}</span>
                                 </div>
@@ -1198,19 +1198,19 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
 
                     {/* Description */}
                     <div className="mb-6">
-                        <h2 className="text-xl font-bold text-gray-200 mb-3">About the Project</h2>
-                        <p className="text-gray-400 leading-relaxed whitespace-pre-wrap">{post.description}</p>
+                        <h2 className="text-xl font-bold text-text-main mb-3">About the Project</h2>
+                        <p className="text-text-muted leading-relaxed whitespace-pre-wrap">{post.description}</p>
                     </div>
 
                     {/* Roles Needed */}
                     {post.rolesNeeded && post.rolesNeeded.length > 0 && (
                         <div className="mb-6">
-                            <h2 className="text-xl font-bold text-gray-200 mb-3">Roles We're Looking For</h2>
+                            <h2 className="text-xl font-bold text-text-main mb-3">Roles We're Looking For</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {post.rolesNeeded.map((role, index) => (
-                                    <div key={index} className="bg-[#FAF9F6] border-2 border-[#E8E4D9] rounded-xl p-4">
+                                    <div key={index} className="bg-surface-elevated border-2 border-border-strong rounded-xl p-4">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-[#1C1917] rounded-full"></div>
+                                            <div className="w-2 h-2 bg-surface-elevated rounded-full"></div>
                                             <span className="font-bold text-[#2D2A26]">{role}</span>
                                         </div>
                                     </div>
@@ -1220,8 +1220,8 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                     )}
 
                     {/* Team Leader Section */}
-                    <div className="bg-[#1A1A1A] rounded-2xl p-6 mb-6">
-                        <h2 className="text-xl font-bold text-gray-200 mb-4">Team Leader</h2>
+                    <div className="bg-surface-elevated rounded-2xl p-6 mb-6">
+                        <h2 className="text-xl font-bold text-text-main mb-4">Team Leader</h2>
                         {loadingProfile ? (
                             <div className="flex items-center gap-4">
                                 <div className="w-16 h-16 rounded-full bg-gray-200 animate-pulse"></div>
@@ -1241,18 +1241,18 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <h3 className="font-bold text-gray-200 text-lg">{post.createdByName}</h3>
+                                        <h3 className="font-bold text-text-main text-lg">{post.createdByName}</h3>
                                         {creatorProfile?.email && (creatorProfile.email.endsWith('@jec.ac.in') || creatorProfile.email.endsWith('@college.edu')) && (
-                                            <CheckCircle2 className="w-5 h-5 text-[#1C1917]" />
+                                            <CheckCircle2 className="w-5 h-5 text-gray-300" />
                                         )}
                                     </div>
-                                    <p className="text-gray-400 text-sm">
+                                    <p className="text-text-muted text-sm">
                                         {creatorProfile?.branch || 'Branch'} • {creatorProfile?.year || 'Year'}
                                     </p>
                                     {creatorProfile?.skills && (
                                         <div className="flex flex-wrap gap-2 mt-2">
                                             {creatorProfile.skills.split(',').slice(0, 3).map((skill, i) => (
-                                                <span key={i} className="px-2 py-1 bg-[#121212] text-gray-400 rounded-full text-xs font-bold border border-gray-800">
+                                                <span key={i} className="px-2 py-1 bg-surface-base text-text-muted rounded-full text-xs font-bold border border-border-strong">
                                                     {skill.trim()}
                                                 </span>
                                             ))}
@@ -1265,9 +1265,9 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                             href={creatorProfile.github}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="p-2 bg-[#121212] rounded-lg hover:bg-gray-900 transition"
+                                            className="p-2 bg-surface-base rounded-lg hover:bg-gray-900 transition"
                                         >
-                                            <Github className="w-5 h-5 text-gray-400" />
+                                            <Github className="w-5 h-5 text-text-muted" />
                                         </a>
                                     )}
                                     {creatorProfile?.linkedin && (
@@ -1275,9 +1275,9 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                             href={creatorProfile.linkedin}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="p-2 bg-[#121212] rounded-lg hover:bg-gray-900 transition"
+                                            className="p-2 bg-surface-base rounded-lg hover:bg-gray-900 transition"
                                         >
-                                            <Linkedin className="w-5 h-5 text-[#1C1917]" />
+                                            <Linkedin className="w-5 h-5 text-gray-300" />
                                         </a>
                                     )}
                                 </div>
@@ -1292,7 +1292,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                 <button
                                     onClick={handleJoinTeam}
                                     disabled={applying}
-                                    className="flex-1 bg-[#1C1917] hover:bg-[#2A2521] text-white font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-lg"
+                                    className="flex-1 bg-surface-elevated hover:bg-surface-elevated-hover text-white font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-lg"
                                 >
                                     {applying ? (
                                         <>
@@ -1318,7 +1318,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                                 window.location.href = `mailto:${creatorProfile.email}?subject=${subject}&body=${body}`;
                                             }
                                         }}
-                                        className="flex-1 bg-[#121212] border-2 border-[#1C1917] text-[#1C1917] font-bold py-4 rounded-xl hover:bg-[#FAF9F6] transition flex items-center justify-center gap-2 text-lg"
+                                        className="flex-1 bg-surface-base border-2 border-accent-dark text-gray-300 font-bold py-4 rounded-xl hover:bg-surface-elevated transition flex items-center justify-center gap-2 text-lg"
                                     >
                                         <Mail className="w-5 h-5" />
                                         Contact Leader
@@ -1326,7 +1326,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                 )}
                             </>
                         ) : (
-                            <div className="w-full bg-[#FAF9F6] border-2 border-[#E8E4D9] rounded-xl p-4 text-center">
+                            <div className="w-full bg-surface-elevated border-2 border-border-strong rounded-xl p-4 text-center">
                                 <p className="text-[#2D2A26] font-bold">This is your team post. Share it to find members!</p>
                             </div>
                         )}

@@ -306,20 +306,20 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
     };
 
     return (
-        <div className="bg-[#1A1A1A] h-[calc(100vh-100px)] rounded-2xl border border-[#333] overflow-hidden flex flex-col md:flex-row text-[#E0E0E0] font-sans">
+        <div className="bg-surface-elevated h-[calc(100vh-100px)] rounded-2xl border border-[#333] overflow-hidden flex flex-col md:flex-row text-[#E0E0E0] font-sans">
             
             {/* Sidebar */}
-            <div className="w-full md:w-72 bg-[#1A1A1A] border-r border-[#333] flex flex-col h-full flex-shrink-0">
-                <div className="flex bg-[#242424] border-b border-[#333]">
+            <div className="w-full md:w-72 bg-surface-elevated border-r border-[#333] flex flex-col h-full flex-shrink-0">
+                <div className="flex bg-surface-highlight border-b border-[#333]">
                     <button 
                         onClick={() => setSidebarTab('channels')}
-                        className={`flex-1 py-3 text-sm font-bold transition ${sidebarTab === 'channels' ? 'text-[#2D5A27] border-b-2 border-[#2D5A27]' : 'text-[#888] hover:text-[#bbb]'}`}
+                        className={`flex-1 py-3 text-sm font-bold transition ${sidebarTab === 'channels' ? 'text-brand-accent border-b-2 border-[#2D5A27]' : 'text-[#888] hover:text-[#bbb]'}`}
                     >
                         Channels
                     </button>
                     <button 
                         onClick={() => setSidebarTab('dms')}
-                        className={`flex-1 py-3 text-sm font-bold transition ${sidebarTab === 'dms' ? 'text-[#2D5A27] border-b-2 border-[#2D5A27]' : 'text-[#888] hover:text-[#bbb]'}`}
+                        className={`flex-1 py-3 text-sm font-bold transition ${sidebarTab === 'dms' ? 'text-brand-accent border-b-2 border-[#2D5A27]' : 'text-[#888] hover:text-[#bbb]'}`}
                     >
                         Direct Messages
                     </button>
@@ -327,7 +327,7 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                 
                 {sidebarTab === 'channels' ? (
                     <>
-                        <div className="p-4 border-b border-[#333] flex justify-between items-center bg-[#1A1A1A]">
+                        <div className="p-4 border-b border-[#333] flex justify-between items-center bg-surface-elevated">
                             <h2 className="font-bold text-sm text-[#888] uppercase tracking-wider">All Channels</h2>
                             <button 
                                 onClick={() => setIsModalOpen(true)}
@@ -339,7 +339,7 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                         </div>
                         <div className="overflow-y-auto flex-1 p-2 space-y-1 custom-scrollbar">
                             {loadingGroups ? (
-                                <div className="flex justify-center p-4"><Loader2 className="w-5 h-5 animate-spin text-[#2D5A27]" /></div>
+                                <div className="flex justify-center p-4"><Loader2 className="w-5 h-5 animate-spin text-brand-accent" /></div>
                             ) : activeGroups.length === 0 ? (
                                 <p className="text-sm text-[#666] text-center p-4">No active channels.</p>
                             ) : (
@@ -351,16 +351,16 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                                             onClick={() => setActiveGroupId(group.id)}
                                             className={`w-full text-left px-3 py-2.5 rounded-lg flex items-center justify-between transition ${
                                                 activeGroupId === group.id 
-                                                    ? 'bg-[#2D5A27]/20 text-white border border-[#2D5A27]/30' 
-                                                    : 'text-[#A0A0A0] hover:bg-[#242424] hover:text-white border border-transparent'
+                                                    ? 'bg-brand-accent/20 text-white border border-[#2D5A27]/30' 
+                                                    : 'text-[#A0A0A0] hover:bg-surface-highlight hover:text-white border border-transparent'
                                             }`}
                                         >
                                             <div className="flex items-center gap-3 overflow-hidden">
-                                                <Hash className={`w-4 h-4 flex-shrink-0 ${activeGroupId === group.id ? 'text-[#2D5A27]' : 'text-[#666]'}`} />
+                                                <Hash className={`w-4 h-4 flex-shrink-0 ${activeGroupId === group.id ? 'text-brand-accent' : 'text-[#666]'}`} />
                                                 <span className={`font-medium truncate text-sm ${isUnread ? 'text-white font-bold' : ''}`}>{group.name}</span>
                                             </div>
                                             {isUnread && (
-                                                <div className="w-2 h-2 rounded-full bg-[#2D5A27] flex-shrink-0"></div>
+                                                <div className="w-2 h-2 rounded-full bg-brand-accent flex-shrink-0"></div>
                                             )}
                                         </button>
                                     );
@@ -370,7 +370,7 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                     </>
                 ) : (
                     <>
-                        <div className="p-3 border-b border-[#333] bg-[#1A1A1A]">
+                        <div className="p-3 border-b border-[#333] bg-surface-elevated">
                             <div className="relative">
                                 <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-[#666]" />
                                 <input 
@@ -378,14 +378,14 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="Search users to chat..."
-                                    className="w-full bg-[#242424] border border-[#333] rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-[#666] focus:ring-1 focus:ring-[#2D5A27] outline-none"
+                                    className="w-full bg-surface-highlight border border-[#333] rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-[#666] focus:ring-1 focus:ring-[#2D5A27] outline-none"
                                 />
                             </div>
                             
                             {searchQuery.trim().length >= 2 && (
-                                <div className="absolute z-10 mt-1 w-[calc(100%-24px)] bg-[#242424] border border-[#333] rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto">
+                                <div className="absolute z-10 mt-1 w-[calc(100%-24px)] bg-surface-highlight border border-[#333] rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto">
                                     {isSearching ? (
-                                        <div className="p-3 text-center"><Loader2 className="w-4 h-4 animate-spin text-[#2D5A27] mx-auto" /></div>
+                                        <div className="p-3 text-center"><Loader2 className="w-4 h-4 animate-spin text-brand-accent mx-auto" /></div>
                                     ) : searchResults.length === 0 ? (
                                         <div className="p-3 text-center text-xs text-[#888]">No users found</div>
                                     ) : (
@@ -398,7 +398,7 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                                                 }}
                                                 className="w-full text-left p-3 hover:bg-[#333] transition flex items-center gap-3 border-b border-[#333] last:border-0"
                                             >
-                                                <div className="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center text-[#A0A0A0] text-xs border border-[#333]">
+                                                <div className="w-8 h-8 rounded-full bg-surface-elevated flex items-center justify-center text-[#A0A0A0] text-xs border border-[#333]">
                                                     {resUser.name.charAt(0)}
                                                 </div>
                                                 <div className="overflow-hidden">
@@ -424,18 +424,18 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                                             onClick={() => setActiveGroupId(dm.id)}
                                             className={`w-full text-left px-3 py-2.5 rounded-lg flex items-center justify-between transition ${
                                                 activeGroupId === dm.id 
-                                                    ? 'bg-[#2D5A27]/20 text-white border border-[#2D5A27]/30' 
-                                                    : 'text-[#A0A0A0] hover:bg-[#242424] hover:text-white border border-transparent'
+                                                    ? 'bg-brand-accent/20 text-white border border-[#2D5A27]/30' 
+                                                    : 'text-[#A0A0A0] hover:bg-surface-highlight hover:text-white border border-transparent'
                                             }`}
                                         >
                                             <div className="flex items-center gap-3 overflow-hidden">
-                                                <div className="w-6 h-6 rounded-full bg-[#1A1A1A] border border-[#333] flex items-center justify-center text-[10px] text-[#A0A0A0] flex-shrink-0">
+                                                <div className="w-6 h-6 rounded-full bg-surface-elevated border border-[#333] flex items-center justify-center text-[10px] text-[#A0A0A0] flex-shrink-0">
                                                     {dmName.charAt(0)}
                                                 </div>
                                                 <span className={`font-medium truncate text-sm ${isUnread ? 'text-white font-bold' : ''}`}>{dmName}</span>
                                             </div>
                                             {isUnread && (
-                                                <div className="w-2 h-2 rounded-full bg-[#2D5A27] flex-shrink-0"></div>
+                                                <div className="w-2 h-2 rounded-full bg-brand-accent flex-shrink-0"></div>
                                             )}
                                         </button>
                                     );
@@ -447,10 +447,10 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
             </div>
 
             {/* Main Chat Area */}
-            <div className="flex-1 flex flex-col h-full bg-[#1A1A1A]">
+            <div className="flex-1 flex flex-col h-full bg-surface-elevated">
                 {/* Chat Header */}
                 {activeGroupData ? (
-                    <div className="p-4 border-b border-[#333] bg-[#242424] flex justify-between items-center flex-shrink-0">
+                    <div className="p-4 border-b border-[#333] bg-surface-highlight flex justify-between items-center flex-shrink-0">
                         <div>
                             <h3 className="font-bold text-white flex items-center gap-2">
                                 {activeGroupData.type === 'direct' ? (
@@ -465,20 +465,20 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                             )}
                         </div>
                         {activeGroupData.type !== 'direct' && (
-                            <div className="flex items-center gap-2 text-[#888] bg-[#1A1A1A] px-3 py-1.5 rounded-lg border border-[#333]">
+                            <div className="flex items-center gap-2 text-[#888] bg-surface-elevated px-3 py-1.5 rounded-lg border border-[#333]">
                                 <Users className="w-4 h-4" />
                                 <span className="text-xs font-bold">{activeGroupData.members?.length || 0}</span>
                             </div>
                         )}
                     </div>
                 ) : (
-                    <div className="p-4 border-b border-[#333] bg-[#242424] h-[73px]"></div>
+                    <div className="p-4 border-b border-[#333] bg-surface-highlight h-[73px]"></div>
                 )}
 
                 {/* Messages Feed */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
                     {loadingMessages ? (
-                        <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-[#2D5A27]" /></div>
+                        <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-brand-accent" /></div>
                     ) : !activeGroupId ? (
                         <div className="h-full flex flex-col items-center justify-center text-[#666]">
                             <MessageSquare className="w-12 h-12 mb-3 opacity-20" />
@@ -507,8 +507,8 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                                     )}
                                     <div className={`px-4 py-2.5 max-w-[75%] rounded-2xl text-sm ${
                                         isMe 
-                                            ? 'bg-[#2D5A27] text-white rounded-tr-sm' 
-                                            : 'bg-[#242424] border border-[#333] text-[#E0E0E0] rounded-tl-sm'
+                                            ? 'bg-brand-accent text-white rounded-tr-sm' 
+                                            : 'bg-surface-highlight border border-[#333] text-[#E0E0E0] rounded-tl-sm'
                                     }`}>
                                         {msg.text}
                                     </div>
@@ -521,19 +521,19 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
 
                 {/* Message Input */}
                 {activeGroupId && (
-                    <div className="p-4 bg-[#242424] border-t border-[#333] flex-shrink-0">
+                    <div className="p-4 bg-surface-highlight border-t border-[#333] flex-shrink-0">
                         <form onSubmit={handleSendMessage} className="flex gap-2">
                             <input
                                 type="text"
                                 value={newMessage}
                                 onChange={(e) => setNewMessage(e.target.value)}
                                 placeholder={activeGroupData?.type === 'direct' ? `Message ${getDmName(activeGroupData)}...` : `Message #${activeGroupData?.name}...`}
-                                className="flex-1 bg-[#1A1A1A] border border-[#333] rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent text-white placeholder-[#666] outline-none transition"
+                                className="flex-1 bg-surface-elevated border border-[#333] rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent text-white placeholder-[#666] outline-none transition"
                             />
                             <button 
                                 type="submit"
                                 disabled={!newMessage.trim()}
-                                className="bg-[#2D5A27] hover:bg-[#386d31] disabled:bg-[#333] disabled:text-[#666] text-white px-4 py-2 rounded-xl transition flex items-center justify-center"
+                                className="bg-brand-accent hover:bg-[#386d31] disabled:bg-[#333] disabled:text-[#666] text-white px-4 py-2 rounded-xl transition flex items-center justify-center"
                             >
                                 <Send className="w-5 h-5" />
                             </button>
@@ -545,10 +545,10 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
             {/* Request Group Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div className="bg-[#1A1A1A] border border-[#333] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
-                        <div className="p-4 border-b border-[#333] bg-[#242424] flex justify-between items-center">
+                    <div className="bg-surface-elevated border border-[#333] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+                        <div className="p-4 border-b border-[#333] bg-surface-highlight flex justify-between items-center">
                             <h3 className="font-bold text-white flex items-center gap-2">
-                                <Plus className="w-5 h-5 text-[#2D5A27]" /> Request New Channel
+                                <Plus className="w-5 h-5 text-brand-accent" /> Request New Channel
                             </h3>
                             <button onClick={() => setIsModalOpen(false)} className="text-[#888] hover:text-white">
                                 <X className="w-5 h-5" />
@@ -564,7 +564,7 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                                     value={newGroupName}
                                     onChange={(e) => setNewGroupName(e.target.value)}
                                     placeholder="e.g. Competitive Programming"
-                                    className="w-full bg-[#242424] border border-[#333] text-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                                    className="w-full bg-surface-highlight border border-[#333] text-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#2D5A27] outline-none"
                                 />
                             </div>
                             <div>
@@ -575,12 +575,12 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                                     onChange={(e) => setNewGroupDesc(e.target.value)}
                                     placeholder="What is this channel about?"
                                     rows="3"
-                                    className="w-full bg-[#242424] border border-[#333] text-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#2D5A27] outline-none resize-none"
+                                    className="w-full bg-surface-highlight border border-[#333] text-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#2D5A27] outline-none resize-none"
                                 />
                             </div>
 
-                            <div className="flex items-start gap-2 bg-[#2D5A27]/10 p-3 rounded-lg border border-[#2D5A27]/30">
-                                <Info className="w-4 h-4 text-[#2D5A27] mt-0.5 flex-shrink-0" />
+                            <div className="flex items-start gap-2 bg-brand-accent/10 p-3 rounded-lg border border-[#2D5A27]/30">
+                                <Info className="w-4 h-4 text-brand-accent mt-0.5 flex-shrink-0" />
                                 <p className="text-xs text-[#A0A0A0] leading-relaxed">
                                     Your request will be sent to the Super Admin for approval. Once approved, it will appear in the Channels list for everyone.
                                 </p>
@@ -597,7 +597,7 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                                 <button
                                     type="submit"
                                     disabled={submittingRequest || !newGroupName.trim() || !newGroupDesc.trim()}
-                                    className="flex-1 bg-[#2D5A27] hover:bg-[#386d31] disabled:bg-[#333] disabled:text-[#666] text-white py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2"
+                                    className="flex-1 bg-brand-accent hover:bg-[#386d31] disabled:bg-[#333] disabled:text-[#666] text-white py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2"
                                 >
                                     {submittingRequest ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit Request'}
                                 </button>

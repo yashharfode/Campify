@@ -13,6 +13,23 @@
   
   --accent-deep: #2D5A27;
   --accent-hover: #397032;
+
+  /* Total Centralization Base Variables */
+  --surface-base: #121212;
+  --surface-elevated: #1A1A1A;
+  --surface-highlight: #242424;
+  
+  --border-strong: #1F2937;
+  --border-subtle: #333333;
+  
+  --text-main: #E5E7EB;
+  --text-muted: #9CA3AF;
+  
+  --brand-accent: #2D5A27;
+  --brand-accent-hover: #397032;
+  
+  --glow-primary: #1b3834;
+  --glow-secondary: #142a27;
 }
 
 @theme inline {
@@ -48,6 +65,28 @@
   --color-purple-500: var(--accent-deep);
   --color-purple-600: var(--accent-deep);
   --color-purple-700: var(--accent-hover);
+
+  /* Centralized Beige Theme Variables */
+  --color-primary: #FAF9F6;
+  --color-primary-foreground: #3E3933;
+  --color-secondary: #F6F2E9;
+  --color-secondary-foreground: #4C463E;
+  --color-border-beige: #E8E4D9;
+  --color-accent-dark: #1C1917;
+  --color-accent-dark-hover: #2A2521;
+
+  /* Total Centralization Theme Map */
+  --color-surface-base: var(--surface-base);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-highlight: var(--surface-highlight);
+  --color-border-strong: var(--border-strong);
+  --color-border-subtle: var(--border-subtle);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-hover: var(--brand-accent-hover);
+  --color-glow-primary: var(--glow-primary);
+  --color-glow-secondary: var(--glow-secondary);
 }
 
 body {

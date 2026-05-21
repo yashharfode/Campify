@@ -283,24 +283,24 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
     <div className="space-y-6">
       {/* Dashboard Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-6 shadow-sm">
-          <h4 className="text-gray-400 text-sm font-medium mb-1">Total Clubs</h4>
+        <div className="bg-surface-elevated border border-border-strong rounded-xl p-6 shadow-sm">
+          <h4 className="text-text-muted text-sm font-medium mb-1">Total Clubs</h4>
           <p className="text-3xl font-bold text-white">{clubs.length}</p>
         </div>
-        <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-6 shadow-sm">
-          <h4 className="text-gray-400 text-sm font-medium mb-1">Active Clubs</h4>
+        <div className="bg-surface-elevated border border-border-strong rounded-xl p-6 shadow-sm">
+          <h4 className="text-text-muted text-sm font-medium mb-1">Active Clubs</h4>
           <p className="text-3xl font-bold text-green-500">
             {clubs.filter(c => c.status === 'Active').length}
           </p>
         </div>
-        <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-6 shadow-sm flex items-center justify-between">
+        <div className="bg-surface-elevated border border-border-strong rounded-xl p-6 shadow-sm flex items-center justify-between">
           <div>
-            <h4 className="text-gray-400 text-sm font-medium mb-1">Quick Action</h4>
+            <h4 className="text-text-muted text-sm font-medium mb-1">Quick Action</h4>
             <p className="text-white text-sm">Add a new organization</p>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-[#2D5A27] hover:bg-[#397032] text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
+            className="bg-brand-accent hover:bg-brand-accent-hover text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
           >
             <Plus size={18} /> Add Club
           </button>
@@ -308,7 +308,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
       </div>
 
       {/* Assign President Section */}
-      <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-6 shadow-sm">
+      <div className="bg-surface-elevated border border-border-strong rounded-xl p-6 shadow-sm">
         <h3 className="text-lg font-bold text-white mb-4">Assign Club President</h3>
         <form onSubmit={handleAssignPresident} className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1 w-full">
@@ -317,7 +317,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
               type="email"
               value={assignEmail}
               onChange={(e) => setAssignEmail(e.target.value)}
-              className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+              className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
               placeholder="student@college.edu"
             />
           </div>
@@ -326,7 +326,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
             <select
               value={assignClubId}
               onChange={(e) => setAssignClubId(e.target.value)}
-              className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+              className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
             >
               <option value="">-- Choose a Club --</option>
               {clubs.map(c => (
@@ -337,7 +337,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
           <button
             type="submit"
             disabled={isAssigning}
-            className="bg-[#2D5A27] hover:bg-[#397032] text-white px-6 py-2.5 rounded-lg font-bold transition disabled:opacity-70 h-[46px] min-w-[120px] flex items-center justify-center"
+            className="bg-brand-accent hover:bg-brand-accent-hover text-white px-6 py-2.5 rounded-lg font-bold transition disabled:opacity-70 h-[46px] min-w-[120px] flex items-center justify-center"
           >
             {isAssigning ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Assign Role'}
           </button>
@@ -345,11 +345,11 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
       </div>
 
       {/* Clubs Table */}
-      <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-surface-elevated border border-border-strong rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-800 bg-[#141414]">
+              <tr className="border-b border-border-strong bg-[#141414]">
                 <th className="p-4 text-sm font-semibold text-gray-300">Club Name</th>
                 <th className="p-4 text-sm font-semibold text-gray-300">Category</th>
                 <th className="p-4 text-sm font-semibold text-gray-300">Status</th>
@@ -373,9 +373,9 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                 </tr>
               ) : (
                 clubs.map(club => (
-                  <tr key={club.id} className="border-b border-gray-800 hover:bg-[#202020] transition group">
+                  <tr key={club.id} className="border-b border-border-strong hover:bg-[#202020] transition group">
                     <td className="p-4 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gray-800 overflow-hidden flex items-center justify-center border border-gray-700">
+                      <div className="w-10 h-10 rounded-full bg-gray-800 overflow-hidden flex items-center justify-center border border-border-subtle">
                         {club.logoUrl ? (
                           <img src={getOptimizedImageUrl(club.logoUrl, '1:1')} alt={club.name} className="w-full h-full object-cover" />
                         ) : (
@@ -391,7 +391,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                       </div>
                     </td>
                     <td className="p-4">
-                      <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-300 border border-gray-700">
+                      <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-300 border border-border-subtle">
                         {club.category}
                       </span>
                     </td>
@@ -408,11 +408,11 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                     <td className="p-4">
                       {club.presidentName ? (
                         <div>
-                          <div className="text-sm font-medium text-gray-200">{club.presidentName}</div>
+                          <div className="text-sm font-medium text-text-main">{club.presidentName}</div>
                           <div className="text-xs text-gray-500">{club.presidentEmail}</div>
                         </div>
                       ) : (
-                        <span className="inline-block px-2 py-0.5 rounded-md text-xs font-medium bg-gray-800 text-gray-400 border border-gray-700">
+                        <span className="inline-block px-2 py-0.5 rounded-md text-xs font-medium bg-gray-800 text-text-muted border border-border-subtle">
                           No President
                         </span>
                       )}
@@ -421,7 +421,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => toast('Notification feature coming soon!', { icon: '📢' })}
-                          className="p-1.5 text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 rounded-md transition"
+                          className="p-1.5 text-text-muted hover:text-blue-400 hover:bg-blue-400/10 rounded-md transition"
                           title="Announce"
                         >
                           <Megaphone size={18} />
@@ -451,7 +451,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                         )}
                         <button
                           onClick={() => openEditModal(club)}
-                          className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition"
+                          className="p-1.5 text-text-muted hover:text-white hover:bg-gray-800 rounded-md transition"
                         >
                           <Edit2 size={18} />
                         </button>
@@ -461,7 +461,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                               deleteClubMutation.mutate(club.id);
                             }
                           }}
-                          className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-md transition"
+                          className="p-1.5 text-text-muted hover:text-red-400 hover:bg-red-400/10 rounded-md transition"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -478,12 +478,12 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#1A1A1A] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl border border-gray-800 flex flex-col">
-            <div className="p-6 border-b border-gray-800 flex justify-between items-center bg-[#1A1A1A] shrink-0">
+          <div className="bg-surface-elevated rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl border border-border-strong flex flex-col">
+            <div className="p-6 border-b border-border-strong flex justify-between items-center bg-surface-elevated shrink-0">
               <h3 className="font-bold text-xl text-white">
                 {editingClub ? 'Edit Club' : 'Add New Club'}
               </h3>
-              <button onClick={closeModal} className="text-gray-400 hover:text-white transition bg-gray-800/50 hover:bg-gray-800 p-2 rounded-full">
+              <button onClick={closeModal} className="text-text-muted hover:text-white transition bg-gray-800/50 hover:bg-gray-800 p-2 rounded-full">
                 <X size={20} />
               </button>
             </div>
@@ -496,7 +496,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                   <label className="block text-sm font-medium text-gray-300 mb-2">Club Logo</label>
                   <div className="flex items-center gap-4">
                     <div
-                      className="w-20 h-20 rounded-xl bg-gray-800 border-2 border-dashed border-gray-700 flex items-center justify-center overflow-hidden cursor-pointer hover:border-gray-500 transition"
+                      className="w-20 h-20 rounded-xl bg-gray-800 border-2 border-dashed border-border-subtle flex items-center justify-center overflow-hidden cursor-pointer hover:border-gray-500 transition"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       {logoPreview ? (
@@ -530,7 +530,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                     <label className="block text-sm font-medium text-gray-300 mb-1">Club Name *</label>
                     <input
                       {...register('name')}
-                      className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent outline-none transition"
+                      className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent outline-none transition"
                       placeholder="e.g., Cyber-Security Cell"
                     />
                     {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name.message}</p>}
@@ -539,7 +539,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                     <label className="block text-sm font-medium text-gray-300 mb-1">Category *</label>
                     <select
                       {...register('category')}
-                      className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                      className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
                     >
                       <option value="Tech">Tech</option>
                       <option value="Arts">Arts</option>
@@ -555,7 +555,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                   <label className="block text-sm font-medium text-gray-300 mb-1">Tagline *</label>
                   <input
                     {...register('tagline')}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                    className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
                     placeholder="Short catchy description"
                   />
                   {errors.tagline && <p className="text-red-400 text-xs mt-1">{errors.tagline.message}</p>}
@@ -566,7 +566,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                   <textarea
                     {...register('description')}
                     rows={4}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                    className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
                     placeholder="Tell us about the club's purpose and vision..."
                   />
                   {errors.description && <p className="text-red-400 text-xs mt-1">{errors.description.message}</p>}
@@ -577,7 +577,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                     <label className="block text-sm font-medium text-gray-300 mb-1">Membership Status</label>
                     <select
                       {...register('status')}
-                      className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                      className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
                     >
                       <option value="Active">Active</option>
                       <option value="Inactive">Inactive</option>
@@ -589,7 +589,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                     <input
                       {...register('email')}
                       type="email"
-                      className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                      className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
                       placeholder="official@club.com"
                     />
                     {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
@@ -600,40 +600,40 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                   <label className="block text-sm font-medium text-gray-300 mb-1">Core Team / Head *</label>
                   <input
                     {...register('coreTeam')}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                    className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
                     placeholder="Name or Email of the President"
                   />
                   {errors.coreTeam && <p className="text-red-400 text-xs mt-1">{errors.coreTeam.message}</p>}
                 </div>
 
-                <div className="space-y-4 pt-4 border-t border-gray-800">
+                <div className="space-y-4 pt-4 border-t border-border-strong">
                   <h4 className="text-white font-medium">Social Links</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1">Instagram URL</label>
-                      <input {...register('instagram')} className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#2D5A27] outline-none" placeholder="https://instagram.com/..." />
+                      <label className="block text-xs text-text-muted mb-1">Instagram URL</label>
+                      <input {...register('instagram')} className="w-full bg-gray-900 border border-border-subtle rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#2D5A27] outline-none" placeholder="https://instagram.com/..." />
                       {errors.instagram && <p className="text-red-400 text-xs mt-1">{errors.instagram.message}</p>}
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1">LinkedIn URL</label>
-                      <input {...register('linkedin')} className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#2D5A27] outline-none" placeholder="https://linkedin.com/..." />
+                      <label className="block text-xs text-text-muted mb-1">LinkedIn URL</label>
+                      <input {...register('linkedin')} className="w-full bg-gray-900 border border-border-subtle rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#2D5A27] outline-none" placeholder="https://linkedin.com/..." />
                       {errors.linkedin && <p className="text-red-400 text-xs mt-1">{errors.linkedin.message}</p>}
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1">GitHub URL</label>
-                      <input {...register('github')} className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#2D5A27] outline-none" placeholder="https://github.com/..." />
+                      <label className="block text-xs text-text-muted mb-1">GitHub URL</label>
+                      <input {...register('github')} className="w-full bg-gray-900 border border-border-subtle rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#2D5A27] outline-none" placeholder="https://github.com/..." />
                       {errors.github && <p className="text-red-400 text-xs mt-1">{errors.github.message}</p>}
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1">Website URL (Optional)</label>
-                      <input {...register('website')} className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#2D5A27] outline-none" placeholder="https://..." />
+                      <label className="block text-xs text-text-muted mb-1">Website URL (Optional)</label>
+                      <input {...register('website')} className="w-full bg-gray-900 border border-border-subtle rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#2D5A27] outline-none" placeholder="https://..." />
                       {errors.website && <p className="text-red-400 text-xs mt-1">{errors.website.message}</p>}
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-gray-800 flex items-center gap-3">
-                  <input type="checkbox" id="isVerified" {...register('isVerified')} className="w-4 h-4 rounded border-gray-700 text-[#2D5A27] focus:ring-[#2D5A27] bg-gray-900" />
+                <div className="pt-4 border-t border-border-strong flex items-center gap-3">
+                  <input type="checkbox" id="isVerified" {...register('isVerified')} className="w-4 h-4 rounded border-border-subtle text-brand-accent focus:ring-[#2D5A27] bg-gray-900" />
                   <label htmlFor="isVerified" className="text-sm font-medium text-gray-300">
                     Grant Verification Badge (Official Club)
                   </label>
@@ -641,7 +641,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
               </form>
             </div>
 
-            <div className="p-6 border-t border-gray-800 bg-[#141414] shrink-0 flex justify-end gap-3">
+            <div className="p-6 border-t border-border-strong bg-[#141414] shrink-0 flex justify-end gap-3">
               <button
                 type="button"
                 onClick={closeModal}
@@ -654,7 +654,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                 type="submit"
                 form="clubForm"
                 disabled={isUploading}
-                className="bg-[#2D5A27] hover:bg-[#397032] text-white px-6 py-2.5 rounded-lg font-medium transition disabled:opacity-70 flex items-center gap-2 shadow-[0_0_15px_rgba(45,90,39,0.3)]"
+                className="bg-brand-accent hover:bg-brand-accent-hover text-white px-6 py-2.5 rounded-lg font-medium transition disabled:opacity-70 flex items-center gap-2 shadow-[0_0_15px_rgba(45,90,39,0.3)]"
               >
                 {isUploading ? (
                   <><Loader2 className="w-5 h-5 animate-spin" /> Saving...</>

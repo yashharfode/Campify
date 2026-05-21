@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import HomeDashboard from '../../components/HomeDashboard';
 import {
     Home, ShoppingBag, Users, Compass, User, Search, Bell, Plus, Heart, Upload,
     AlertCircle, Calendar, Download, Github, Linkedin, Filter, Menu, Settings,
@@ -241,25 +242,25 @@ const AuthScreen = () => {
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse"></div>
             <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-orange-600/10 rounded-full blur-3xl animate-pulse delay-700"></div>
 
-            <div className="bg-[#1A1A1A] border border-gray-800 p-8 rounded-3xl w-full max-w-md shadow-2xl z-10">
+            <div className="bg-surface-elevated border border-border-strong p-8 rounded-3xl w-full max-w-md shadow-2xl z-10">
                 <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4 overflow-hidden shadow-lg">
                         <img src="/logo.ico" alt="Campify Logo" className="w-full h-full object-cover" />
                     </div>
-                    <h1 className="text-3xl font-black text-gray-200 mb-2">{mode === 'login' ? 'Welcome back' : 'Create your account'}</h1>
+                    <h1 className="text-3xl font-black text-text-main mb-2">{mode === 'login' ? 'Welcome back' : 'Create your account'}</h1>
                     <p className="text-gray-500">Enter your credentials to continue</p>
                 </div>
 
-                <div className="flex gap-2 mb-6 bg-[#121212] p-1 rounded-xl">
+                <div className="flex gap-2 mb-6 bg-surface-base p-1 rounded-xl">
                     <button
                         onClick={() => switchMode('login')}
-                        className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${mode === 'login' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-400'}`}
+                        className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${mode === 'login' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:text-text-muted'}`}
                     >
                         Login
                     </button>
                     <button
                         onClick={() => switchMode('signup')}
-                        className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${mode === 'signup' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-400'}`}
+                        className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${mode === 'signup' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:text-text-muted'}`}
                     >
                         Sign Up
                     </button>
@@ -270,72 +271,72 @@ const AuthScreen = () => {
                         <>
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="text-gray-400 text-xs font-bold uppercase tracking-wider ml-1">First Name</label>
+                                    <label className="text-text-muted text-xs font-bold uppercase tracking-wider ml-1">First Name</label>
                                     <input
                                         type="text"
                                         value={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
-                                        className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl p-3 text-gray-200 mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
+                                        className="w-full bg-surface-elevated border border-border-strong rounded-xl p-3 text-text-main mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
                                         placeholder="Alex"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-gray-400 text-xs font-bold uppercase tracking-wider ml-1">Last Name</label>
+                                    <label className="text-text-muted text-xs font-bold uppercase tracking-wider ml-1">Last Name</label>
                                     <input
                                         type="text"
                                         value={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
-                                        className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl p-3 text-gray-200 mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
+                                        className="w-full bg-surface-elevated border border-border-strong rounded-xl p-3 text-text-main mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
                                         placeholder="Sharma"
                                     />
                                 </div>
                             </div>
                             <div>
-                                <label className="text-gray-400 text-xs font-bold uppercase tracking-wider ml-1">Username</label>
+                                <label className="text-text-muted text-xs font-bold uppercase tracking-wider ml-1">Username</label>
                                 <input
                                     type="text"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl p-3 text-gray-200 mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
+                                    className="w-full bg-surface-elevated border border-border-strong rounded-xl p-3 text-text-main mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
                                     placeholder="uniqueusername"
                                 />
-                                <p className="text-[10px] text-gray-400 mt-1">3-20 chars (letters, numbers, ., _, -)</p>
+                                <p className="text-[10px] text-text-muted mt-1">3-20 chars (letters, numbers, ., _, -)</p>
                             </div>
                         </>
                     )}
 
                     <div>
-                        <label className="text-gray-400 text-xs font-bold uppercase tracking-wider ml-1">Email</label>
+                        <label className="text-text-muted text-xs font-bold uppercase tracking-wider ml-1">Email</label>
                         <input
                             type="email"
                             required
                             placeholder="alex@college.edu"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl p-3 text-gray-200 mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition placeholder:text-gray-400"
+                            className="w-full bg-surface-elevated border border-border-strong rounded-xl p-3 text-text-main mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition placeholder:text-text-muted"
                         />
                     </div>
 
                     <div>
-                        <label className="text-gray-400 text-xs font-bold uppercase tracking-wider ml-1">Password</label>
+                        <label className="text-text-muted text-xs font-bold uppercase tracking-wider ml-1">Password</label>
                         <input
                             type="password"
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl p-3 text-gray-200 mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition placeholder:text-gray-400"
+                            className="w-full bg-surface-elevated border border-border-strong rounded-xl p-3 text-text-main mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition placeholder:text-text-muted"
                         />
                     </div>
 
                     {mode === 'signup' && (
                         <div>
-                            <label className="text-gray-400 text-xs font-bold uppercase tracking-wider ml-1">Confirm Password</label>
+                            <label className="text-text-muted text-xs font-bold uppercase tracking-wider ml-1">Confirm Password</label>
                             <input
                                 type="password"
                                 required
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl p-3 text-gray-200 mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition placeholder:text-gray-400"
+                                className="w-full bg-surface-elevated border border-border-strong rounded-xl p-3 text-text-main mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition placeholder:text-text-muted"
                             />
                         </div>
                     )}
@@ -364,7 +365,7 @@ const AuthScreen = () => {
                     </button>
                 </form>
 
-                <div className="my-4 flex items-center gap-2 text-gray-400 text-xs">
+                <div className="my-4 flex items-center gap-2 text-text-muted text-xs">
                     <div className="flex-1 h-px bg-gray-200"></div>
                     OR
                     <div className="flex-1 h-px bg-gray-200"></div>
@@ -372,7 +373,7 @@ const AuthScreen = () => {
 
                 <button
                     onClick={handleGoogleAuth}
-                    className="w-full border border-gray-800 text-gray-400 font-bold py-3 rounded-xl hover:bg-[#121212] transition flex items-center justify-center gap-3 bg-[#1A1A1A]"
+                    className="w-full border border-border-strong text-text-muted font-bold py-3 rounded-xl hover:bg-surface-base transition flex items-center justify-center gap-3 bg-surface-elevated"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.61 20.083H42V20H24v8h11.303C34.125 31.617 29.598 35 24 35c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C33.659 5.009 29.082 3 24 3 12.955 3 4 11.955 4 23s8.955 20 20 20c11.045 0 20-8.955 20-20 0-1.341-.138-2.651-.39-3.917z" /><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 16.077 18.961 13 24 13c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C33.659 5.009 29.082 3 24 3c-7.938 0-14.68 4.632-17.694 11.691z" /><path fill="#4CAF50" d="M24 43c5.522 0 10.508-2.115 14.167-5.564l-6.506-5.506C29.64 34.318 26.929 35 24 35c-5.564 0-10.279-3.559-11.957-8.483l-6.6 5.086C8.434 38.419 15.62 43 24 43z" /><path fill="#1976D2" d="M43.61 20.083H42V20H24v8h11.303C34.732 31.135 30.251 35 24 35c-5.564 0-10.279-3.559-11.957-8.483l-6.6 5.086C8.434 38.419 15.62 43 24 43c11.045 0 20-8.955 20-20 0-1.341-.138-2.651-.39-3.917z" /></svg>
                     {mode === 'login' ? 'Continue with Google' : 'Sign up with Google'}
@@ -382,19 +383,19 @@ const AuthScreen = () => {
             {/* Forgot Password Modal */}
             {forgotPasswordOpen && (
                 <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-4">
-                    <div className="bg-[#1A1A1A] rounded-2xl w-full max-w-md p-6 shadow-2xl">
-                        <h3 className="text-xl font-bold text-gray-200 mb-4">Reset Password</h3>
+                    <div className="bg-surface-elevated rounded-2xl w-full max-w-md p-6 shadow-2xl">
+                        <h3 className="text-xl font-bold text-text-main mb-4">Reset Password</h3>
                         <form onSubmit={handlePasswordReset} className="space-y-3">
                             <input
                                 type="email"
                                 required
                                 value={forgotPasswordEmail}
                                 onChange={(e) => setForgotPasswordEmail(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg p-3 bg-[#121212] text-gray-200 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                                className="w-full border border-gray-300 rounded-lg p-3 bg-surface-base text-text-main placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                                 placeholder="Enter your email"
                             />
                             <div className="flex gap-3">
-                                <button type="button" onClick={() => setForgotPasswordOpen(false)} className="flex-1 bg-[#1A1A1A] text-gray-400 font-bold py-3 rounded-lg">Cancel</button>
+                                <button type="button" onClick={() => setForgotPasswordOpen(false)} className="flex-1 bg-surface-elevated text-text-muted font-bold py-3 rounded-lg">Cancel</button>
                                 <button type="submit" className="flex-1 bg-blue-600 text-white font-bold py-3 rounded-lg">Send Reset Link</button>
                             </div>
                         </form>
@@ -653,12 +654,12 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
     };
 
     return (
-        <div className="pb-24 pt-0 min-h-screen bg-[#121212] max-w-7xl mx-auto animate-in fade-in">
+        <div className="pb-24 pt-0 min-h-screen bg-surface-base max-w-7xl mx-auto animate-in fade-in">
             {/* Header Dark Card */}
-            <div className="bg-[#1A1A1A] pt-8 pb-20 px-6 rounded-b-[3rem] relative shadow-lg border-b border-gray-800">
-                <div className="flex justify-between items-start text-gray-200 mb-4 max-w-2xl mx-auto">
+            <div className="bg-surface-elevated pt-8 pb-20 px-6 rounded-b-[3rem] relative shadow-lg border-b border-border-strong">
+                <div className="flex justify-between items-start text-text-main mb-4 max-w-2xl mx-auto">
                     <Settings className="w-6 h-6 cursor-pointer hover:rotate-90 transition opacity-80 hover:opacity-100" onClick={() => setIsEditing(prev => !prev)} />
-                    <div className="bg-[#2D5A27]/20 backdrop-blur-md p-2 rounded-full cursor-pointer hover:bg-[#2D5A27]/40 transition text-[#2D5A27]">
+                    <div className="bg-brand-accent/20 backdrop-blur-md p-2 rounded-full cursor-pointer hover:bg-brand-accent/40 transition text-brand-accent">
                         <ShieldCheck className="w-5 h-5" />
                     </div>
                 </div>
@@ -666,7 +667,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                 <div className="flex flex-col items-center max-w-md mx-auto relative z-10">
                     {/* Profile Image with Camera Icon */}
                     <div className="relative group mb-4">
-                        <div className="w-32 h-32 rounded-full border-[6px] border-[#121212] bg-[#1A1A1A] overflow-hidden shadow-2xl flex items-center justify-center text-white relative">
+                        <div className="w-32 h-32 rounded-full border-[6px] border-[#121212] bg-surface-elevated overflow-hidden shadow-2xl flex items-center justify-center text-white relative">
                             {formData.profileImage ? (
                                 <img
                                     src={getOptimizedImageUrl(formData.profileImage, '1:1')}
@@ -703,7 +704,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                 name="name"
                                 value={formData.name || ''}
                                 onChange={handleChange}
-                                className="w-full bg-[#121212] border border-gray-700 rounded-lg py-2 px-3 text-gray-200 placeholder-gray-500 text-center font-bold focus:outline-none focus:border-[#2D5A27] transition"
+                                className="w-full bg-surface-base border border-border-subtle rounded-lg py-2 px-3 text-text-main placeholder-gray-500 text-center font-bold focus:outline-none focus:border-[#2D5A27] transition"
                                 placeholder="Full Name"
                             />
                             <div className="flex gap-2">
@@ -711,14 +712,14 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                     name="branch"
                                     value={formData.branch || ''}
                                     onChange={handleChange}
-                                    className="w-1/2 bg-[#121212] border border-gray-700 rounded-lg py-2 px-3 text-gray-200 text-sm placeholder-gray-500 text-center focus:outline-none focus:border-[#2D5A27]"
+                                    className="w-1/2 bg-surface-base border border-border-subtle rounded-lg py-2 px-3 text-text-main text-sm placeholder-gray-500 text-center focus:outline-none focus:border-[#2D5A27]"
                                     placeholder="Branch (e.g. CSE)"
                                 />
                                 <input
                                     name="year"
                                     value={formData.year || ''}
                                     onChange={handleChange}
-                                    className="w-1/2 bg-[#121212] border border-gray-700 rounded-lg py-2 px-3 text-gray-200 text-sm placeholder-gray-500 text-center focus:outline-none focus:border-[#2D5A27]"
+                                    className="w-1/2 bg-surface-base border border-border-subtle rounded-lg py-2 px-3 text-text-main text-sm placeholder-gray-500 text-center focus:outline-none focus:border-[#2D5A27]"
                                     placeholder="Year (e.g. 3rd)"
                                 />
                             </div>
@@ -726,15 +727,15 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                     ) : (
                         <div className="text-center">
                             <div className="flex items-center justify-center gap-2 mb-2">
-                                <h2 className="text-gray-200 font-bold text-2xl tracking-tight">{formData.name || 'New Student'}</h2>
+                                <h2 className="text-text-main font-bold text-2xl tracking-tight">{formData.name || 'New Student'}</h2>
                                 {(formData.email && (formData.email.endsWith('@jec.ac.in') || formData.email.endsWith('@college.edu'))) && (
-                                    <div className="inline-flex items-center gap-1 bg-[#2D5A27]/20 border border-[#2D5A27]/30 px-2 py-0.5 rounded-full">
-                                        <CheckCircle2 className="w-4 h-4 text-[#2D5A27]" />
-                                        <span className="text-[#2D5A27] text-[10px] font-bold">Verified</span>
+                                    <div className="inline-flex items-center gap-1 bg-brand-accent/20 border border-[#2D5A27]/30 px-2 py-0.5 rounded-full">
+                                        <CheckCircle2 className="w-4 h-4 text-brand-accent" />
+                                        <span className="text-brand-accent text-[10px] font-bold">Verified</span>
                                     </div>
                                 )}
                             </div>
-                            <p className="text-gray-400 text-sm font-medium mt-1 opacity-90">{formData.branch || 'Branch'} • {formData.year || 'Year'}</p>
+                            <p className="text-text-muted text-sm font-medium mt-1 opacity-90">{formData.branch || 'Branch'} • {formData.year || 'Year'}</p>
                             {formData.username && (
                                 <p className="text-gray-500 text-xs font-semibold mt-1 opacity-80">@{formData.username}</p>
                             )}
@@ -744,8 +745,8 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                             {formData.email && !(formData.email.endsWith('@jec.ac.in') || formData.email.endsWith('@college.edu')) && (
                                 <p className="text-gray-500 text-xs mt-1 opacity-75">Guest User</p>
                             )}
-                            <div className="mt-3 inline-flex items-center gap-1 bg-[#121212] px-4 py-1 rounded-full border border-gray-800 shadow-sm">
-                                <span className="text-[#2D5A27]">★</span>
+                            <div className="mt-3 inline-flex items-center gap-1 bg-surface-base px-4 py-1 rounded-full border border-border-strong shadow-sm">
+                                <span className="text-brand-accent">★</span>
                                 <span className="text-gray-300 text-xs font-bold tracking-wide">Trust Score: 4.9</span>
                             </div>
                         </div>
@@ -768,7 +769,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="flex-1 bg-[#2D5A27] hover:bg-[#397032] text-white py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center justify-center gap-2"
+                            className="flex-1 bg-brand-accent hover:bg-brand-accent-hover text-white py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center justify-center gap-2"
                         >
                             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Save className="w-4 h-4" /> Save Profile</>}
                         </button>
@@ -785,19 +786,19 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                 ) : (
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="w-full bg-[#1A1A1A] text-[#2D5A27] border-2 border-[#2D5A27]/20 py-3 rounded-xl font-bold text-sm shadow-sm hover:bg-[#121212] transition flex items-center justify-center gap-2"
+                        className="w-full bg-surface-elevated text-brand-accent border-2 border-[#2D5A27]/20 py-3 rounded-xl font-bold text-sm shadow-sm hover:bg-surface-base transition flex items-center justify-center gap-2"
                     >
                         <Edit3 className="w-4 h-4" /> Edit Profile
                     </button>
                 )}
 
                 {/* Profile Tabs */}
-                <div className="flex gap-2 mb-6 bg-[#1A1A1A] p-2 rounded-xl border border-gray-800">
+                <div className="flex gap-2 mb-6 bg-surface-elevated p-2 rounded-xl border border-border-strong">
                     <button
                         onClick={() => setActiveProfileTab('about')}
                         className={`flex-1 px-4 py-2 rounded-lg font-bold text-sm transition ${activeProfileTab === 'about'
-                            ? 'bg-[#2D5A27] text-white shadow-md'
-                            : 'text-gray-400 hover:bg-[#121212]'
+                            ? 'bg-brand-accent text-white shadow-md'
+                            : 'text-text-muted hover:bg-surface-base'
                             }`}
                     >
                         About
@@ -805,8 +806,8 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                     <button
                         onClick={() => setActiveProfileTab('orders')}
                         className={`flex-1 px-4 py-2 rounded-lg font-bold text-sm transition ${activeProfileTab === 'orders'
-                            ? 'bg-[#2D5A27] text-white shadow-md'
-                            : 'text-gray-400 hover:bg-[#121212]'
+                            ? 'bg-brand-accent text-white shadow-md'
+                            : 'text-text-muted hover:bg-surface-base'
                             }`}
                     >
                         My Orders ({myOrders.length})
@@ -814,8 +815,8 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                     <button
                         onClick={() => setActiveProfileTab('sales')}
                         className={`flex-1 px-4 py-2 rounded-lg font-bold text-sm transition ${activeProfileTab === 'sales'
-                            ? 'bg-[#2D5A27] text-white shadow-md'
-                            : 'text-gray-400 hover:bg-[#121212]'
+                            ? 'bg-brand-accent text-white shadow-md'
+                            : 'text-text-muted hover:bg-surface-base'
                             }`}
                     >
                         Pending Sales ({pendingSales.filter(s => s.status === 'pending_meetup').length})
@@ -824,15 +825,15 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
 
                 {/* About & Skills */}
                 {activeProfileTab === 'about' && (
-                    <div className="bg-[#1A1A1A] p-6 rounded-2xl shadow-sm border border-gray-800">
-                        <div className="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
-                            <h3 className="font-bold text-gray-200 flex items-center gap-2 text-lg">
-                                <Briefcase className="w-5 h-5 text-[#2D5A27]" /> About Me
+                    <div className="bg-surface-elevated p-6 rounded-2xl shadow-sm border border-border-strong">
+                        <div className="flex justify-between items-center mb-6 border-b border-border-strong pb-4">
+                            <h3 className="font-bold text-text-main flex items-center gap-2 text-lg">
+                                <Briefcase className="w-5 h-5 text-brand-accent" /> About Me
                             </h3>
                             {isEditing && (
-                                <div className="flex items-center gap-3 bg-[#121212] px-4 py-2 rounded-lg border border-gray-700">
+                                <div className="flex items-center gap-3 bg-surface-base px-4 py-2 rounded-lg border border-border-subtle">
                                     <ToggleRight
-                                        className={`w-6 h-6 cursor-pointer transition ${formData.isVisibleInTeams ? 'text-[#2D5A27]' : 'text-gray-400'}`}
+                                        className={`w-6 h-6 cursor-pointer transition ${formData.isVisibleInTeams ? 'text-brand-accent' : 'text-text-muted'}`}
                                         onClick={() => setFormData(prev => ({ ...prev, isVisibleInTeams: !prev.isVisibleInTeams }))}
                                     />
                                     <span className="text-sm font-bold text-gray-300">Show me in Teams</span>
@@ -850,11 +851,11 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                         value={formData.bio || ''}
                                         onChange={handleChange}
                                         rows="4"
-                                        className="w-full bg-[#121212] border border-gray-700 rounded-xl p-3 text-sm text-gray-300 focus:outline-none focus:border-[#2D5A27] resize-none transition"
+                                        className="w-full bg-surface-base border border-border-subtle rounded-xl p-3 text-sm text-gray-300 focus:outline-none focus:border-[#2D5A27] resize-none transition"
                                         placeholder="Tell us about yourself..."
                                     />
                                 ) : (
-                                    <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap">
+                                    <p className="text-text-muted text-sm leading-relaxed whitespace-pre-wrap">
                                         {formData.bio || "No bio added yet. Click edit to introduce yourself!"}
                                     </p>
                                 )}
@@ -862,13 +863,13 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
 
                             {/* SKILLS */}
                             <div>
-                                <p className="text-xs text-gray-400 font-bold uppercase mb-2 tracking-wider">Skills</p>
+                                <p className="text-xs text-text-muted font-bold uppercase mb-2 tracking-wider">Skills</p>
                                 {isEditing ? (
                                     <input
                                         name="skills"
                                         value={formData.skills || ''}
                                         onChange={handleChange}
-                                        className="w-full bg-[#121212] border border-gray-800 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                        className="w-full bg-surface-base border border-border-strong rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                                         placeholder="React, Node.js, Design (Comma separated)..."
                                     />
                                 ) : (
@@ -877,33 +878,33 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                             <span key={i} className="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-100 shadow-sm">
                                                 {skill.trim()}
                                             </span>
-                                        )) : <span className="text-gray-400 text-xs italic">No skills listed</span>}
+                                        )) : <span className="text-text-muted text-xs italic">No skills listed</span>}
                                     </div>
                                 )}
                             </div>
 
                             {/* SOCIAL LINKS */}
                             <div>
-                                <p className="text-xs text-gray-400 font-bold uppercase mb-2 tracking-wider">Connect</p>
+                                <p className="text-xs text-text-muted font-bold uppercase mb-2 tracking-wider">Connect</p>
                                 {isEditing ? (
                                     <div className="space-y-3">
-                                        <div className="flex items-center gap-2 bg-[#121212] p-2 rounded-lg border border-gray-800">
+                                        <div className="flex items-center gap-2 bg-surface-base p-2 rounded-lg border border-border-strong">
                                             <Github className="w-4 h-4 text-gray-500" />
                                             <input
                                                 name="github"
                                                 value={formData.github || ''}
                                                 onChange={handleChange}
-                                                className="bg-transparent w-full text-sm outline-none placeholder:text-gray-400"
+                                                className="bg-transparent w-full text-sm outline-none placeholder:text-text-muted"
                                                 placeholder="GitHub Profile URL"
                                             />
                                         </div>
-                                        <div className="flex items-center gap-2 bg-[#121212] p-2 rounded-lg border border-gray-800">
+                                        <div className="flex items-center gap-2 bg-surface-base p-2 rounded-lg border border-border-strong">
                                             <Linkedin className="w-4 h-4 text-blue-600" />
                                             <input
                                                 name="linkedin"
                                                 value={formData.linkedin || ''}
                                                 onChange={handleChange}
-                                                className="bg-transparent w-full text-sm outline-none placeholder:text-gray-400"
+                                                className="bg-transparent w-full text-sm outline-none placeholder:text-text-muted"
                                                 placeholder="LinkedIn Profile URL"
                                             />
                                         </div>
@@ -911,7 +912,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                 ) : (
                                     <div className="flex gap-4">
                                         {formData.github && (
-                                            <a href={formData.github} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-gray-400 hover:text-black transition">
+                                            <a href={formData.github} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-text-muted hover:text-black transition">
                                                 <Github className="w-5 h-5" /> GitHub
                                             </a>
                                         )}
@@ -920,18 +921,18 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                                 <Linkedin className="w-5 h-5" /> LinkedIn
                                             </a>
                                         )}
-                                        {!formData.github && !formData.linkedin && <span className="text-gray-400 text-xs italic">No social links added</span>}
+                                        {!formData.github && !formData.linkedin && <span className="text-text-muted text-xs italic">No social links added</span>}
                                     </div>
                                 )}
                             </div>
 
                             {/* PROJECTS SHOWCASE */}
                             <div>
-                                <p className="text-xs text-gray-400 font-bold uppercase mb-2 tracking-wider">Projects Showcase</p>
+                                <p className="text-xs text-text-muted font-bold uppercase mb-2 tracking-wider">Projects Showcase</p>
                                 {isEditing ? (
                                     <div className="space-y-3">
                                         {(formData.projects || [createEmptyProject()]).map((project, index) => (
-                                            <div key={index} className="border-2 border-gray-800 rounded-xl p-4 space-y-2 bg-[#121212]">
+                                            <div key={index} className="border-2 border-border-strong rounded-xl p-4 space-y-2 bg-surface-base">
                                                 <div className="flex justify-between items-center mb-2">
                                                     <span className="text-xs font-bold text-gray-500">Project #{index + 1}</span>
                                                     {(formData.projects || []).length > 1 && (
@@ -946,22 +947,22 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                                 <input
                                                     value={project.title || ''}
                                                     onChange={(e) => handleProjectChange(index, 'title', e.target.value)}
-                                                    className="w-full bg-[#1A1A1A] border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    className="w-full bg-surface-elevated border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     placeholder="Project Title (e.g., E-commerce Website)"
                                                 />
                                                 <textarea
                                                     value={project.description || ''}
                                                     onChange={(e) => handleProjectChange(index, 'description', e.target.value)}
                                                     rows="2"
-                                                    className="w-full bg-[#1A1A1A] border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                                    className="w-full bg-surface-elevated border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                                                     placeholder="Brief description..."
                                                 />
-                                                <div className="flex items-center gap-2 bg-[#1A1A1A] p-2 rounded-lg border border-gray-300">
+                                                <div className="flex items-center gap-2 bg-surface-elevated p-2 rounded-lg border border-gray-300">
                                                     <LinkIcon className="w-4 h-4 text-gray-500" />
                                                     <input
                                                         value={project.link || ''}
                                                         onChange={(e) => handleProjectChange(index, 'link', e.target.value)}
-                                                        className="bg-transparent w-full text-sm outline-none placeholder:text-gray-400"
+                                                        className="bg-transparent w-full text-sm outline-none placeholder:text-text-muted"
                                                         placeholder="Project URL (GitHub, Live Demo, etc.)"
                                                     />
                                                 </div>
@@ -978,9 +979,9 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                     <div className="space-y-3">
                                         {formData.projects && formData.projects.filter(p => p.title || p.description || p.link).length > 0 ? (
                                             formData.projects.filter(p => p.title || p.description || p.link).map((project, index) => (
-                                                <div key={index} className="bg-[#121212] border border-gray-800 rounded-xl p-4">
+                                                <div key={index} className="bg-surface-base border border-border-strong rounded-xl p-4">
                                                     <div className="flex justify-between items-start mb-2">
-                                                        <h4 className="font-bold text-gray-200">{project.title || 'Untitled Project'}</h4>
+                                                        <h4 className="font-bold text-text-main">{project.title || 'Untitled Project'}</h4>
                                                         {project.link && (
                                                             <a
                                                                 href={project.link}
@@ -993,14 +994,14 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                                         )}
                                                     </div>
                                                     {project.description && (
-                                                        <p className="text-sm text-gray-400 whitespace-pre-wrap">{project.description}</p>
+                                                        <p className="text-sm text-text-muted whitespace-pre-wrap">{project.description}</p>
                                                     )}
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="text-center py-8 bg-[#121212] rounded-xl border border-dashed border-gray-300">
+                                            <div className="text-center py-8 bg-surface-base rounded-xl border border-dashed border-gray-300">
                                                 <Briefcase className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                                                <p className="text-xs text-gray-400 italic">No projects added yet. Click edit to showcase your work!</p>
+                                                <p className="text-xs text-text-muted italic">No projects added yet. Click edit to showcase your work!</p>
                                             </div>
                                         )}
                                     </div>
@@ -1022,9 +1023,9 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
 
                 {/* Wishlist Section */}
                 {activeProfileTab === 'about' && (
-                    <div className="bg-[#1A1A1A] p-6 rounded-2xl shadow-sm border border-gray-800">
-                        <div className="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
-                            <h3 className="font-bold text-gray-200 flex items-center gap-2 text-lg">
+                    <div className="bg-surface-elevated p-6 rounded-2xl shadow-sm border border-border-strong">
+                        <div className="flex justify-between items-center mb-6 border-b border-border-strong pb-4">
+                            <h3 className="font-bold text-text-main flex items-center gap-2 text-lg">
                                 <Heart className="w-5 h-5 text-red-500 fill-red-500" /> Saved Items
                             </h3>
                         </div>
@@ -1033,14 +1034,14 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                 <Loader2 className="w-6 h-6 animate-spin text-blue-600 mx-auto" />
                             </div>
                         ) : wishlistItems.length === 0 ? (
-                            <div className="text-center py-8 text-gray-400">
+                            <div className="text-center py-8 text-text-muted">
                                 <Heart className="w-12 h-12 mx-auto mb-2 opacity-20" />
                                 <p className="text-sm">No saved items yet. Start saving items you like!</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 {wishlistItems.map((item) => (
-                                    <div key={item.id} className="bg-[#121212] p-3 rounded-xl border border-gray-800">
+                                    <div key={item.id} className="bg-surface-base p-3 rounded-xl border border-border-strong">
                                         <div className="h-24 rounded-lg overflow-hidden bg-gray-200 mb-2">
                                             {item.image ? (
                                                 <img src={item.image} className="w-full h-full object-cover" alt={item.title} />
@@ -1050,7 +1051,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                                 </div>
                                             )}
                                         </div>
-                                        <h4 className="font-bold text-gray-200 text-xs line-clamp-2 mb-1">{item.title}</h4>
+                                        <h4 className="font-bold text-text-main text-xs line-clamp-2 mb-1">{item.title}</h4>
                                         <p className="text-blue-600 font-bold text-sm">₹{item.price}</p>
                                     </div>
                                 ))}
@@ -1061,9 +1062,9 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
 
                 {/* Wishlist Events Section */}
                 {activeProfileTab === 'about' && (
-                    <div className="bg-[#1A1A1A] p-6 rounded-2xl shadow-sm border border-gray-800 mt-4">
-                        <div className="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
-                            <h3 className="font-bold text-gray-200 flex items-center gap-2 text-lg">
+                    <div className="bg-surface-elevated p-6 rounded-2xl shadow-sm border border-border-strong mt-4">
+                        <div className="flex justify-between items-center mb-6 border-b border-border-strong pb-4">
+                            <h3 className="font-bold text-text-main flex items-center gap-2 text-lg">
                                 <Calendar className="w-5 h-5 text-purple-500" /> Saved Events
                             </h3>
                         </div>
@@ -1072,14 +1073,14 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                 <Loader2 className="w-6 h-6 animate-spin text-blue-600 mx-auto" />
                             </div>
                         ) : wishlistEvents.length === 0 ? (
-                            <div className="text-center py-8 text-gray-400">
+                            <div className="text-center py-8 text-text-muted">
                                 <Calendar className="w-12 h-12 mx-auto mb-2 opacity-20" />
                                 <p className="text-sm">No saved events yet. Explore events to add them!</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {wishlistEvents.map((event) => (
-                                    <div key={event.id} className="bg-[#121212] p-4 rounded-xl border border-gray-800 flex gap-4">
+                                    <div key={event.id} className="bg-surface-base p-4 rounded-xl border border-border-strong flex gap-4">
                                         <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                                             {event.image ? (
                                                 <img src={event.image} className="w-full h-full object-cover" alt={event.title} />
@@ -1095,7 +1096,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                                     {event.type}
                                                 </span>
                                             </div>
-                                            <h4 className="font-bold text-gray-200 text-sm line-clamp-1 mb-1">{event.title}</h4>
+                                            <h4 className="font-bold text-text-main text-sm line-clamp-1 mb-1">{event.title}</h4>
                                             <div className="text-xs text-gray-500 space-y-1">
                                                 <div className="flex items-center gap-1">
                                                     <Clock className="w-3 h-3" /> {event.date}
@@ -1113,7 +1114,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                 )}
 
                 {/* Account Settings */}
-                <div className="bg-[#1A1A1A] rounded-2xl shadow-sm border border-gray-800 overflow-hidden">
+                <div className="bg-surface-elevated rounded-2xl shadow-sm border border-border-strong overflow-hidden">
                     {/* Real Admin Panel - Only for authorized emails */}
                     {(user?.email === 'yash.harfode.sati@gmail.com' ||
                         user?.email === 'yashharfode123@gmail.com' ||
@@ -1130,9 +1131,9 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
 
                     {userData?.role === 'club_admin' && (
                         <SettingsItem
-                            icon={<Shield className="w-5 h-5 text-[#2D5A27]" />}
+                            icon={<Shield className="w-5 h-5 text-brand-accent" />}
                             label="Club Command"
-                            color="text-[#2D5A27]"
+                            color="text-brand-accent"
                             onClick={() => setActiveTab('club_command')}
                         />
                     )}
@@ -1152,14 +1153,14 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
 
 // --- HELPER COMPONENTS ---
 const QuickActionBtn = ({ icon, label, color, onClick }) => (
-    <div onClick={onClick} className="flex flex-col md:flex-row items-center md:bg-[#1A1A1A] md:p-3 md:rounded-xl md:shadow-sm md:border md:border-gray-800 md:flex-1 gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95">
+    <div onClick={onClick} className="flex flex-col md:flex-row items-center md:bg-surface-elevated md:p-3 md:rounded-xl md:shadow-sm md:border md:border-border-strong md:flex-1 gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95">
         <div className={`w-14 h-14 md:w-10 md:h-10 ${color} rounded-full flex items-center justify-center shadow-sm`}>{icon}</div>
-        <span className="text-xs font-bold text-gray-400 md:text-sm">{label}</span>
+        <span className="text-xs font-bold text-text-muted md:text-sm">{label}</span>
     </div>
 );
 
 const StatCard = ({ number, label, color = "text-blue-600 bg-blue-50" }) => (
-    <div className={`p-4 rounded-2xl text-center bg-[#1A1A1A] shadow-sm border border-gray-800`}>
+    <div className={`p-4 rounded-2xl text-center bg-surface-elevated shadow-sm border border-border-strong`}>
         <h4 className={`text-2xl font-bold ${color.split(' ')[0]}`}>{number}</h4>
         <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mt-1">{label}</p>
     </div>
@@ -1179,7 +1180,7 @@ const OrdersView = ({ orders, loading, user }) => {
 
     if (loading) {
         return (
-            <div className="bg-[#1A1A1A] p-6 rounded-2xl shadow-sm border border-gray-800">
+            <div className="bg-surface-elevated p-6 rounded-2xl shadow-sm border border-border-strong">
                 <div className="text-center py-12">
                     <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
                 </div>
@@ -1189,8 +1190,8 @@ const OrdersView = ({ orders, loading, user }) => {
 
     if (orders.length === 0) {
         return (
-            <div className="bg-[#1A1A1A] p-6 rounded-2xl shadow-sm border border-gray-800">
-                <div className="text-center py-12 text-gray-400">
+            <div className="bg-surface-elevated p-6 rounded-2xl shadow-sm border border-border-strong">
+                <div className="text-center py-12 text-text-muted">
                     <Package className="w-16 h-16 mx-auto mb-4 opacity-20" />
                     <p className="text-sm">No orders yet. Start shopping!</p>
                 </div>
@@ -1201,22 +1202,22 @@ const OrdersView = ({ orders, loading, user }) => {
     return (
         <div className="space-y-4">
             {orders.map((order) => (
-                <div key={order.id} className="bg-[#1A1A1A] p-6 rounded-2xl shadow-sm border border-gray-800">
+                <div key={order.id} className="bg-surface-elevated p-6 rounded-2xl shadow-sm border border-border-strong">
                     <div className="flex items-start gap-4">
                         {order.itemImage && order.itemImage.trim() !== '' ? (
-                            <div className="w-20 h-20 rounded-xl overflow-hidden bg-[#1A1A1A] flex-shrink-0">
+                            <div className="w-20 h-20 rounded-xl overflow-hidden bg-surface-elevated flex-shrink-0">
                                 <img src={order.itemImage} alt={order.itemTitle} className="w-full h-full object-cover" />
                             </div>
                         ) : (
-                            <div className="w-20 h-20 rounded-xl bg-[#1A1A1A] flex items-center justify-center flex-shrink-0">
+                            <div className="w-20 h-20 rounded-xl bg-surface-elevated flex items-center justify-center flex-shrink-0">
                                 <ShoppingBag className="w-8 h-8 text-gray-300" />
                             </div>
                         )}
                         <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between mb-2">
                                 <div className="flex-1">
-                                    <h4 className="font-bold text-gray-200 text-lg mb-1">{order.itemTitle}</h4>
-                                    <p className="text-gray-400 text-sm">Seller: {order.sellerName}</p>
+                                    <h4 className="font-bold text-text-main text-lg mb-1">{order.itemTitle}</h4>
+                                    <p className="text-text-muted text-sm">Seller: {order.sellerName}</p>
                                 </div>
                                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${order.status === 'completed'
                                     ? 'bg-green-100 text-green-700'
@@ -1331,8 +1332,8 @@ const PendingSalesView = ({ sales, user }) => {
 
     if (pendingSales.length === 0) {
         return (
-            <div className="bg-[#1A1A1A] p-6 rounded-2xl shadow-sm border border-gray-800">
-                <div className="text-center py-12 text-gray-400">
+            <div className="bg-surface-elevated p-6 rounded-2xl shadow-sm border border-border-strong">
+                <div className="text-center py-12 text-text-muted">
                     <ShoppingBag className="w-16 h-16 mx-auto mb-4 opacity-20" />
                     <p className="text-sm">No pending sales. Your completed orders will appear here!</p>
                 </div>
@@ -1343,22 +1344,22 @@ const PendingSalesView = ({ sales, user }) => {
     return (
         <div className="space-y-4">
             {pendingSales.map((order) => (
-                <div key={order.id} className="bg-[#1A1A1A] p-6 rounded-2xl shadow-sm border border-gray-800">
+                <div key={order.id} className="bg-surface-elevated p-6 rounded-2xl shadow-sm border border-border-strong">
                     <div className="flex items-start gap-4 mb-4">
                         {order.itemImage && order.itemImage.trim() !== '' ? (
-                            <div className="w-20 h-20 rounded-xl overflow-hidden bg-[#1A1A1A] flex-shrink-0">
+                            <div className="w-20 h-20 rounded-xl overflow-hidden bg-surface-elevated flex-shrink-0">
                                 <img src={order.itemImage} alt={order.itemTitle} className="w-full h-full object-cover" />
                             </div>
                         ) : (
-                            <div className="w-20 h-20 rounded-xl bg-[#1A1A1A] flex items-center justify-center flex-shrink-0">
+                            <div className="w-20 h-20 rounded-xl bg-surface-elevated flex items-center justify-center flex-shrink-0">
                                 <ShoppingBag className="w-8 h-8 text-gray-300" />
                             </div>
                         )}
                         <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between mb-2">
                                 <div className="flex-1">
-                                    <h4 className="font-bold text-gray-200 text-lg mb-1">{order.itemTitle}</h4>
-                                    <p className="text-gray-400 text-sm">Buyer: {order.buyerName}</p>
+                                    <h4 className="font-bold text-text-main text-lg mb-1">{order.itemTitle}</h4>
+                                    <p className="text-text-muted text-sm">Buyer: {order.buyerName}</p>
                                 </div>
                                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700">
                                     Pending Meetup
@@ -1369,7 +1370,7 @@ const PendingSalesView = ({ sales, user }) => {
                                 <span className="text-xs text-gray-500">{formatDate(order.createdAt)}</span>
                             </div>
                             {order.meetupLocation && (
-                                <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
+                                <div className="mt-2 flex items-center gap-2 text-xs text-text-muted">
                                     <MapPin className="w-3 h-3" />
                                     <span>{order.meetupLocation}</span>
                                 </div>
@@ -1393,7 +1394,7 @@ const PendingSalesView = ({ sales, user }) => {
                                         setOtpInputs(prev => ({ ...prev, [order.id]: value }));
                                     }}
                                     placeholder="1234"
-                                    className="flex-1 bg-[#1A1A1A] border-2 border-orange-300 rounded-lg px-4 py-3 text-2xl font-black text-center tracking-widest focus:outline-none focus:border-orange-500"
+                                    className="flex-1 bg-surface-elevated border-2 border-orange-300 rounded-lg px-4 py-3 text-2xl font-black text-center tracking-widest focus:outline-none focus:border-orange-500"
                                 />
                                 <button
                                     onClick={() => handleVerifyOTP(order.id, otpInputs[order.id])}
@@ -1418,10 +1419,10 @@ const PendingSalesView = ({ sales, user }) => {
     );
 };
 
-const SettingsItem = ({ icon, label, color = "text-gray-400", onClick }) => (
-    <div onClick={onClick} className="flex items-center justify-between p-4 border-b border-gray-50 last:border-0 hover:bg-[#121212] cursor-pointer transition">
+const SettingsItem = ({ icon, label, color = "text-text-muted", onClick }) => (
+    <div onClick={onClick} className="flex items-center justify-between p-4 border-b border-border-strong last:border-0 hover:bg-surface-base cursor-pointer transition">
         <div className={`flex items-center gap-3 ${color} font-medium`}>{icon} {label}</div>
-        <ChevronRight className="w-4 h-4 text-gray-400" />
+        <ChevronRight className="w-4 h-4 text-text-muted" />
     </div>
 );
 
@@ -1432,7 +1433,7 @@ const DesktopNavLink = ({ icon, label, active, onClick }) => (
 );
 
 const NavBtn = ({ icon, label, active, onClick }) => (
-    <button onClick={onClick} className={`flex flex-col items-center gap-1 transition-all ${active ? 'text-blue-600 -translate-y-1' : 'text-gray-400 hover:text-blue-600'}`}>
+    <button onClick={onClick} className={`flex flex-col items-center gap-1 transition-all ${active ? 'text-blue-600 -translate-y-1' : 'text-text-muted hover:text-blue-600'}`}>
         {icon}
         <span className="text-[10px] font-bold">{label}</span>
     </button>
@@ -1442,126 +1443,14 @@ const DrawerNavLink = ({ icon, label, active, onClick, color }) => (
     <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
         active 
             ? 'bg-blue-600 text-white shadow-sm' 
-            : color || 'text-gray-400 hover:bg-[#1A1A1A] hover:text-[#2D5A27]'
+            : color || 'text-text-muted hover:bg-surface-elevated hover:text-brand-accent'
     }`}>
         {icon}
         <span>{label}</span>
-        {active && <span className="ml-auto w-1.5 h-1.5 bg-[#1A1A1A] rounded-full"></span>}
+        {active && <span className="ml-auto w-1.5 h-1.5 bg-surface-elevated rounded-full"></span>}
     </button>
 );
 
-const SponsoredAds = () => {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [banners, setBanners] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchBanners = async () => {
-            try {
-                const bannersRef = collection(db, 'artifacts', appId, 'public', 'data', 'banners');
-                const snapshot = await getDocs(bannersRef);
-                const fetchedBanners = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                setBanners(fetchedBanners.length > 0 ? fetchedBanners : ADS_DATA);
-            } catch (error) {
-                console.error("Error fetching banners:", error);
-                setBanners(ADS_DATA); // Fallback
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchBanners();
-    }, []);
-
-    useEffect(() => {
-        if (banners.length === 0) return;
-        const timer = setInterval(() => { setCurrentIndex((prev) => (prev + 1) % banners.length); }, 4000);
-        return () => clearInterval(timer);
-    }, [banners]);
-
-    if (loading) return <div className="h-[150px] md:h-[220px] bg-[#1C1917] rounded-2xl animate-pulse border border-[#2D5A27]/20" />;
-
-    const openBannerLink = (link) => {
-        if (!link) return;
-        window.open(link, '_blank', 'noopener,noreferrer');
-    };
-
-    return (
-        <div className="w-full relative group">
-            <div className="flex items-center justify-between mb-4 px-1">
-                <h3 className="text-xl font-bold text-gray-200 flex items-center gap-2"><Megaphone className="w-5 h-5 text-[#2D5A27]" /> Sponsored</h3>
-                <span className="text-xs text-gray-400 font-medium">Ads by Admin</span>
-            </div>
-            <div className="relative overflow-hidden rounded-2xl shadow-lg border border-gray-800 bg-[#121212]">
-                <div className="flex transition-transform duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
-                    {banners.map((ad) => (
-                        <div key={ad.id} className="min-w-full flex flex-col shrink-0">
-                            {/* Cinematic image strip — no text overlay */}
-                            <div className="relative w-full overflow-hidden bg-[#1C1917] h-[150px] md:h-[220px]">
-                                {ad.desktopImage || ad.mobileImage || ad.image ? (
-                                    <picture>
-                                        {ad.desktopImage && <source media="(min-width: 768px)" srcSet={ad.desktopImage} />}
-                                        <img src={ad.mobileImage || ad.desktopImage || ad.image} className="w-full h-full object-cover" alt={ad.title || ''} />
-                                    </picture>
-                                ) : (
-                                    <div className="absolute inset-0 bg-gradient-to-br from-stone-800 to-stone-950" />
-                                )}
-                                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/25 to-transparent" />
-                            </div>
-                            {/* Attached content panel — reads as one unit with the poster */}
-                            <div className="relative border-t border-gray-800 bg-gradient-to-b from-[#1C1917] to-[#121212] px-4 py-4 md:px-7 md:py-6">
-                                <div className="absolute -top-px left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#2D5A27]/60 to-transparent" aria-hidden />
-                                <div className="flex flex-row items-center justify-between gap-4">
-                                    <div className="flex-1 min-w-0">
-                                        {ad.badge && (
-                                            <span className="inline-block text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B645A] mb-1">
-                                                {ad.badge}
-                                            </span>
-                                        )}
-                                        <h3 className="text-lg md:text-2xl font-extrabold text-gray-200 leading-tight tracking-tight mb-1 truncate md:whitespace-normal">
-                                            {ad.title}
-                                        </h3>
-                                        {ad.subtitle && (
-                                            <p className="text-xs md:text-[15px] text-gray-400 leading-relaxed line-clamp-2 md:line-clamp-none max-w-2xl">
-                                                {ad.subtitle}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => openBannerLink(ad.link)}
-                                        className="flex-shrink-0 inline-flex items-center justify-center bg-[#2D5A27] text-white px-4 py-2.5 md:px-6 md:py-2.5 rounded-xl text-xs md:text-sm font-semibold tracking-wide hover:bg-[#397032] transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                        disabled={!ad.link}
-                                        title={ad.link ? 'Open banner link' : 'No link configured for this banner'}
-                                    >
-                                        {ad.cta || 'Learn More'}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                {/* Slide indicators */}
-                {banners.length > 1 && (
-                    <div className="flex justify-center gap-1.5 py-3 border-t border-gray-800 bg-[#121212]/80">
-                        {banners.map((_, i) => (
-                            <button
-                                key={i}
-                                type="button"
-                                aria-label={`Go to slide ${i + 1}`}
-                                onClick={() => setCurrentIndex(i)}
-                                className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-6 bg-[#1C1917]' : 'w-1.5 bg-stone-300 hover:bg-stone-400'}`}
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-};
 
 // --- MAIN APP COMPONENT ---
 export default function App() {
@@ -1624,7 +1513,7 @@ export default function App() {
     }, [user]);
 
     if (authLoading) {
-        return <div className="min-h-screen flex items-center justify-center bg-[#1A1A1A]"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>;
+        return <div className="min-h-screen flex items-center justify-center bg-surface-elevated"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>;
     }
 
     if (!user) {
@@ -1632,276 +1521,16 @@ export default function App() {
     }
 
     // --- DASHBOARD SUB-COMPONENT ---
-    const DashboardView = () => {
-        const [featuredEvents, setFeaturedEvents] = useState([]);
-        const [scholarships, setScholarships] = useState([]);
-        const [scholarshipsLoading, setScholarshipsLoading] = useState(true);
-        const [selectedScholarship, setSelectedScholarship] = useState(null);
-
-        useEffect(() => {
-            const fetchFeatured = async () => {
-                try {
-                    const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'events');
-                    const q = query(eventsRef, where('featured', '==', true));
-                    const snapshot = await getDocs(q);
-                    const events = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    setFeaturedEvents(events);
-                } catch (error) {
-                    console.error("Error fetching featured events:", error);
-                }
-            };
-            fetchFeatured();
-        }, []);
-
-        useEffect(() => {
-            const fetchScholarships = async () => {
-                try {
-                    const scholarshipsRef = collection(db, 'artifacts', appId, 'public', 'data', 'scholarships');
-                    const snapshot = await getDocs(scholarshipsRef);
-                    const fetchedScholarships = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    setScholarships(fetchedScholarships);
-                } catch (error) {
-                    console.error("Error fetching scholarships:", error);
-                } finally {
-                    setScholarshipsLoading(false);
-                }
-            };
-            fetchScholarships();
-        }, []);
-
-        const [greeting, setGreeting] = useState({ text: "Hello", icon: "👋", subText: "Welcome back to Campify!" });
-
-        useEffect(() => {
-            const hour = new Date().getHours();
-            if (hour >= 5 && hour < 12) {
-                setGreeting({ text: "Good Morning", icon: "🌅", subText: "Hope you have an awesome day ahead!" });
-            } else if (hour >= 12 && hour < 17) {
-                setGreeting({ text: "Good Afternoon", icon: "☀️", subText: "Hope your day is going great!" });
-            } else if (hour >= 17 && hour < 22) {
-                setGreeting({ text: "Good Evening", icon: "🌇", subText: "Hope you are having a relaxing evening!" });
-            } else {
-                setGreeting({ text: "Good Night", icon: "🌙", subText: "Burning the midnight oil? Get some rest soon!" });
-            }
-        }, []);
-
-        return (
-            <div className="pb-24 pt-4 px-4 space-y-8 max-w-7xl mx-auto animate-in fade-in">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h2 className="text-gray-400 text-sm font-medium flex items-center gap-1.5">
-                            {greeting.text} {greeting.icon}
-                        </h2>
-                        <h1 className="text-gray-200 text-3xl font-bold">{userData?.name?.split(' ')[0] || 'Student'} 👋</h1>
-                        <p className="text-xs text-gray-500 mt-0.5 font-medium">{greeting.subText}</p>
-                    </div>
-                    <div
-                        className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden border border-blue-200 cursor-pointer hover:shadow-md transition"
-                        onClick={() => setActiveTab('profile')}
-                    >
-                        {userData?.profileImage ?
-                            <img src={userData.profileImage} className="w-full h-full object-cover" alt="Profile" /> :
-                            <span className="text-blue-600 font-bold">{userData?.name ? userData.name[0] : 'U'}</span>
-                        }
-                    </div>
-                </div>
-
-                <SponsoredAds />
-
-                <div>
-                    <h3 className="font-bold text-gray-200 mb-4 flex items-center gap-2">
-                        <Layers className="w-5 h-5 text-[#2D5A27]" /> Quick Actions
-                    </h3>
-                    <div className="grid grid-cols-4 gap-3 md:gap-6">
-                        <QuickActionBtn icon={<ShoppingBag className="w-6 h-6 text-[#2D5A27]" />} label="Sell" color="bg-[#2D5A27]/10 hover:bg-[#2D5A27]/20 border-[#2D5A27]/20" onClick={() => setActiveTab('market')} />
-                        <QuickActionBtn icon={<Upload className="w-6 h-6 text-[#2D5A27]" />} label="Notes" color="bg-[#2D5A27]/10 hover:bg-[#2D5A27]/20 border-[#2D5A27]/20" onClick={() => setActiveTab('notes')} />
-                        <QuickActionBtn icon={<Users className="w-6 h-6 text-[#2D5A27]" />} label="Team" color="bg-[#2D5A27]/10 hover:bg-[#2D5A27]/20 border-[#2D5A27]/20" onClick={() => setActiveTab('teams')} />
-                        <QuickActionBtn icon={<MessageSquare className="w-6 h-6 text-[#2D5A27]" />} label="Chat" color="bg-[#2D5A27]/10 hover:bg-[#2D5A27]/20 border-[#2D5A27]/20" onClick={() => setActiveTab('chat')} />
-                    </div>
-                </div>
-
-                {featuredEvents.length > 0 && (
-                    <div>
-                        <h3 className="font-bold text-gray-200 mb-4 flex items-center gap-2">
-                            <Calendar className="w-5 h-5 text-pink-600" /> Featured Events
-                        </h3>
-                        <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide">
-                            {featuredEvents.map(event => (
-                                <div key={event.id}
-                                     onClick={() => {
-                                         window.dispatchEvent(new CustomEvent('open-event', { detail: event }));
-                                         setActiveTab('discover');
-                                     }}
-                                     className="min-w-[280px] bg-[#1A1A1A] rounded-2xl border border-gray-800 shadow-sm overflow-hidden hover:shadow-md transition cursor-pointer">
-                                    <div className="h-32 bg-[#1A1A1A] relative">
-                                        {event.image && <img src={event.image} className="w-full h-full object-cover" alt={event.title} />}
-                                        <div className="absolute top-2 right-2 bg-[#1A1A1A]/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold text-pink-600 shadow-sm">
-                                            {event.date}
-                                        </div>
-                                    </div>
-                                    <div className="p-4">
-                                        <span className={`text-[10px] font-bold px-2 py-1 rounded-full bg-${event.color}-50 text-${event.color}-700 mb-2 inline-block`}>
-                                            {event.category}
-                                        </span>
-                                        <h4 className="font-bold text-gray-200 mb-1 line-clamp-1">{event.title}</h4>
-                                        <p className="text-xs text-gray-500 flex items-center gap-1">
-                                            <MapPin className="w-3 h-3" /> {event.location}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-
-                {/* Scholarships Section */}
-                <div>
-                    <h3 className="font-bold text-gray-200 mb-4 flex items-center gap-2">
-                        <GraduationCap className="w-5 h-5 text-[#2D5A27]" /> Scholarships & Opportunities
-                    </h3>
-
-                    {scholarshipsLoading ? (
-                        <div className="text-center py-12">
-                            <Loader2 className="w-8 h-8 animate-spin text-[#2D5A27] mx-auto mb-4" />
-                            <p className="text-gray-500 text-sm">Loading scholarships...</p>
-                        </div>
-                    ) : scholarships.length === 0 ? (
-                        <div className="bg-[#1A1A1A] p-8 rounded-2xl border border-gray-800 text-center">
-                            <GraduationCap className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                            <h4 className="font-bold text-gray-200 mb-2">No Scholarships Yet</h4>
-                            <p className="text-sm text-gray-400">Check back later for scholarship opportunities</p>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {scholarships.map((scholarship) => (
-                                <div
-                                    key={scholarship.id}
-                                    onClick={() => setSelectedScholarship(scholarship)}
-                                    className="bg-[#1A1A1A] p-6 rounded-2xl border border-[#333] hover:border-[#2D5A27] hover:shadow-lg transition cursor-pointer group"
-                                >
-                                    <div className="flex items-start justify-between mb-3">
-                                        <span className="text-xs font-bold px-2 py-1 rounded-full bg-[#2D5A27]/20 text-[#2D5A27]">
-                                            Scholarship
-                                        </span>
-                                        {scholarship.deadline && (
-                                            <span className="text-xs text-gray-400 flex items-center gap-1">
-                                                <Clock className="w-3 h-3" />
-                                                {new Date(scholarship.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <h4 className="font-bold text-gray-200 mb-2 line-clamp-2 group-hover:text-[#2D5A27] transition">
-                                        {scholarship.title}
-                                    </h4>
-                                    {scholarship.provider && (
-                                        <p className="text-sm text-gray-400 font-medium mb-2">{scholarship.provider}</p>
-                                    )}
-                                    {scholarship.amount && (
-                                        <p className="text-lg font-bold text-[#2D5A27] mb-2">💰 {scholarship.amount}</p>
-                                    )}
-                                    <p className="text-sm text-gray-400 mb-3 line-clamp-2">{scholarship.description}</p>
-                                    <div className="flex items-center text-[#2D5A27] text-sm font-bold group-hover:gap-2 transition-all">
-                                        View Details <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Scholarship Detail Modal */}
-                    {selectedScholarship && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedScholarship(null)}>
-                            <div className="bg-[#1A1A1A] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
-                                <div className="sticky top-0 bg-[#2D5A27] p-6 text-white z-10">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#1A1A1A]/20 backdrop-blur-md mb-3 inline-block">
-                                                SCHOLARSHIP
-                                            </span>
-                                            <h2 className="text-2xl font-bold mb-2">{selectedScholarship.title}</h2>
-                                            {selectedScholarship.provider && (
-                                                <p className="text-gray-300 font-medium">{selectedScholarship.provider}</p>
-                                            )}
-                                        </div>
-                                        <button
-                                            onClick={() => setSelectedScholarship(null)}
-                                            className="ml-4 p-2 hover:bg-[#1A1A1A]/10 rounded-full transition"
-                                        >
-                                            <X className="w-6 h-6" />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="p-6 space-y-6">
-                                    {/* Amount & Deadline */}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {selectedScholarship.amount && (
-                                            <div className="bg-[#242424] border border-[#333] rounded-xl p-4">
-                                                <p className="text-xs font-bold text-gray-400 uppercase mb-1">Amount</p>
-                                                <p className="text-2xl font-bold text-[#2D5A27]">💰 {selectedScholarship.amount}</p>
-                                            </div>
-                                        )}
-                                        {selectedScholarship.deadline && (
-                                            <div className="bg-[#242424] border border-[#333] rounded-xl p-4">
-                                                <p className="text-xs font-bold text-gray-400 uppercase mb-1">Deadline</p>
-                                                <p className="text-xl font-bold text-gray-200 flex items-center gap-2">
-                                                    <Calendar className="w-5 h-5" />
-                                                    {new Date(selectedScholarship.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Description */}
-                                    {selectedScholarship.description && (
-                                        <div>
-                                            <h3 className="font-bold text-gray-200 mb-2">Description</h3>
-                                            <p className="text-gray-400 leading-relaxed">{selectedScholarship.description}</p>
-                                        </div>
-                                    )}
-
-                                    {/* Eligibility */}
-                                    {selectedScholarship.eligibility && (
-                                        <div>
-                                            <h3 className="font-bold text-gray-200 mb-2">Eligibility Criteria</h3>
-                                            <div className="bg-[#242424] border border-[#333] rounded-xl p-4">
-                                                <p className="text-gray-400 leading-relaxed whitespace-pre-wrap">{selectedScholarship.eligibility}</p>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Website Link */}
-                                    {selectedScholarship.website && (
-                                        <div>
-                                            <a
-                                                href={selectedScholarship.website}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="w-full flex items-center justify-center gap-2 bg-[#2D5A27] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#386d31] hover:shadow-lg transition"
-                                            >
-                                                <ExternalLink className="w-5 h-5" />
-                                                Visit Official Website
-                                            </a>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        );
-    };
 
     return (
-        <div className="bg-[#1A1A1A] min-h-screen relative font-sans text-gray-200">
+        <div className="bg-surface-elevated min-h-screen relative font-sans text-text-main">
             {/* Desktop Header */}
-            <div className="hidden md:flex items-center justify-between px-8 py-4 bg-[#121212]/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
+            <div className="hidden md:flex items-center justify-between px-8 py-4 bg-surface-base/80 backdrop-blur-md border-b border-border-strong sticky top-0 z-50">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab('home')}>
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
                         <img src="/logo.ico" alt="Campify" className="w-full h-full object-cover" />
                     </div>
-                    <h1 className="text-xl font-bold text-gray-200">CAMPIFY</h1>
+                    <h1 className="text-xl font-bold text-text-main">CAMPIFY</h1>
                 </div>
                 <div className="flex items-center gap-8">
                     <DesktopNavLink icon={<Home className="w-5 h-5" />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
@@ -1913,30 +1542,30 @@ export default function App() {
                     <DesktopNavLink icon={<Package className="w-5 h-5" />} label="Lost & Found" active={activeTab === 'lost'} onClick={() => setActiveTab('lost')} />
                 </div>
                 <div className="flex items-center gap-4 cursor-pointer" onClick={() => setActiveTab('profile')}>
-                    <div className="flex items-center gap-2 hover:bg-[#121212] p-1.5 rounded-lg transition">
-                        <div className="w-8 h-8 rounded-full overflow-hidden bg-[#1A1A1A]">
+                    <div className="flex items-center gap-2 hover:bg-surface-base p-1.5 rounded-lg transition">
+                        <div className="w-8 h-8 rounded-full overflow-hidden bg-surface-elevated">
                             <img
                                 src={userData?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData?.name || 'User'}`}
                                 className="w-full h-full object-cover"
                                 alt="User"
                             />
                         </div>
-                        <span className="text-sm font-bold text-gray-400">{userData?.name || 'Student'}</span>
+                        <span className="text-sm font-bold text-text-muted">{userData?.name || 'Student'}</span>
                     </div>
                 </div>
             </div>
 
             {/* Mobile Header */}
-            <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#1A1A1A]/90 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50 shadow-sm">
+            <div className="md:hidden flex items-center justify-between px-4 py-3 bg-surface-elevated/90 backdrop-blur-md border-b border-border-strong sticky top-0 z-50 shadow-sm">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setActiveTab('home'); setHamburgerOpen(false); }}>
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
                         <img src="/logo.ico" alt="Campify" className="w-full h-full object-cover" />
                     </div>
-                    <h1 className="text-lg font-bold text-gray-200">CAMPIFY</h1>
+                    <h1 className="text-lg font-bold text-text-main">CAMPIFY</h1>
                 </div>
                 <button
                     onClick={() => setHamburgerOpen(!hamburgerOpen)}
-                    className="p-2 text-gray-400 hover:bg-[#1A1A1A] rounded-lg transition-colors focus:outline-none"
+                    className="p-2 text-text-muted hover:bg-surface-elevated rounded-lg transition-colors focus:outline-none"
                     aria-label="Toggle menu"
                 >
                     <Menu className="w-6 h-6 text-[#2f2a26]" />
@@ -1953,25 +1582,25 @@ export default function App() {
 
             {/* Slide Drawer Panel */}
             <div
-                className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-surface border-l border-gray-800 shadow-2xl z-[60] md:hidden flex flex-col transition-transform duration-300 ease-out transform ${
+                className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-surface border-l border-border-strong shadow-2xl z-[60] md:hidden flex flex-col transition-transform duration-300 ease-out transform ${
                     hamburgerOpen ? 'translate-x-0' : 'translate-x-full'
                 }`}
             >
                 {/* Drawer Header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800 bg-[#1A1A1A]">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-border-strong bg-surface-elevated">
                     <span className="text-xs font-bold tracking-widest text-[#2f2a26] uppercase">Navigation</span>
                     <button
                         onClick={() => setHamburgerOpen(false)}
-                        className="p-1.5 hover:bg-[#1A1A1A] rounded-full transition-colors text-gray-400"
+                        className="p-1.5 hover:bg-surface-elevated rounded-full transition-colors text-text-muted"
                     >
                         <X className="w-5 h-5 text-gray-500" />
                     </button>
                 </div>
 
                 {/* User Profile Card */}
-                <div className="p-5 bg-gradient-to-br bg-surface border-b border-gray-800">
+                <div className="p-5 bg-gradient-to-br bg-surface border-b border-border-strong">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-800 bg-[#1A1A1A] shadow-inner shrink-0">
+                        <div className="w-12 h-12 rounded-full overflow-hidden border border-border-strong bg-surface-elevated shadow-inner shrink-0">
                             <img
                                 src={userData?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData?.name || 'User'}`}
                                 className="w-full h-full object-cover"
@@ -1979,7 +1608,7 @@ export default function App() {
                             />
                         </div>
                         <div className="min-w-0 flex-1">
-                            <h4 className="text-sm font-bold text-gray-200 truncate">{userData?.name || 'Student'}</h4>
+                            <h4 className="text-sm font-bold text-text-main truncate">{userData?.name || 'Student'}</h4>
                             <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                             {(userData?.branch || userData?.year) && (
                                 <p className="text-[10px] font-bold text-blue-600 mt-1 uppercase tracking-wide">
@@ -1992,7 +1621,7 @@ export default function App() {
 
                 {/* Drawer Nav Links */}
                 <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-                    <div className="px-3 mb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    <div className="px-3 mb-2 text-[10px] font-bold text-text-muted uppercase tracking-widest">
                         Main Pages
                     </div>
                     <DrawerNavLink icon={<Home className="w-5 h-5" />} label="Home" active={activeTab === 'home'} onClick={() => { setActiveTab('home'); setHamburgerOpen(false); }} />
@@ -2001,7 +1630,7 @@ export default function App() {
                     <DrawerNavLink icon={<Compass className="w-5 h-5" />} label="Discover" active={activeTab === 'discover'} onClick={() => { setActiveTab('discover'); setHamburgerOpen(false); }} />
                     <DrawerNavLink icon={<User className="w-5 h-5" />} label="Profile" active={activeTab === 'profile'} onClick={() => { setActiveTab('profile'); setHamburgerOpen(false); }} />
 
-                    <div className="pt-4 px-3 mb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    <div className="pt-4 px-3 mb-2 text-[10px] font-bold text-text-muted uppercase tracking-widest">
                         Additional Tools
                     </div>
                     <DrawerNavLink icon={<FileText className="w-5 h-5" />} label="Notes" active={activeTab === 'notes'} onClick={() => { setActiveTab('notes'); setHamburgerOpen(false); }} />
@@ -2013,10 +1642,10 @@ export default function App() {
                     )}
                     
                     {userData?.role === 'club_admin' && (
-                        <DrawerNavLink icon={<Shield className="w-5 h-5 text-[#2D5A27]" />} label="Club Command" active={activeTab === 'club_command'} onClick={() => { setTargetClubId(null); setActiveTab('club_command'); setHamburgerOpen(false); }} />
+                        <DrawerNavLink icon={<Shield className="w-5 h-5 text-brand-accent" />} label="Club Command" active={activeTab === 'club_command'} onClick={() => { setTargetClubId(null); setActiveTab('club_command'); setHamburgerOpen(false); }} />
                     )}
 
-                    <div className="pt-4 border-t border-gray-800/50 my-2" />
+                    <div className="pt-4 border-t border-border-strong/50 my-2" />
                     <DrawerNavLink icon={<AlertCircle className="w-5 h-5" />} label="Help & Support" onClick={() => { setHamburgerOpen(false); }} />
                     <DrawerNavLink icon={<LogOut className="w-5 h-5 text-red-500" />} label="Log Out" onClick={() => { setHamburgerOpen(false); signOut(auth); }} color="text-red-500 hover:bg-red-50 hover:text-red-600" />
                 </div>
@@ -2024,7 +1653,7 @@ export default function App() {
 
             {/* Content Area */}
             <div className="h-full">
-                {activeTab === 'home' && <DashboardView />}
+                {activeTab === 'home' && <HomeDashboard user={user} userData={userData} setActiveTab={setActiveTab} />}
                 {activeTab === 'market' && <div className="pb-24 pt-4 px-4 max-w-7xl mx-auto"><Marketplace user={user} userData={userData} setActiveTab={setActiveTab} setChatTargetUser={setChatTargetUser} /></div>}
                 {activeTab === 'teams' && <Teams user={user} userData={userData} setActiveTab={setActiveTab} setChatTargetUser={setChatTargetUser} />}
                 {activeTab === 'discover' && <Discover user={user} />}
@@ -2048,7 +1677,7 @@ export default function App() {
             </div>
 
             {/* Mobile Nav */}
-            <div className="md:hidden fixed bottom-0 w-full bg-[#1A1A1A] border-t border-gray-800 px-6 py-3 flex justify-between items-center z-50 pb-safe shadow-lg">
+            <div className="md:hidden fixed bottom-0 w-full bg-surface-elevated border-t border-border-strong px-6 py-3 flex justify-between items-center z-50 pb-safe shadow-lg">
                 <NavBtn icon={<Home className="w-6 h-6" />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
                 <NavBtn icon={<ShoppingBag className="w-6 h-6" />} label="Market" active={activeTab === 'market'} onClick={() => setActiveTab('market')} />
                 <NavBtn icon={<Users className="w-6 h-6" />} label="Teams" active={activeTab === 'teams'} onClick={() => setActiveTab('teams')} />
