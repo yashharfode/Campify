@@ -271,10 +271,10 @@ export default function Notes({ user, userData }) {
     const availableFilterSubjects = filterSem === 'All' ? [] : (categories[filterBranch]?.[filterSem] || []);
 
     return (
-        <div className="min-h-screen bg-[#f6f3eb] pb-24 pt-4 px-3 md:px-4 max-w-7xl mx-auto">
+        <div className="min-h-screen bg-background pb-24 pt-4 px-3 md:px-4 max-w-7xl mx-auto">
             {/* Header */}
             <div className="mb-6">
-                <h1 className="text-2xl md:text-3xl font-bold text-[#2f2f2f] flex items-center gap-3 mb-2">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-200 flex items-center gap-3 mb-2">
                     <GraduationCap className="w-7 h-7 md:w-8 md:h-8 text-[#0f4c52]" />
                     Study Notes
                 </h1>
@@ -282,11 +282,11 @@ export default function Notes({ user, userData }) {
             </div>
             
             {/* Tabs */}
-            <div className="bg-[#121212]/90 rounded-xl border border-[#d9ccba] p-1 mb-6 flex gap-2 overflow-x-auto">
+            <div className="bg-[#121212]/90 rounded-xl border border-gray-800 p-1 mb-6 flex gap-2 overflow-x-auto">
                 <button
                     onClick={() => setActiveTab('all')}
                     className={`min-w-[120px] flex-1 px-3 md:px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 ${
-                        activeTab === 'all' ? 'bg-[#0f4c52] text-[#f6f3eb]' : 'text-[#5f666d] hover:bg-[#f3efe4]'
+                        activeTab === 'all' ? 'bg-[#2D5A27] text-white' : 'text-gray-400 hover:bg-surface-2'
                     }`}
                 >
                     <BookOpen className="w-4 h-4" /> All Notes
@@ -294,7 +294,7 @@ export default function Notes({ user, userData }) {
                 <button
                     onClick={() => setActiveTab('my-notes')}
                     className={`min-w-[120px] flex-1 px-3 md:px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 ${
-                        activeTab === 'my-notes' ? 'bg-[#0f4c52] text-[#f6f3eb]' : 'text-[#5f666d] hover:bg-[#f3efe4]'
+                        activeTab === 'my-notes' ? 'bg-[#2D5A27] text-white' : 'text-gray-400 hover:bg-surface-2'
                     }`}
                 >
                     <FileText className="w-4 h-4" /> My Notes
@@ -302,7 +302,7 @@ export default function Notes({ user, userData }) {
                 <button
                     onClick={() => setActiveTab('upload')}
                     className={`min-w-[132px] flex-1 px-3 md:px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 ${
-                        activeTab === 'upload' ? 'bg-[#0f4c52] text-[#f6f3eb]' : 'text-[#5f666d] hover:bg-[#f3efe4]'
+                        activeTab === 'upload' ? 'bg-[#2D5A27] text-white' : 'text-gray-400 hover:bg-surface-2'
                     }`}
                 >
                     <Upload className="w-4 h-4" /> Upload Note
@@ -314,7 +314,7 @@ export default function Notes({ user, userData }) {
                 <div className="flex flex-col lg:flex-row gap-6">
                     {/* Mobile Sidebar Toggle */}
                     <button 
-                        className="lg:hidden w-full bg-[#121212] border border-[#d9ccba] text-[#2f2f2f] p-3 rounded-xl font-bold flex justify-between items-center shadow-sm"
+                        className="lg:hidden w-full bg-[#121212] border border-gray-800 text-gray-200 p-3 rounded-xl font-bold flex justify-between items-center shadow-sm"
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     >
                         <span className="flex items-center gap-2"><Filter className="w-5 h-5"/> Filter Notes</span>
@@ -323,7 +323,7 @@ export default function Notes({ user, userData }) {
 
                     {/* Sidebar / Filters */}
                     <div className={`lg:w-64 flex-shrink-0 space-y-4 ${isSidebarOpen ? 'block' : 'hidden lg:block'}`}>
-                        <div className="bg-[#121212] border border-[#d9ccba] rounded-xl p-5 sticky top-24 shadow-sm">
+                        <div className="bg-[#121212] border border-gray-800 rounded-xl p-5 sticky top-24 shadow-sm">
                             <div className="mb-6 relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                 <input
@@ -331,7 +331,7 @@ export default function Notes({ user, userData }) {
                                     placeholder="Search notes..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#0f4c52] focus:border-transparent text-sm"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent text-sm"
                                 />
                             </div>
 
@@ -341,7 +341,7 @@ export default function Notes({ user, userData }) {
                                     <select
                                         value={filterBranch}
                                         onChange={handleFilterBranchChange}
-                                        className="w-full bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#0f4c52]"
+                                        className="w-full bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
                                     >
                                         <option value="All">All Branches</option>
                                         {Object.keys(categories).map(branch => (
@@ -356,7 +356,7 @@ export default function Notes({ user, userData }) {
                                         value={filterSem}
                                         onChange={handleFilterSemChange}
                                         disabled={filterBranch === 'All'}
-                                        className="w-full bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#0f4c52] disabled:opacity-50"
+                                        className="w-full bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27] disabled:opacity-50"
                                     >
                                         <option value="All">All Semesters</option>
                                         {availableFilterSems.map(sem => (
@@ -371,7 +371,7 @@ export default function Notes({ user, userData }) {
                                         value={filterSubject}
                                         onChange={(e) => setFilterSubject(e.target.value)}
                                         disabled={filterSem === 'All'}
-                                        className="w-full bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#0f4c52] disabled:opacity-50"
+                                        className="w-full bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27] disabled:opacity-50"
                                     >
                                         <option value="All">All Subjects</option>
                                         {availableFilterSubjects.map(sub => (
@@ -385,7 +385,7 @@ export default function Notes({ user, userData }) {
                                     <select
                                         value={filterUnit}
                                         onChange={(e) => setFilterUnit(e.target.value)}
-                                        className="w-full bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#0f4c52]"
+                                        className="w-full bg-[#1A1A1A] border border-gray-300 text-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
                                     >
                                         {UNITS.map(unit => (
                                             <option key={unit} value={unit}>{unit}</option>
@@ -399,12 +399,12 @@ export default function Notes({ user, userData }) {
                     {/* Notes Grid */}
                     <div className="flex-1">
                         {loading ? (
-                            <div className="flex flex-col items-center justify-center h-64 bg-[#121212] border border-[#d9ccba] rounded-xl shadow-sm">
+                            <div className="flex flex-col items-center justify-center h-64 bg-[#121212] border border-gray-800 rounded-xl shadow-sm">
                                 <Loader2 className="w-10 h-10 animate-spin text-[#0f4c52] mb-4" />
                                 <p className="text-gray-500 font-bold tracking-wide">Loading notes...</p>
                             </div>
                         ) : filteredNotes.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-64 bg-[#121212] border border-[#d9ccba] rounded-xl shadow-sm">
+                            <div className="flex flex-col items-center justify-center h-64 bg-[#121212] border border-gray-800 rounded-xl shadow-sm">
                                 <FileText className="w-16 h-16 text-gray-300 mb-4" />
                                 <p className="text-gray-500 font-bold text-lg">No notes found</p>
                                 <p className="text-gray-400 text-sm">Try adjusting your filters.</p>
@@ -412,18 +412,18 @@ export default function Notes({ user, userData }) {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                                 {filteredNotes.map(note => (
-                                    <div key={note.id} className="bg-[#121212] rounded-xl border border-[#d9ccba] overflow-hidden hover:shadow-md transition group flex flex-col h-full">
+                                    <div key={note.id} className="bg-[#121212] rounded-xl border border-gray-800 overflow-hidden hover:shadow-md transition group flex flex-col h-full">
                                         {/* Cover Image */}
-                                        <div className="h-32 bg-gray-900 overflow-hidden relative border-b border-[#d9ccba] aspect-video w-full">
+                                        <div className="h-32 bg-gray-900 overflow-hidden relative border-b border-gray-800 aspect-video w-full">
                                             {note.coverImage ? (
                                                 <img src={getOptimizedImageUrl(note.coverImage, '16:9')} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt={note.title} />
                                             ) : (
-                                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50">
+                                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#242424]">
                                                     <BookOpen className="w-12 h-12 text-gray-300" />
                                                 </div>
                                             )}
                                             <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
-                                                <span className="bg-[#0f4c52] text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                                                <span className="bg-[#2D5A27] text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
                                                     {note.semester}
                                                 </span>
                                                 {note.unit !== 'All Units' && (
@@ -451,7 +451,7 @@ export default function Notes({ user, userData }) {
                                                 </div>
                                                 <button
                                                     onClick={() => handleDownload(note)}
-                                                    className="bg-[#0f4c52] hover:bg-[#0a383d] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                                                    className="bg-[#2D5A27] hover:bg-[#397032] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
                                                 >
                                                     <LinkIcon className="w-3.5 h-3.5" /> Open
                                                 </button>
@@ -469,12 +469,12 @@ export default function Notes({ user, userData }) {
             {activeTab === 'my-notes' && (
                 <div>
                     {myNotes.length === 0 ? (
-                         <div className="flex flex-col items-center justify-center py-12 bg-[#121212] border border-[#d9ccba] rounded-xl shadow-sm">
+                         <div className="flex flex-col items-center justify-center py-12 bg-[#121212] border border-gray-800 rounded-xl shadow-sm">
                              <FileText className="w-16 h-16 text-gray-300 mb-4" />
                              <p className="text-gray-500 font-bold text-lg mb-4">You haven't uploaded any notes yet.</p>
                              <button
                                  onClick={() => setActiveTab('upload')}
-                                 className="bg-[#0f4c52] text-white px-6 py-2.5 rounded-lg font-bold hover:bg-[#0a383d] transition shadow-md"
+                                 className="bg-[#2D5A27] text-white px-6 py-2.5 rounded-lg font-bold hover:bg-[#397032] transition shadow-md"
                              >
                                  Upload Your First Note
                              </button>
@@ -482,13 +482,13 @@ export default function Notes({ user, userData }) {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {myNotes.map(note => (
-                                <div key={note.id} className="bg-[#121212] rounded-xl border border-[#d9ccba] overflow-hidden hover:shadow-md transition flex flex-col shadow-sm">
+                                <div key={note.id} className="bg-[#121212] rounded-xl border border-gray-800 overflow-hidden hover:shadow-md transition flex flex-col shadow-sm">
                                     {/* Cover Image */}
-                                    <div className="h-28 bg-gray-900 overflow-hidden relative border-b border-[#d9ccba] aspect-video w-full">
+                                    <div className="h-28 bg-gray-900 overflow-hidden relative border-b border-gray-800 aspect-video w-full">
                                         {note.coverImage ? (
                                             <img src={getOptimizedImageUrl(note.coverImage, '16:9')} className="w-full h-full object-cover" alt={note.title} />
                                         ) : (
-                                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50">
+                                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#242424]">
                                                 <BookOpen className="w-10 h-10 text-gray-300" />
                                             </div>
                                         )}
@@ -523,7 +523,7 @@ export default function Notes({ user, userData }) {
 
             {/* Upload Tab */}
             {activeTab === 'upload' && (
-                <div className="bg-[#121212] rounded-2xl border border-[#d9ccba] p-6 md:p-8 max-w-2xl mx-auto shadow-md">
+                <div className="bg-[#121212] rounded-2xl border border-gray-800 p-6 md:p-8 max-w-2xl mx-auto shadow-md">
                     <h2 className="text-2xl font-bold text-gray-200 mb-2">Upload Study Note</h2>
                     <p className="text-gray-500 text-sm mb-8">Share your materials. All uploads are reviewed before publishing.</p>
 
@@ -535,7 +535,7 @@ export default function Notes({ user, userData }) {
                                 type="text"
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#0f4c52] focus:border-transparent transition"
+                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent transition"
                                 placeholder="e.g., Calculus Formula Sheet"
                             />
                         </div>
@@ -546,7 +546,7 @@ export default function Notes({ user, userData }) {
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 rows="3"
-                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#0f4c52] focus:border-transparent transition resize-none"
+                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent transition resize-none"
                                 placeholder="Briefly describe what this contains..."
                             />
                         </div>
@@ -564,7 +564,7 @@ export default function Notes({ user, userData }) {
                                         required
                                         value={formData.branch}
                                         onChange={handleFormBranchChange}
-                                        className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#0f4c52]"
+                                        className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
                                     >
                                         {Object.keys(categories).map(branch => (
                                             <option key={branch} value={branch}>{branch}</option>
@@ -577,7 +577,7 @@ export default function Notes({ user, userData }) {
                                         required
                                         value={formData.semester}
                                         onChange={handleFormSemChange}
-                                        className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#0f4c52]"
+                                        className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
                                     >
                                         {Object.keys(categories[formData.branch] || {}).map(sem => (
                                             <option key={sem} value={sem}>{sem}</option>
@@ -591,7 +591,7 @@ export default function Notes({ user, userData }) {
                                             required
                                             value={formData.subject}
                                             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                            className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#0f4c52]"
+                                            className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
                                         >
                                             {(categories[formData.branch]?.[formData.semester] || []).map(sub => (
                                                 <option key={sub} value={sub}>{sub}</option>
@@ -603,7 +603,7 @@ export default function Notes({ user, userData }) {
                                         <select
                                             value={formData.unit}
                                             onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                                            className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#0f4c52]"
+                                            className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
                                         >
                                             {UNITS.map(unit => (
                                                 <option key={unit} value={unit}>{unit}</option>
@@ -621,7 +621,7 @@ export default function Notes({ user, userData }) {
                                 type="url"
                                 value={formData.driveLink}
                                 onChange={(e) => setFormData({ ...formData, driveLink: e.target.value })}
-                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#0f4c52] focus:border-transparent transition"
+                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent transition"
                                 placeholder="https://drive.google.com/file/d/..."
                             />
                             <p className="text-xs text-gray-500 mt-1.5 font-medium">Make sure the link has viewing permissions for everyone</p>
@@ -631,7 +631,7 @@ export default function Notes({ user, userData }) {
                             <label className="block text-sm font-bold text-gray-400 mb-2">Cover Image (Optional)</label>
                             <div
                                 onClick={() => coverImageInputRef.current?.click()}
-                                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-[#0f4c52] hover:bg-[#1A1A1A] transition group"
+                                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-[#2D5A27] hover:bg-[#1A1A1A] transition group"
                             >
                                 {formData.coverImage ? (
                                     <div className="space-y-3">
@@ -657,7 +657,7 @@ export default function Notes({ user, userData }) {
                             </div>
                         </div>
 
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="bg-[#242424] border border-[#333] rounded-lg p-4">
                             <div className="flex items-start gap-2">
                                 <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                                 <div className="text-sm text-blue-900">
@@ -670,7 +670,7 @@ export default function Notes({ user, userData }) {
                         <button
                             type="submit"
                             disabled={uploading || categoriesLoading || !formData.subject}
-                            className="w-full bg-[#0f4c52] hover:bg-[#0a383d] text-white px-6 py-4 rounded-xl font-bold transition disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 text-base shadow-md hover:shadow-lg"
+                            className="w-full bg-[#2D5A27] hover:bg-[#397032] text-white px-6 py-4 rounded-xl font-bold transition disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 text-base shadow-md hover:shadow-lg"
                         >
                             {uploading ? (
                                 <>
@@ -690,4 +690,5 @@ export default function Notes({ user, userData }) {
         </div>
     );
 }
+
 

@@ -60,12 +60,12 @@ export default function RootLayout({ children }) {
           toastOptions={{
             duration: 3000,
             style: {
-              background: '#fbf7f0',
-              color: '#2f2a26',
+              background: '#242424',
+              color: '#E0E0E0',
               borderRadius: '12px',
               padding: '12px 16px',
-              border: '1px solid #d9cdbb',
-              boxShadow: '0 8px 20px rgba(77, 64, 49, 0.12)',
+              border: '1px solid #333',
+              boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
             },
             success: {
               iconTheme: {

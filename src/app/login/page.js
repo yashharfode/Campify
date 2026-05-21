@@ -236,7 +236,7 @@ const AuthScreen = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F5F2EB] flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
             {/* Soft decorative blurred circles matching the warm-beige/teal-green palette */}
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse"></div>
             <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-orange-600/10 rounded-full blur-3xl animate-pulse delay-700"></div>
@@ -1442,7 +1442,7 @@ const DrawerNavLink = ({ icon, label, active, onClick, color }) => (
     <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
         active 
             ? 'bg-blue-600 text-white shadow-sm' 
-            : color || 'text-gray-400 hover:bg-[#f3efe4] hover:text-[#2f5d56]'
+            : color || 'text-gray-400 hover:bg-[#1A1A1A] hover:text-[#2D5A27]'
     }`}>
         {icon}
         <span>{label}</span>
@@ -1953,12 +1953,12 @@ export default function App() {
 
             {/* Slide Drawer Panel */}
             <div
-                className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-[#fbf7f0] border-l border-[#d9cdbb] shadow-2xl z-[60] md:hidden flex flex-col transition-transform duration-300 ease-out transform ${
+                className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-surface border-l border-gray-800 shadow-2xl z-[60] md:hidden flex flex-col transition-transform duration-300 ease-out transform ${
                     hamburgerOpen ? 'translate-x-0' : 'translate-x-full'
                 }`}
             >
                 {/* Drawer Header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-[#d9cdbb] bg-[#1A1A1A]">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800 bg-[#1A1A1A]">
                     <span className="text-xs font-bold tracking-widest text-[#2f2a26] uppercase">Navigation</span>
                     <button
                         onClick={() => setHamburgerOpen(false)}
@@ -1969,9 +1969,9 @@ export default function App() {
                 </div>
 
                 {/* User Profile Card */}
-                <div className="p-5 bg-gradient-to-br from-[#f2e8da] to-[#fbf7f0] border-b border-[#d9cdbb]">
+                <div className="p-5 bg-gradient-to-br bg-surface border-b border-gray-800">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full overflow-hidden border border-[#d9cdbb] bg-[#1A1A1A] shadow-inner shrink-0">
+                        <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-800 bg-[#1A1A1A] shadow-inner shrink-0">
                             <img
                                 src={userData?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData?.name || 'User'}`}
                                 className="w-full h-full object-cover"
@@ -2016,7 +2016,7 @@ export default function App() {
                         <DrawerNavLink icon={<Shield className="w-5 h-5 text-[#2D5A27]" />} label="Club Command" active={activeTab === 'club_command'} onClick={() => { setTargetClubId(null); setActiveTab('club_command'); setHamburgerOpen(false); }} />
                     )}
 
-                    <div className="pt-4 border-t border-[#d9cdbb]/50 my-2" />
+                    <div className="pt-4 border-t border-gray-800/50 my-2" />
                     <DrawerNavLink icon={<AlertCircle className="w-5 h-5" />} label="Help & Support" onClick={() => { setHamburgerOpen(false); }} />
                     <DrawerNavLink icon={<LogOut className="w-5 h-5 text-red-500" />} label="Log Out" onClick={() => { setHamburgerOpen(false); signOut(auth); }} color="text-red-500 hover:bg-red-50 hover:text-red-600" />
                 </div>
@@ -2056,7 +2056,9 @@ export default function App() {
                 <NavBtn icon={<User className="w-6 h-6" />} label="Profile" active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} />
             </div>
 
-            {activeTab === 'home' && <MentorChatBubble />}
+            {/* activeTab === 'home' && <MentorChatBubble /> */}
         </div>
     );
 }
+
+

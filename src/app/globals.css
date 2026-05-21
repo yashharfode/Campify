@@ -1,15 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5efe5;
-  --foreground: #2f2a26;
-  --surface: #fbf7f0;
-  --surface-2: #f2e8da;
-  --ink-soft: #5f5750;
-  --line-soft: #d9cdbb;
-  --accent-deep: #2f5d56;
-  --accent-copper: #b77a4d;
-  --accent-lilac: #7b7099;
+  /* Centralized Dark Theme Variables (Silent Coder) */
+  --background: #121212;
+  --foreground: #E0E0E0;
+  
+  --surface: #1A1A1A;
+  --surface-2: #242424;
+  
+  --ink-soft: #A0A0A0;
+  --line-soft: #333333;
+  
+  --accent-deep: #2D5A27;
+  --accent-hover: #397032;
 }
 
 @theme inline {
@@ -18,90 +21,43 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Override blue to be consistent with our accent-deep (teal) */
-  --color-blue-50: #edf5f3;
-  --color-blue-100: #dbe8e2;
-  --color-blue-200: #b9d1c5;
-  --color-blue-300: #8eb1a1;
-  --color-blue-400: #5f8d7b;
-  --color-blue-500: #427467;
+  /* Map common utility colors to our dark theme tokens so old classes inherit correctly */
+  --color-blue-50: var(--surface-2);
+  --color-blue-100: var(--surface);
+  --color-blue-200: var(--line-soft);
+  --color-blue-500: var(--accent-deep);
   --color-blue-600: var(--accent-deep);
-  --color-blue-700: #244a44;
-  --color-blue-800: #1b3834;
-  --color-blue-900: #142a27;
-  --color-blue-950: #0a1614;
+  --color-blue-700: var(--accent-hover);
+  --color-blue-800: var(--accent-hover);
+  --color-blue-900: #1b3834;
+  --color-blue-950: #142a27;
 
-  /* Override indigo to also match our teal theme for elements styled with indigo */
-  --color-indigo-50: #edf5f3;
-  --color-indigo-100: #dbe8e2;
-  --color-indigo-200: #b9d1c5;
-  --color-indigo-300: #8eb1a1;
-  --color-indigo-400: #5f8d7b;
-  --color-indigo-500: #427467;
+  --color-indigo-50: var(--surface-2);
+  --color-indigo-100: var(--surface);
+  --color-indigo-200: var(--line-soft);
+  --color-indigo-500: var(--accent-deep);
   --color-indigo-600: var(--accent-deep);
-  --color-indigo-700: #244a44;
-  --color-indigo-800: #1b3834;
-  --color-indigo-900: #142a27;
-  --color-indigo-950: #0a1614;
+  --color-indigo-700: var(--accent-hover);
+  --color-indigo-800: var(--accent-hover);
+  --color-indigo-900: #1b3834;
+  --color-indigo-950: #142a27;
 
-  /* Override purple to match our lilac theme */
-  --color-purple-50: #f6f5fa;
-  --color-purple-100: #ededf6;
-  --color-purple-200: #dcdcfa;
-  --color-purple-300: #bebcee;
-  --color-purple-400: #9e9bd9;
-  --color-purple-500: #837fbf;
-  --color-purple-600: var(--accent-lilac);
-  --color-purple-700: #625880;
-  --color-purple-800: #4d4466;
-  --color-purple-900: #3f3754;
-
-  /* Override orange to match our copper theme */
-  --color-orange-50: #fbf5f1;
-  --color-orange-100: #f6e8de;
-  --color-orange-200: #edceb9;
-  --color-orange-300: #e2ad8b;
-  --color-orange-400: #d58a5e;
-  --color-orange-500: #c96f3d;
-  --color-orange-600: var(--accent-copper);
-  --color-orange-700: #9c633a;
-  --color-orange-800: #7d4f30;
-  --color-orange-900: #664128;
+  --color-purple-50: var(--surface-2);
+  --color-purple-100: var(--surface);
+  --color-purple-200: var(--line-soft);
+  --color-purple-500: var(--accent-deep);
+  --color-purple-600: var(--accent-deep);
+  --color-purple-700: var(--accent-hover);
 }
 
 body {
-  position: relative;
-  background:
-    radial-gradient(1200px 600px at 0% 0%, rgba(123, 112, 153, 0.14), transparent 60%),
-    radial-gradient(1000px 600px at 100% 10%, rgba(47, 93, 86, 0.12), transparent 60%),
-    linear-gradient(180deg, #f9f4ec 0%, #f3eadc 100%);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   min-height: 100vh;
 }
 
-/* Printed texture layer (very subtle paper grain) */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.35;
-  background-image:
-    radial-gradient(rgba(88, 79, 68, 0.05) 0.7px, transparent 0.7px),
-    radial-gradient(rgba(88, 79, 68, 0.03) 0.6px, transparent 0.6px);
-  background-size: 18px 18px, 14px 14px;
-  background-position: 0 0, 7px 9px;
-  z-index: 0;
-}
-
-/* Keep app content above texture layer */
-body > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Global UI polish for cards/containers */
+/* Provide fallbacks for common light-mode classes still lingering */
 .bg-white {
   background-color: var(--surface) !important;
 }
@@ -111,7 +67,7 @@ body > * {
 }
 
 .text-gray-900 {
-  color: #2f2a26 !important;
+  color: var(--foreground) !important;
 }
 
 .text-gray-700,
@@ -127,55 +83,20 @@ body > * {
 .shadow-lg,
 .shadow-md,
 .shadow-sm {
-  box-shadow:
-    0 8px 26px rgba(77, 64, 49, 0.08),
-    0 2px 10px rgba(77, 64, 49, 0.06) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Accent refresh for common utility colors */
-.bg-blue-600 {
-  background-color: var(--accent-deep) !important;
-}
-
-.hover\:bg-blue-700:hover {
-  background-color: #244a44 !important;
-}
-
-.text-blue-600,
-.text-indigo-600 {
-  color: var(--accent-deep) !important;
-}
-
-.bg-indigo-100,
-.bg-blue-100 {
-  background-color: #dbe8e2 !important;
-}
-
-.bg-purple-600 {
-  background-color: var(--accent-lilac) !important;
-}
-
-.text-orange-600,
-.text-yellow-700 {
-  color: var(--accent-copper) !important;
-}
-
+/* Animations */
 @keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-50%);
-  }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 .animate-marquee {
   animation: marquee 20s linear infinite;
 }
 
-/* Stacked Cards Effect */
 .stack-card {
   transform-origin: center top;
-  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.8);
 }
