@@ -4,15 +4,16 @@ import React, { useState, useEffect } from 'react';
 import {
     Search, Clock, MapPin, Users, Calendar, ExternalLink,
     Sparkles, TrendingUp, Heart, Share2, Zap, BookOpen,
-    Music, Palette, Code, Trophy, Globe, Lightbulb, X
+    Music, Palette, Code, Trophy, Globe, Lightbulb, X, Image as ImageIcon, ArrowLeft, Instagram, Linkedin, Mail, Phone, Layers
 } from 'lucide-react';
 import { collection, getDocs, query, orderBy, limit, where, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, increment, onSnapshot } from 'firebase/firestore';
 import { db, appId } from '../lib/firebase';
 import toast from 'react-hot-toast';
+import { getOptimizedImageUrl } from '../lib/cloudinary';
 
 // Campus Clubs Data
 const CAMPUS_CLUBS = [
-    { name: 'Robotics Club', icon: Zap, color: 'bg-blue-500', gradient: 'from-blue-500 to-blue-600' },
+    { name: 'Robotics Club', icon: Zap, color: 'bg-[#2D5A27]', gradient: 'from-blue-500 to-blue-600' },
     { name: 'Debate Club', icon: Users, color: 'bg-purple-500', gradient: 'from-purple-500 to-purple-600' },
     { name: 'Music Club', icon: Music, color: 'bg-pink-500', gradient: 'from-pink-500 to-pink-600' },
     { name: 'Innovation Hub', icon: Lightbulb, color: 'bg-orange-500', gradient: 'from-orange-500 to-orange-600' },
@@ -119,26 +120,53 @@ export default function Discover({ user }) {
     const [wishlist, setWishlist] = useState([]);
     const [registrations, setRegistrations] = useState([]);
 
+    const [clubs, setClubs] = useState([]);
+    const [selectedClub, setSelectedClub] = useState(null);
+    const [isClubDetailModalOpen, setIsClubDetailModalOpen] = useState(false);
+
     // Fetch events from Firestore
     useEffect(() => {
-        const fetchEvents = async () => {
+        const fetchEventsAndClubs = async () => {
             try {
+                // Fetch events
                 const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'events');
-                const snapshot = await getDocs(eventsRef);
-                const fetchedEvents = snapshot.docs.map(doc => ({
+                const eventsSnap = await getDocs(eventsRef);
+                const fetchedEvents = eventsSnap.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
                 setEvents(fetchedEvents);
+
+                // Fetch clubs
+                const clubsRef = collection(db, 'artifacts', appId, 'public', 'data', 'clubs');
+                const clubsSnap = await getDocs(clubsRef);
+                const fetchedClubs = clubsSnap.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setClubs(fetchedClubs);
+
                 setLoading(false);
             } catch (error) {
-                console.error('Error fetching events:', error);
-                // Fallback to mock data if fetch fails
+                console.error('Error fetching data:', error);
                 setEvents(UPCOMING_ACTIVITIES);
+                setClubs(CAMPUS_CLUBS);
                 setLoading(false);
             }
         };
-        fetchEvents();
+        fetchEventsAndClubs();
+    }, []);
+
+    // Listen for custom events to open a specific event (e.g., from Home tab)
+    useEffect(() => {
+        const handleOpenEvent = (e) => {
+            if (e.detail) {
+                setSelectedEvent(e.detail);
+                setIsDetailModalOpen(true);
+            }
+        };
+        window.addEventListener('open-event', handleOpenEvent);
+        return () => window.removeEventListener('open-event', handleOpenEvent);
     }, []);
 
     // Fetch User Wishlist and Registrations
@@ -178,9 +206,14 @@ export default function Discover({ user }) {
         return matchesSearch && matchesCategory;
     });
 
-    const handleJoinEvent = async (eventId) => {
+    const handleJoinEvent = async (event) => {
+        const eventId = event.id;
         if (!user) {
             toast.error('Please login to join events');
+            return;
+        }
+        if (event.isRegistrationOpen === false) {
+            toast.error('Registrations for this event are closed.');
             return;
         }
         if (registrations.includes(eventId)) {
@@ -201,7 +234,16 @@ export default function Discover({ user }) {
                 attendees: increment(1)
             });
 
-            // 3. Update local state (optional as listeners will catch it, but good for immediate feedback)
+            // 3. Store user details in event's registrations subcollection for admin
+            const eventRegistrationRef = doc(db, 'artifacts', appId, 'public', 'data', 'events', eventId, 'registrations', user.uid);
+            await setDoc(eventRegistrationRef, {
+                userId: user.uid,
+                name: user.displayName || user.email?.split('@')[0] || 'Unknown User',
+                email: user.email || 'No email',
+                joinedAt: new Date().toISOString()
+            });
+
+            // 4. Update local state
             toast.success('Successfully registered for event!');
         } catch (error) {
             console.error('Error joining event:', error);
@@ -237,17 +279,17 @@ export default function Discover({ user }) {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 pb-24 px-4 md:px-6 pt-6 max-w-7xl mx-auto">
+        <div className="min-h-screen bg-[#1A1A1A] text-gray-200 pb-24 px-4 md:px-6 pt-6 max-w-7xl mx-auto">
 
             {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2D5A27] to-[#1a3a19] flex items-center justify-center">
                         <Sparkles className="w-5 h-5 text-white" />
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-black text-gray-900">Discover</h1>
+                    <h1 className="text-3xl md:text-4xl font-black text-white">Discover</h1>
                 </div>
-                <p className="text-gray-600 text-lg">Explore events, clubs, and opportunities</p>
+                <p className="text-gray-400 text-lg">Explore events, clubs, and opportunities</p>
             </div>
 
             {/* Search Bar */}
@@ -258,65 +300,91 @@ export default function Discover({ user }) {
                     placeholder="Search events, clubs..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-white border-2 border-gray-200 rounded-2xl py-4 pl-12 pr-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition"
+                    className="w-full bg-[#1A1A1A] border-2 border-gray-800 rounded-2xl py-4 pl-12 pr-4 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent shadow-sm transition"
                 />
+            </div>
+
+            {/* Campus Clubs */}
+            <div className="mb-10">
+                <h2 className="text-xl font-bold text-gray-200 mb-4 flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-[#2D5A27]" />
+                    Campus Clubs
+                </h2>
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-6">
+                    {clubs.map((club, index) => {
+                        const IconComponent = club.icon || Users;
+                        return (
+                            <button
+                                key={club.id || index}
+                                onClick={() => {
+                                    setSelectedClub(club);
+                                    setIsClubDetailModalOpen(true);
+                                }}
+                                className="flex flex-col items-center gap-3 group"
+                            >
+                                <div className={`w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br ${club.gradient || 'from-[#121212] to-[#1A1A1A]'} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform overflow-hidden border border-[#2D5A27]/30`}>
+                                    {club.logoUrl ? (
+                                        <img src={getOptimizedImageUrl(club.logoUrl, '1:1')} alt={club.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <IconComponent className="w-10 h-10 md:w-12 md:h-12 text-[#2D5A27]" />
+                                    )}
+                                </div>
+                                <span className="text-sm font-bold text-gray-300 text-center line-clamp-2">{club.name}</span>
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Featured Events */}
             <div className="mb-10">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-blue-600" />
+                    <h2 className="text-xl font-bold text-gray-200 flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-[#2D5A27]" />
                         Featured Events
                     </h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {FEATURED_EVENTS.map(event => (
-                        <div key={event.id} className="relative h-48 rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-all">
+                    {events.filter(e => e.featured).map(event => (
+                        <div key={event.id}
+                             onClick={() => { setSelectedEvent(event); setIsDetailModalOpen(true); }}
+                             className="relative h-64 md:h-72 rounded-3xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all border border-gray-800">
                             <img
-                                src={event.image}
+                                src={event.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop'}
                                 alt={event.title}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
-                            <div className={`absolute inset-0 bg-gradient-to-t ${event.gradient} opacity-80`}></div>
-                            <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-                                <span className="bg-white/20 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full mb-3 w-fit border border-white/30">
-                                    {event.tag}
-                                </span>
-                                <h3 className="text-2xl font-black mb-2">{event.title}</h3>
-                                <div className="flex items-center gap-2 text-white/90">
-                                    <Calendar className="w-4 h-4" />
-                                    <span className="text-sm font-semibold">{event.date}</span>
+                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+                            
+                            {/* Content */}
+                            <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                                <div className="mb-auto flex justify-between items-start">
+                                    <span className="bg-[#1A1A1A]/20 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full border border-white/30 shadow-sm">
+                                        {event.type}
+                                    </span>
+                                    <div className="bg-[#121212]/90 backdrop-blur-md p-2 rounded-2xl text-center min-w-[3.5rem] shadow-sm">
+                                        <div className="text-xs font-bold text-[#2D5A27] uppercase">
+                                            {event.date ? event.date.substring(0, 3) : 'TBD'}
+                                        </div>
+                                    </div>
                                 </div>
-                                <button className="mt-4 bg-white text-gray-900 px-6 py-2 rounded-xl font-bold text-sm hover:bg-gray-100 transition w-fit">
-                                    Register Now
-                                </button>
+                                <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    <h3 className="text-2xl md:text-3xl font-black text-white mb-2 leading-tight">{event.title}</h3>
+                                    <div className="flex items-center gap-4 text-white/80 text-sm font-medium mb-4">
+                                        <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> {event.date}</span>
+                                        <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> {event.location || 'Campus'}</span>
+                                    </div>
+                                    <button className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[#2D5A27] text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-[#397032] w-fit flex items-center gap-2">
+                                        View Details <ExternalLink className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Campus Clubs */}
-            <div className="mb-10">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-purple-600" />
-                    Campus Clubs
-                </h2>
-                <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
-                    {CAMPUS_CLUBS.map((club, index) => (
-                        <button
-                            key={index}
-                            className="flex flex-col items-center gap-2 group"
-                        >
-                            <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${club.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
-                                <club.icon className="w-8 h-8 text-white" />
-                            </div>
-                            <span className="text-xs font-bold text-gray-700 text-center line-clamp-2">{club.name}</span>
-                        </button>
-                    ))}
-                </div>
-            </div>
+
 
             {/* Category Filter */}
             <div className="mb-6">
@@ -326,8 +394,8 @@ export default function Discover({ user }) {
                             key={category}
                             onClick={() => setActiveCategory(category)}
                             className={`px-4 py-2 rounded-full font-bold text-sm whitespace-nowrap transition ${activeCategory === category
-                                ? 'bg-blue-600 text-white shadow-lg'
-                                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                                ? 'bg-[#2D5A27] text-white shadow-lg'
+                                : 'bg-[#1A1A1A] text-gray-400 hover:bg-[#1A1A1A] border border-gray-800'
                                 }`}
                         >
                             {category}
@@ -338,8 +406,8 @@ export default function Discover({ user }) {
 
             {/* Upcoming Activities */}
             <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-green-600" />
+                <h2 className="text-xl font-bold text-gray-200 mb-4 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-[#2D5A27]" />
                     Upcoming Activities
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -359,12 +427,27 @@ export default function Discover({ user }) {
                     ))}
                 </div>
                 {filteredEvents.length === 0 && (
-                    <div className="text-center py-12 bg-white rounded-2xl border border-gray-200">
+                    <div className="text-center py-12 bg-[#1A1A1A] rounded-2xl border border-gray-800">
                         <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                         <p className="text-gray-500">No events found matching your search</p>
                     </div>
                 )}
             </div>
+
+            {/* Club Detail Modal */}
+            <ClubDetailModal
+                isOpen={isClubDetailModalOpen}
+                onClose={() => {
+                    setIsClubDetailModalOpen(false);
+                    setSelectedClub(null);
+                }}
+                club={selectedClub}
+                events={events.filter(e => e.clubId === (selectedClub?.id))}
+                onJoinEvent={handleJoinEvent}
+                onLikeEvent={handleLikeEvent}
+                registrations={registrations}
+                wishlist={wishlist}
+            />
 
             {/* Event Detail Modal */}
             <EventDetailModal
@@ -383,12 +466,222 @@ export default function Discover({ user }) {
     );
 }
 
+// Club Detail Modal
+const ClubDetailModal = ({ isOpen, onClose, club, events, onJoinEvent, onLikeEvent, registrations, wishlist }) => {
+    if (!isOpen || !club) return null;
+
+    const IconComponent = club.icon || Users;
+    const gradient = club.gradient || 'from-slate-800 to-slate-900';
+
+    return (
+        <div className="fixed inset-0 z-[100] w-full h-full bg-[#121212] overflow-y-auto animate-in fade-in zoom-in-95 duration-300">
+            
+            {/* Navigation Bar - Floating */}
+            <div className="fixed top-0 left-0 w-full z-50 p-4 md:p-6 flex justify-between items-start pointer-events-none">
+                <button
+                    onClick={onClose}
+                    className="flex items-center gap-2 bg-[#1A1A1A]/90 backdrop-blur-md text-gray-300 hover:text-[#2D5A27] px-6 py-3 rounded-full shadow-md hover:shadow-lg transition-all pointer-events-auto font-bold text-sm border border-gray-800"
+                >
+                    <ArrowLeft className="w-4 h-4" /> Back to Discover
+                </button>
+            </div>
+
+            {/* Hero Section */}
+            <div className="relative h-[25vh] md:h-[30vh] w-full">
+                <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-90`} />
+                
+                {/* Decorative Elements */}
+                <div className="absolute inset-0 overflow-hidden opacity-30">
+                    <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-[#1A1A1A]/20 blur-3xl translate-x-1/3 -translate-y-1/3"></div>
+                    <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/60 to-transparent"></div>
+                </div>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="max-w-6xl mx-auto px-4 md:px-8 pb-24 -mt-20 relative z-10">
+                
+                {/* Header Profile Section */}
+                <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-end mb-12">
+                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-[#1A1A1A] p-2 shadow-xl flex-shrink-0 relative group border border-gray-800">
+                        <div className="w-full h-full rounded-2xl bg-[#121212] overflow-hidden flex items-center justify-center">
+                            {club.logoUrl ? (
+                                <img src={getOptimizedImageUrl(club.logoUrl, '1:1')} alt={club.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                            ) : (
+                                <IconComponent className="w-16 h-16 text-gray-300" />
+                            )}
+                        </div>
+                        {club.isVerified && (
+                            <div className="absolute -bottom-2 -right-2 bg-[#2D5A27] rounded-full p-1.5 border-4 border-white shadow-lg">
+                                <Sparkles className="w-5 h-5 text-white" />
+                            </div>
+                        )}
+                    </div>
+                    <div className="flex-1 bg-[#1A1A1A] p-6 rounded-3xl shadow-sm border border-gray-800/80 w-full">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-lg text-blue-700 text-xs font-bold tracking-wide mb-3 border border-blue-100">
+                            <Layers className="w-3 h-3" />
+                            {club.category || 'Student Community'}
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-black text-gray-200 mb-2 tracking-tight">{club.name}</h1>
+                        <p className="text-base md:text-lg text-gray-400 font-medium leading-relaxed">
+                            {club.tagline || 'Connect, Learn, and Grow with us.'}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
+                    
+                    {/* Left Column: About & Events */}
+                    <div className="lg:col-span-2 space-y-12">
+                        
+                        {/* About Section */}
+                        <section className="bg-[#1A1A1A] rounded-3xl p-8 md:p-10 shadow-sm border border-gray-800">
+                            <h2 className="text-2xl font-bold text-gray-200 mb-6 flex items-center gap-3">
+                                <span className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl"><BookOpen className="w-6 h-6" /></span>
+                                About Us
+                            </h2>
+                            <p className="text-gray-400 text-lg leading-relaxed whitespace-pre-wrap">
+                                {club.description || "Welcome to our official profile! We are currently setting things up. Stay tuned for more updates about our activities and mission."}
+                            </p>
+                            
+                            {club.mission && (
+                                <div className="mt-8 bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100/50 rounded-2xl p-8 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-200/20 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+                                    <h3 className="font-bold text-indigo-900 text-lg mb-3 flex items-center gap-2">
+                                        <Zap className="w-5 h-5 text-indigo-500" /> Our Mission
+                                    </h3>
+                                    <p className="text-indigo-800 text-lg font-medium leading-relaxed relative z-10">{club.mission}</p>
+                                </div>
+                            )}
+                        </section>
+
+                        {/* Upcoming Events */}
+                        {events && events.length > 0 && (
+                            <section>
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-2xl font-bold text-gray-200 flex items-center gap-3">
+                                        <span className="p-2.5 bg-rose-50 text-rose-500 rounded-xl"><Calendar className="w-6 h-6" /></span>
+                                        Upcoming Events
+                                    </h2>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    {events.map(event => (
+                                        <div key={event.id} className="transform hover:-translate-y-1 transition-all duration-300">
+                                            <EventCard
+                                                event={event}
+                                                onJoin={onJoinEvent}
+                                                onLike={onLikeEvent}
+                                                isLiked={wishlist.includes(event.id)}
+                                                isJoined={registrations.includes(event.id)}
+                                                onViewDetails={() => toast("Head back to Discover to view full event details.", { icon: '🔍' })}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                        
+                        {/* Media Gallery */}
+                        {club.gallery && club.gallery.length > 0 && (
+                            <section>
+                                <h2 className="text-2xl font-bold text-gray-200 mb-6 flex items-center gap-3">
+                                    <span className="p-2.5 bg-emerald-50 text-emerald-500 rounded-xl"><ImageIcon className="w-6 h-6" /></span>
+                                    Gallery
+                                </h2>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    {club.gallery.map((url, idx) => (
+                                        <div key={idx} className="group aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all relative">
+                                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center justify-center">
+                                                <ImageIcon className="w-8 h-8 text-white drop-shadow-md" />
+                                            </div>
+                                            <img src={getOptimizedImageUrl(url, '16:9')} alt={`Gallery ${idx}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                    </div>
+
+                    {/* Right Column: Contact & Team */}
+                    <div className="space-y-8">
+                        
+                        {/* Contact Widget */}
+                        <div className="bg-[#1A1A1A] rounded-3xl p-8 shadow-sm border border-gray-800 sticky top-24">
+                            <h3 className="text-xl font-bold text-gray-200 mb-6">Contact Info</h3>
+                            <div className="space-y-5">
+                                <a href={`mailto:${club.contactEmail || club.email}`} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-[#121212] transition group border border-transparent hover:border-gray-800">
+                                    <div className="w-12 h-12 rounded-xl bg-blue-50 text-[#2D5A27] flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <Mail className="w-5 h-5" />
+                                    </div>
+                                    <div className="overflow-hidden">
+                                        <p className="text-xs text-gray-500 font-medium mb-0.5">Email Address</p>
+                                        <p className="text-sm font-bold text-gray-200 truncate">{club.contactEmail || club.email || "No email"}</p>
+                                    </div>
+                                </a>
+                                
+                                {club.contactPhone && (
+                                    <a href={`tel:${club.contactPhone}`} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-[#121212] transition group border border-transparent hover:border-gray-800">
+                                        <div className="w-12 h-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <Phone className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 font-medium mb-0.5">Phone Number</p>
+                                            <p className="text-sm font-bold text-gray-200">{club.contactPhone}</p>
+                                        </div>
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Core Team Widget */}
+                        {club.teamMembers && club.teamMembers.length > 0 && (
+                            <div className="bg-[#1A1A1A] rounded-3xl p-8 shadow-sm border border-gray-800">
+                                <h3 className="text-xl font-bold text-gray-200 mb-6 flex items-center gap-2">
+                                    Core Team
+                                </h3>
+                                <div className="space-y-4">
+                                    {club.teamMembers.map((member, i) => (
+                                        <div key={member.id || i} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-[#121212] transition group">
+                                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center flex-shrink-0 shadow-inner">
+                                                <span className="font-bold text-indigo-600 text-lg">
+                                                    {member.name.charAt(0)}
+                                                </span>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-bold text-gray-200 truncate">{member.name}</h4>
+                                                <p className="text-sm text-indigo-600 font-medium truncate mb-1">{member.position}</p>
+                                                <div className="flex gap-3">
+                                                    {member.linkedInUrl && (
+                                                        <a href={member.linkedInUrl} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#2D5A27] transition">
+                                                            <Linkedin className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                    {member.instagramUrl && (
+                                                        <a href={member.instagramUrl} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-pink-600 transition">
+                                                            <Instagram className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    );
+};
+
 // Event Detail Modal
-const EventDetailModal = ({ isOpen, onClose, event, onJoin, isJoined, onLike, isLiked }) => {
+export const EventDetailModal = ({ isOpen, onClose, event, onJoin, isJoined, onLike, isLiked }) => {
     if (!isOpen || !event) return null;
 
     const colorClasses = {
-        blue: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', button: 'bg-blue-600 hover:bg-blue-700' },
+        blue: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', button: 'bg-[#2D5A27] hover:bg-blue-700' },
         orange: { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200', button: 'bg-orange-600 hover:bg-orange-700' },
         green: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200', button: 'bg-green-600 hover:bg-green-700' },
         purple: { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200', button: 'bg-purple-600 hover:bg-purple-700' },
@@ -400,21 +693,42 @@ const EventDetailModal = ({ isOpen, onClose, event, onJoin, isJoined, onLike, is
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="bg-[#1A1A1A] rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
                 <div className="relative h-64 md:h-80">
                     {event.image ? (
-                        <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+                        <img src={getOptimizedImageUrl(event.image, '16:9')} alt={event.title} className="w-full h-full object-cover" />
                     ) : (
                         <div className={`w-full h-full bg-gradient-to-br ${event.gradient || 'from-blue-500 to-purple-600'}`} />
                     )}
-                    <button
-                        onClick={onClose}
-                        className="absolute top-4 right-4 bg-black/20 hover:bg-black/40 text-white p-2 rounded-full backdrop-blur-md transition"
-                    >
-                        <X className="w-6 h-6" />
-                    </button>
+                    <div className="absolute top-4 right-4 z-20 flex gap-2">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                const shareData = {
+                                    title: event.title,
+                                    text: `Check out ${event.title} on Campify!`,
+                                    url: window.location.href,
+                                };
+                                if (navigator.share) {
+                                    navigator.share(shareData).catch((err) => console.log('Error sharing:', err));
+                                } else {
+                                    navigator.clipboard.writeText(`${window.location.origin}/login`);
+                                    toast.success('Link copied to clipboard!');
+                                }
+                            }}
+                            className="bg-black/20 hover:bg-black/40 text-white p-2 rounded-full backdrop-blur-md transition"
+                        >
+                            <Share2 className="w-6 h-6" />
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="bg-black/20 hover:bg-black/40 text-white p-2 rounded-full backdrop-blur-md transition"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                    </div>
                     <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-8">
-                        <span className="bg-white/20 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block border border-white/30">
+                        <span className="bg-[#1A1A1A]/20 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block border border-white/30">
                             {event.type}
                         </span>
                         <h2 className="text-3xl md:text-4xl font-black text-white mb-2">{event.title}</h2>
@@ -437,32 +751,32 @@ const EventDetailModal = ({ isOpen, onClose, event, onJoin, isJoined, onLike, is
                             <span className={`px-4 py-1.5 rounded-full text-sm font-bold border ${colors.bg} ${colors.text} ${colors.border}`}>
                                 {event.category}
                             </span>
-                            <span className="px-4 py-1.5 rounded-full text-sm font-bold bg-gray-100 text-gray-700 border border-gray-200 flex items-center gap-2">
+                            <span className="px-4 py-1.5 rounded-full text-sm font-bold bg-[#1A1A1A] text-gray-400 border border-gray-800 flex items-center gap-2">
                                 <Users className="w-4 h-4" /> {event.attendees} Attending
                             </span>
                         </div>
                         <button
                             onClick={() => onLike(event.id)}
-                            className={`p-2 rounded-full transition ${isLiked ? 'bg-red-50 text-red-500' : 'bg-gray-50 text-gray-400 hover:text-red-500'}`}
+                            className={`p-2 rounded-full transition ${isLiked ? 'bg-red-50 text-red-500' : 'bg-[#121212] text-gray-400 hover:text-red-500'}`}
                         >
                             <Heart className={`w-6 h-6 ${isLiked ? 'fill-current' : ''}`} />
                         </button>
                     </div>
 
-                    <div className="prose prose-lg text-gray-600 mb-8">
-                        <h3 className="text-gray-900 font-bold text-xl mb-2">About Event</h3>
+                    <div className="prose prose-lg text-gray-400 mb-8">
+                        <h3 className="text-gray-200 font-bold text-xl mb-2">About Event</h3>
                         <p>{event.description || "No description available for this event."}</p>
                     </div>
 
                     <button
-                        onClick={() => onJoin(event.id)}
-                        disabled={isJoined}
-                        className={`w-full py-4 rounded-xl font-bold text-lg transition shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] ${isJoined
-                            ? 'bg-green-100 text-green-700 cursor-default'
+                        onClick={() => onJoin(event)}
+                        disabled={isJoined || event.isRegistrationOpen === false}
+                        className={`w-full py-4 rounded-xl font-bold text-lg transition shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] ${isJoined || event.isRegistrationOpen === false
+                            ? 'bg-[#1A1A1A] text-gray-500 cursor-default shadow-none'
                             : `${colors.button} text-white`
                             }`}
                     >
-                        {isJoined ? 'Registered Successfully ✓' : 'Join Event Now'}
+                        {event.isRegistrationOpen === false ? 'Registrations Closed' : (isJoined ? 'Registered Successfully ✓' : 'Join Event Now')}
                     </button>
                 </div>
             </div>
@@ -473,7 +787,7 @@ const EventDetailModal = ({ isOpen, onClose, event, onJoin, isJoined, onLike, is
 // Event Card Component
 const EventCard = ({ event, onJoin, onLike, isLiked, isJoined, onViewDetails }) => {
     const colorClasses = {
-        blue: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-200', button: 'bg-blue-600 hover:bg-blue-700' },
+        blue: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-200', button: 'bg-[#2D5A27] hover:bg-blue-700' },
         orange: { bg: 'bg-orange-100', text: 'text-orange-700', border: 'border-orange-200', button: 'bg-orange-600 hover:bg-orange-700' },
         green: { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-200', button: 'bg-green-600 hover:bg-green-700' },
         purple: { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-200', button: 'bg-purple-600 hover:bg-purple-700' },
@@ -484,7 +798,7 @@ const EventCard = ({ event, onJoin, onLike, isLiked, isJoined, onViewDetails }) 
     const colors = colorClasses[event.color] || colorClasses.blue;
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-200 hover:shadow-lg transition-all group overflow-hidden flex flex-col h-full">
+        <div className="bg-[#1A1A1A] rounded-2xl border border-gray-800 hover:shadow-lg transition-all group overflow-hidden flex flex-col h-full">
             {/* Event Image */}
             <div className="relative h-48 w-full overflow-hidden cursor-pointer" onClick={() => onViewDetails(event)}>
                 {event.image ? (
@@ -504,7 +818,7 @@ const EventCard = ({ event, onJoin, onLike, isLiked, isJoined, onViewDetails }) 
                             e.stopPropagation();
                             onLike(event.id);
                         }}
-                        className={`p-2 rounded-full backdrop-blur-md transition ${isLiked ? 'bg-white text-red-500' : 'bg-black/20 text-white hover:bg-white hover:text-red-500'}`}
+                        className={`p-2 rounded-full backdrop-blur-md transition ${isLiked ? 'bg-[#1A1A1A] text-red-500' : 'bg-black/20 text-white hover:bg-[#1A1A1A] hover:text-red-500'}`}
                     >
                         <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
                     </button>
@@ -520,21 +834,21 @@ const EventCard = ({ event, onJoin, onLike, isLiked, isJoined, onViewDetails }) 
 
                 <h3
                     onClick={() => onViewDetails(event)}
-                    className="font-bold text-gray-900 text-lg mb-3 group-hover:text-blue-600 transition line-clamp-2 cursor-pointer"
+                    className="font-bold text-gray-200 text-lg mb-3 group-hover:text-[#2D5A27] transition line-clamp-2 cursor-pointer"
                 >
                     {event.title}
                 </h3>
 
                 <div className="space-y-2 mb-4 flex-1">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
                         <Clock className="w-4 h-4 flex-shrink-0" />
                         <span className="truncate">{event.date}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
                         <MapPin className="w-4 h-4 flex-shrink-0" />
                         <span className="truncate">{event.location}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
                         <Users className="w-4 h-4 flex-shrink-0" />
                         <span>{event.attendees} attending</span>
                     </div>
@@ -543,22 +857,23 @@ const EventCard = ({ event, onJoin, onLike, isLiked, isJoined, onViewDetails }) 
                 <div className="flex gap-2">
                     <button
                         onClick={() => onViewDetails(event)}
-                        className="flex-1 py-2.5 rounded-xl font-bold text-sm transition border border-gray-200 hover:bg-gray-50 text-gray-700"
+                        className="flex-1 py-2.5 rounded-xl font-bold text-sm transition border border-gray-800 hover:bg-[#121212] text-gray-400"
                     >
                         View Details
                     </button>
                     <button
-                        onClick={() => onJoin(event.id)}
-                        disabled={isJoined}
-                        className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition shadow-md ${isJoined
-                            ? 'bg-green-100 text-green-700 cursor-default'
+                        onClick={() => onJoin(event)}
+                        disabled={isJoined || event.isRegistrationOpen === false}
+                        className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition shadow-md ${isJoined || event.isRegistrationOpen === false
+                            ? 'bg-[#1A1A1A] text-gray-500 cursor-default shadow-none'
                             : `${colors.button} text-white`
                             }`}
                     >
-                        {isJoined ? 'Joined' : 'Join'}
+                        {event.isRegistrationOpen === false ? 'Closed' : (isJoined ? 'Joined' : 'Join')}
                     </button>
                 </div>
             </div>
         </div>
     );
 };
+

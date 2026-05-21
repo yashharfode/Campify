@@ -8,6 +8,7 @@ import {
 import { collection, addDoc, getDocs, query, where, serverTimestamp } from 'firebase/firestore';
 import { db, appId } from '../lib/firebase';
 import toast from 'react-hot-toast';
+import { uploadToCloudinary, getOptimizedImageUrl } from '../lib/cloudinary';
 
 export default function LostAndFound({ user, userData }) {
     const [activeTab, setActiveTab] = useState('lost'); // 'lost', 'found', 'post'
@@ -65,19 +66,21 @@ export default function LostAndFound({ user, userData }) {
         }
     };
 
-    const handleImageUpload = (e) => {
+    const handleImageUpload = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 500000) {
-                toast.error('Image too large! Max 500KB');
+            if (file.size > 2097152) { // 2MB
+                toast.error('Image too large! Max 2MB');
                 return;
             }
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, image: reader.result }));
-                toast.success('Image added!');
-            };
-            reader.readAsDataURL(file);
+            try {
+                toast.loading('Uploading image...', { id: 'lnfUpload' });
+                const url = await uploadToCloudinary(file);
+                setFormData(prev => ({ ...prev, image: url }));
+                toast.success('Image added!', { id: 'lnfUpload' });
+            } catch (err) {
+                toast.error('Failed to upload image', { id: 'lnfUpload' });
+            }
         }
     };
 
@@ -143,21 +146,21 @@ export default function LostAndFound({ user, userData }) {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-24 pt-4 px-4 max-w-7xl mx-auto">
+        <div className="min-h-screen pb-24 pt-4 px-4 max-w-7xl mx-auto">
             {/* Header */}
             <div className="mb-6">
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold text-gray-200 flex items-center gap-3 mb-2">
                     <Package className="w-8 h-8 text-orange-600" />
                     Lost & Found
                 </h1>
-                <p className="text-gray-600">Help others find their lost items or report what you've found</p>
+                <p className="text-gray-400">Help others find their lost items or report what you've found</p>
             </div>
 
             {/* Tabs */}
-            <div className="bg-white rounded-xl border border-gray-200 p-1 mb-6 flex gap-2">
+            <div className="bg-[#121212] rounded-xl border border-gray-800 p-1 mb-6 flex gap-2">
                 <button
                     onClick={() => setActiveTab('lost')}
-                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'lost' ? 'bg-orange-600 text-white' : 'text-gray-600 hover:bg-gray-50'
+                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'lost' ? 'bg-orange-600 text-white' : 'text-gray-400 hover:bg-[#1A1A1A]'
                         }`}
                 >
                     <XCircle className="w-4 h-4 inline mr-2" />
@@ -165,7 +168,7 @@ export default function LostAndFound({ user, userData }) {
                 </button>
                 <button
                     onClick={() => setActiveTab('found')}
-                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'found' ? 'bg-green-600 text-white' : 'text-gray-600 hover:bg-gray-50'
+                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'found' ? 'bg-green-600 text-white' : 'text-gray-400 hover:bg-[#1A1A1A]'
                         }`}
                 >
                     <CheckCircle className="w-4 h-4 inline mr-2" />
@@ -173,7 +176,7 @@ export default function LostAndFound({ user, userData }) {
                 </button>
                 <button
                     onClick={() => setActiveTab('post')}
-                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'post' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'
+                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'post' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-[#1A1A1A]'
                         }`}
                 >
                     <Plus className="w-4 h-4 inline mr-2" />
@@ -185,7 +188,7 @@ export default function LostAndFound({ user, userData }) {
             {(activeTab === 'lost' || activeTab === 'found') && (
                 <div>
                     {/* Filters */}
-                    <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+                    <div className="bg-[#121212] rounded-xl border border-gray-800 p-4 mb-6">
                         <div className="flex flex-col md:flex-row gap-4">
                             <div className="flex-1">
                                 <div className="relative">
@@ -220,20 +223,20 @@ export default function LostAndFound({ user, userData }) {
                             <p className="text-gray-500">Loading items...</p>
                         </div>
                     ) : filteredItems.length === 0 ? (
-                        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+                        <div className="text-center py-12 bg-[#121212] rounded-xl border border-gray-800">
                             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                             <p className="text-gray-500">No {activeTab} items found</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {filteredItems.map(item => (
-                                <div key={item.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition">
+                                <div key={item.id} className="bg-[#121212] rounded-xl border border-gray-800 overflow-hidden hover:shadow-md transition">
                                     {item.image ? (
-                                        <div className="h-40 bg-gray-100 overflow-hidden">
-                                            <img src={item.image} className="w-full h-full object-cover" alt={item.itemName} />
+                                        <div className="bg-gray-900 overflow-hidden aspect-[4/3] w-full">
+                                            <img src={getOptimizedImageUrl(item.image, '4:3')} className="w-full h-full object-cover" alt={item.itemName} />
                                         </div>
                                     ) : (
-                                        <div className="h-40 bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center">
+                                        <div className="bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center aspect-[4/3] w-full">
                                             <Package className="w-16 h-16 text-gray-300" />
                                         </div>
                                     )}
@@ -247,8 +250,8 @@ export default function LostAndFound({ user, userData }) {
                                                 {item.type === 'lost' ? 'LOST' : 'FOUND'}
                                             </span>
                                         </div>
-                                        <h3 className="font-bold text-gray-900 mb-2">{item.itemName}</h3>
-                                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
+                                        <h3 className="font-bold text-gray-200 mb-2">{item.itemName}</h3>
+                                        <p className="text-sm text-gray-400 mb-3 line-clamp-2">{item.description}</p>
                                         <div className="space-y-1 text-xs text-gray-500 mb-3">
                                             {item.location && (
                                                 <div className="flex items-center gap-1">
@@ -263,7 +266,7 @@ export default function LostAndFound({ user, userData }) {
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="pt-3 border-t border-gray-100">
+                                        <div className="pt-3 border-t border-gray-800">
                                             <p className="text-xs text-gray-500 mb-2">Contact: {item.postedByName}</p>
                                             {item.contactInfo && (
                                                 <p className="text-xs text-blue-600 font-medium">{item.contactInfo}</p>
@@ -279,17 +282,17 @@ export default function LostAndFound({ user, userData }) {
 
             {/* Post Item Form */}
             {activeTab === 'post' && (
-                <div className="bg-white rounded-xl border border-gray-200 p-6 max-w-2xl mx-auto">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Post Item</h2>
+                <div className="bg-[#121212] rounded-xl border border-gray-800 p-6 max-w-2xl mx-auto">
+                    <h2 className="text-2xl font-bold text-gray-200 mb-6">Post Item</h2>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Type *</label>
+                            <label className="block text-sm font-bold text-gray-400 mb-2">Type *</label>
                             <div className="grid grid-cols-2 gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setFormData({ ...formData, type: 'lost' })}
-                                    className={`px-4 py-3 rounded-lg text-sm font-bold transition ${formData.type === 'lost' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700'
+                                    className={`px-4 py-3 rounded-lg text-sm font-bold transition ${formData.type === 'lost' ? 'bg-red-600 text-white' : 'bg-gray-900 text-gray-400'
                                         }`}
                                 >
                                     <XCircle className="w-4 h-4 inline mr-2" />
@@ -298,7 +301,7 @@ export default function LostAndFound({ user, userData }) {
                                 <button
                                     type="button"
                                     onClick={() => setFormData({ ...formData, type: 'found' })}
-                                    className={`px-4 py-3 rounded-lg text-sm font-bold transition ${formData.type === 'found' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700'
+                                    className={`px-4 py-3 rounded-lg text-sm font-bold transition ${formData.type === 'found' ? 'bg-green-600 text-white' : 'bg-gray-900 text-gray-400'
                                         }`}
                                 >
                                     <CheckCircle className="w-4 h-4 inline mr-2" />
@@ -308,7 +311,7 @@ export default function LostAndFound({ user, userData }) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Item Name *</label>
+                            <label className="block text-sm font-bold text-gray-400 mb-2">Item Name *</label>
                             <input
                                 required
                                 type="text"
@@ -320,7 +323,7 @@ export default function LostAndFound({ user, userData }) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Description *</label>
+                            <label className="block text-sm font-bold text-gray-400 mb-2">Description *</label>
                             <textarea
                                 required
                                 value={formData.description}
@@ -333,7 +336,7 @@ export default function LostAndFound({ user, userData }) {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Category *</label>
+                                <label className="block text-sm font-bold text-gray-400 mb-2">Category *</label>
                                 <select
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -345,7 +348,7 @@ export default function LostAndFound({ user, userData }) {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Date {formData.type === 'lost' ? 'Lost' : 'Found'} *</label>
+                                <label className="block text-sm font-bold text-gray-400 mb-2">Date {formData.type === 'lost' ? 'Lost' : 'Found'} *</label>
                                 <input
                                     required
                                     type="date"
@@ -357,7 +360,7 @@ export default function LostAndFound({ user, userData }) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Location *</label>
+                            <label className="block text-sm font-bold text-gray-400 mb-2">Location *</label>
                             <input
                                 required
                                 type="text"
@@ -369,7 +372,7 @@ export default function LostAndFound({ user, userData }) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Contact Info *</label>
+                            <label className="block text-sm font-bold text-gray-400 mb-2">Contact Info *</label>
                             <input
                                 required
                                 type="text"
@@ -381,20 +384,20 @@ export default function LostAndFound({ user, userData }) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Item Image (Optional, max 500KB)</label>
+                            <label className="block text-sm font-bold text-gray-400 mb-2">Item Image (Optional, max 500KB)</label>
                             <div
                                 onClick={() => imageInputRef.current?.click()}
                                 className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-orange-500 transition"
                             >
                                 {formData.image ? (
                                     <div className="space-y-2">
-                                        <img src={formData.image} className="w-full max-h-48 object-contain rounded-lg mx-auto" alt="Preview" />
+                                        <img src={getOptimizedImageUrl(formData.image, '4:3')} className="w-full max-h-48 object-contain rounded-lg mx-auto" alt="Preview" />
                                         <p className="text-xs text-green-600 font-bold">✓ Image added</p>
                                     </div>
                                 ) : (
                                     <>
                                         <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                                        <p className="text-sm text-gray-600">Click to upload image</p>
+                                        <p className="text-sm text-gray-400">Click to upload image</p>
                                     </>
                                 )}
                                 <input
@@ -443,3 +446,4 @@ export default function LostAndFound({ user, userData }) {
         </div>
     );
 }
+

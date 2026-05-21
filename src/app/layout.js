@@ -16,7 +16,7 @@ export const metadata = {
   title: "CAMPIFY - Campus Connect",
   description: "Your all-in-one campus management platform for events, marketplace, notes, lost & found, and team collaboration",
   manifest: "/manifest.json",
-  themeColor: "#2f5d56",
+
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

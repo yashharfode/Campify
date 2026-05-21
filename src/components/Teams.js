@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Plus, Loader2, X, Users, Mail, Github, Linkedin, ExternalLink, User, ToggleRight, CheckCircle2, XCircle, Camera, Briefcase, Calendar, MapPin, Clock, Send, UserPlus, Share2, Link as LinkIcon, Trash2 } from 'lucide-react';
+import { Search, Plus, Loader2, X, Users, Mail, Github, Linkedin, ExternalLink, User, ToggleRight, CheckCircle2, XCircle, Camera, Briefcase, Calendar, MapPin, Clock, Send, UserPlus, Share2, Link as LinkIcon, Trash2, MessageSquare } from 'lucide-react';
 import { collection, addDoc, serverTimestamp, collectionGroup, getDocs, query, doc, setDoc, onSnapshot, getDoc, deleteDoc } from 'firebase/firestore';
 import { db, appId } from '../lib/firebase';
 import toast from 'react-hot-toast';
+import { uploadToCloudinary, getOptimizedImageUrl } from '../lib/cloudinary';
 
 // ADMIN EMAILS
 const ADMIN_EMAILS = [
@@ -16,7 +17,7 @@ const isAdminUser = (email) => ADMIN_EMAILS.includes(email);
 
 // Skeleton Loader Component
 const SkeletonCard = () => (
-    <div className="bg-white p-6 rounded-2xl border border-[#E8E4D9] flex flex-col h-full animate-pulse">
+    <div className="bg-[#121212] p-6 rounded-2xl border border-[#E8E4D9] flex flex-col h-full animate-pulse">
         <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 rounded-full bg-gray-200"></div>
             <div className="flex-1">
@@ -29,7 +30,7 @@ const SkeletonCard = () => (
             <div className="h-6 bg-gray-200 rounded-full w-20"></div>
             <div className="h-6 bg-gray-200 rounded-full w-20"></div>
         </div>
-        <div className="mt-auto pt-4 border-t border-gray-200">
+        <div className="mt-auto pt-4 border-t border-gray-800">
             <div className="flex gap-2">
                 <div className="h-9 bg-gray-200 rounded-lg flex-1"></div>
                 <div className="h-9 bg-gray-200 rounded-lg flex-1"></div>
@@ -72,7 +73,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
     const isAvailable = profile.status !== 'busy'; // Default to available if not set
 
     return (
-        <div className="bg-white p-6 rounded-2xl border border-[#E8E4D9] flex flex-col h-full hover:shadow-md transition-all hover:scale-[1.01] relative group">
+        <div className="bg-[#121212] p-6 rounded-2xl border border-[#E8E4D9] flex flex-col h-full hover:shadow-md transition-all hover:scale-[1.01] relative group">
             {isAdmin && (
                 <button
                     onClick={(e) => {
@@ -102,12 +103,12 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-bold text-gray-900 text-lg truncate">{profile.name || 'Student'}</h3>
+                        <h3 className="font-bold text-gray-200 text-lg truncate">{profile.name || 'Student'}</h3>
                         {profile.email && (profile.email.endsWith('@jec.ac.in') || profile.email.endsWith('@college.edu')) && (
                             <CheckCircle2 className="w-4 h-4 text-[#1C1917] flex-shrink-0" />
                         )}
                     </div>
-                    <p className="text-gray-600 text-sm font-medium">{profile.branch || 'Branch'} • {profile.year || 'Year'}</p>
+                    <p className="text-gray-400 text-sm font-medium">{profile.branch || 'Branch'} • {profile.year || 'Year'}</p>
                     <div className="mt-1 flex items-center gap-2">
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isAvailable
                             ? 'bg-green-100 text-green-700'
@@ -121,7 +122,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
 
             {/* Bio */}
             {profile.bio && (
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">{profile.bio}</p>
+                <p className="text-gray-400 text-sm mb-4 line-clamp-2">{profile.bio}</p>
             )}
 
             {/* Skills */}
@@ -131,7 +132,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
                         <SkillTag key={index} skill={skill} index={index} />
                     ))}
                     {remainingSkills > 0 && (
-                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-900 text-gray-400 border border-gray-800">
                             +{remainingSkills}
                         </span>
                     )}
@@ -161,7 +162,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
             )}
 
             {/* Action Buttons */}
-            <div className="mt-auto pt-4 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="mt-auto pt-4 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                     onClick={() => onInvite(profile)}
                     className="flex items-center justify-center gap-2 bg-[#1C1917] hover:bg-[#2A2521] text-white px-4 py-2.5 rounded-xl text-sm font-bold transition"
@@ -170,7 +171,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
                 </button>
                 <button
                     onClick={() => onViewProfile(profile)}
-                    className="flex items-center justify-center gap-2 bg-gray-900/5 hover:bg-gray-900/10 text-gray-900 px-4 py-2.5 rounded-xl text-sm font-bold transition"
+                    className="flex items-center justify-center gap-2 bg-gray-900/5 hover:bg-gray-900/10 text-gray-200 px-4 py-2.5 rounded-xl text-sm font-bold transition"
                 >
                     <User className="w-4 h-4" /> View Profile
                 </button>
@@ -180,7 +181,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
                             if (profile.github) window.open(profile.github, '_blank');
                             else if (profile.linkedin) window.open(profile.linkedin, '_blank');
                         }}
-                        className="flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-bold transition sm:col-span-2"
+                        className="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-200 text-gray-400 px-4 py-2.5 rounded-xl text-sm font-bold transition sm:col-span-2"
                     >
                         <ExternalLink className="w-4 h-4" /> Portfolio
                     </button>
@@ -190,7 +191,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
     );
 };
 
-export default function Teams({ user, userData }) {
+export default function Teams({ user, userData, setActiveTab, setChatTargetUser }) {
     const [profiles, setProfiles] = useState([]);
     const [teamPosts, setTeamPosts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -318,7 +319,10 @@ export default function Teams({ user, userData }) {
             const body = encodeURIComponent(`Hi ${selectedProfile.name},\n\nI would like to invite you to join my team for ${projectName}.\n\nLooking forward to working with you!\n\nBest regards,\n${userData?.name || 'Team Lead'}`);
             const email = selectedProfile.email || '';
 
-            if (email) {
+            if (email && setChatTargetUser && setActiveTab) {
+                setChatTargetUser({ uid: selectedProfile.id, name: selectedProfile.name, email });
+                setActiveTab('chat');
+            } else if (email) {
                 window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
             }
 
@@ -360,7 +364,7 @@ export default function Teams({ user, userData }) {
     return (
         <div className="animate-in fade-in pb-24 pt-4 px-4 max-w-7xl mx-auto">
             {/* Hero Banner */}
-            <div className="relative overflow-hidden rounded-3xl mb-8 bg-white p-8 md:p-12 border border-[#E8E4D9]">
+            <div className="relative overflow-hidden rounded-3xl mb-8 bg-[#121212] p-8 md:p-12 border border-[#E8E4D9]">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,#F4F1E8,transparent_35%),radial-gradient(circle_at_80%_10%,#F8F5ED,transparent_30%)]"></div>
                 <div className="relative z-10">
                     <h1 className="text-4xl md:text-5xl font-black mb-3 text-[#1C1917]">Build Your Dream Team 🚀</h1>
@@ -400,7 +404,7 @@ export default function Teams({ user, userData }) {
                                     placeholder="Search by Skills (e.g., React, Figma) or Name..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    className="w-full bg-[#FAF9F6] border border-[#E8E4D9] rounded-2xl py-4 pl-12 pr-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#D9D2C5] text-lg"
+                                    className="w-full bg-[#FAF9F6] border border-[#E8E4D9] rounded-2xl py-4 pl-12 pr-4 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#D9D2C5] text-lg"
                                 />
                             </div>
 
@@ -425,7 +429,7 @@ export default function Teams({ user, userData }) {
                     ) : filteredProfiles.length === 0 ? (
                         <div className="text-center py-20">
                             <Users className="w-24 h-24 mx-auto mb-6 text-gray-300 opacity-50" />
-                            <h3 className="text-2xl font-bold text-gray-700 mb-2">No profiles found</h3>
+                            <h3 className="text-2xl font-bold text-gray-400 mb-2">No profiles found</h3>
                             <p className="text-gray-500">
                                 {search ? "Try adjusting your search or filters" : "Be the first to create a profile!"}
                             </p>
@@ -457,7 +461,7 @@ export default function Teams({ user, userData }) {
                     ) : teamPosts.length === 0 ? (
                         <div className="text-center py-20">
                             <Briefcase className="w-24 h-24 mx-auto mb-6 text-gray-300 opacity-50" />
-                            <h3 className="text-2xl font-bold text-gray-700 mb-2">No team posts yet</h3>
+                            <h3 className="text-2xl font-bold text-gray-400 mb-2">No team posts yet</h3>
                             <p className="text-gray-500 mb-4">Be the first to create a team post!</p>
                             <button
                                 onClick={() => setIsCreateTeamModalOpen(true)}
@@ -517,6 +521,8 @@ export default function Teams({ user, userData }) {
                         handleInvite(selectedProfile);
                     }
                 }}
+                setActiveTab={setActiveTab}
+                setChatTargetUser={setChatTargetUser}
             />
 
             {/* Invite Modal */}
@@ -552,7 +558,7 @@ const TeamPostCard = ({ post, user, onClick, isAdmin, onDelete }) => {
     return (
         <div
             onClick={onClick}
-            className="bg-white p-6 rounded-2xl border border-[#E8E4D9] flex flex-col h-full hover:shadow-md transition-all cursor-pointer relative group"
+            className="bg-[#121212] p-6 rounded-2xl border border-[#E8E4D9] flex flex-col h-full hover:shadow-md transition-all cursor-pointer relative group"
         >
             {(isAdmin || user?.uid === post.createdBy) && (
                 <button
@@ -567,14 +573,14 @@ const TeamPostCard = ({ post, user, onClick, isAdmin, onDelete }) => {
                 </button>
             )}
             {post.image && (
-                <div className="h-48 rounded-xl overflow-hidden mb-4 bg-gray-100">
-                    <img src={post.image} alt={post.teamName} className="w-full h-full object-cover" />
+                <div className="h-48 rounded-xl overflow-hidden mb-4 bg-gray-900 aspect-video w-full">
+                    <img src={getOptimizedImageUrl(post.image, '16:9')} alt={post.teamName} className="w-full h-full object-cover" />
                 </div>
             )}
             <div className="flex-1">
-                <h3 className="font-bold text-gray-900 text-xl mb-2">{post.teamName}</h3>
+                <h3 className="font-bold text-gray-200 text-xl mb-2">{post.teamName}</h3>
                 <p className="text-[#1C1917] font-semibold text-sm mb-3">{post.projectName}</p>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{post.description}</p>
+                <p className="text-gray-400 text-sm mb-4 line-clamp-3">{post.description}</p>
                 {post.rolesNeeded && post.rolesNeeded.length > 0 && (
                     <div className="mb-4">
                         <p className="text-xs font-bold text-gray-500 uppercase mb-2">Roles Needed:</p>
@@ -588,7 +594,7 @@ const TeamPostCard = ({ post, user, onClick, isAdmin, onDelete }) => {
                     </div>
                 )}
             </div>
-            <div className="pt-4 border-t border-gray-200 mt-4">
+            <div className="pt-4 border-t border-gray-800 mt-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
@@ -598,7 +604,7 @@ const TeamPostCard = ({ post, user, onClick, isAdmin, onDelete }) => {
                                 className="w-full h-full object-cover"
                             />
                         </div>
-                        <span className="text-xs text-gray-600 font-medium">{post.createdByName}</span>
+                        <span className="text-xs text-gray-400 font-medium">{post.createdByName}</span>
                     </div>
                     {post.createdBy === user?.uid && (
                         <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">Your Post</span>
@@ -645,16 +651,21 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
         setFormData({ ...formData, roles: newRoles });
     };
 
-    const handleImage = (e) => {
+    const handleImage = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 500000) {
-                toast.error("Image too large! Max 500KB.");
+            if (file.size > 2097152) {
+                toast.error("Image too large! Max 2MB.");
                 return;
             }
-            const reader = new FileReader();
-            reader.onloadend = () => setFormData({ ...formData, image: reader.result });
-            reader.readAsDataURL(file);
+            try {
+                toast.loading('Uploading...', { id: 'teamImage' });
+                const url = await uploadToCloudinary(file);
+                setFormData({ ...formData, image: url });
+                toast.success('Image uploaded!', { id: 'teamImage' });
+            } catch (error) {
+                toast.error('Upload failed', { id: 'teamImage' });
+            }
         }
     };
 
@@ -688,9 +699,9 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-                <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                    <h3 className="font-bold text-lg text-gray-800">Create Team Post</h3>
+            <div className="bg-[#121212] rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+                <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#1A1A1A]">
+                    <h3 className="font-bold text-lg text-gray-300">Create Team Post</h3>
                     <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
                 </div>
 
@@ -700,10 +711,10 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
                         <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Team Image (Optional)</label>
                         <div
                             onClick={() => fileInputRef.current.click()}
-                            className="border-2 border-dashed border-gray-300 rounded-xl h-32 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 transition cursor-pointer relative overflow-hidden"
+                            className="border-2 border-dashed border-gray-300 rounded-xl h-32 flex flex-col items-center justify-center text-gray-400 hover:bg-[#1A1A1A] transition cursor-pointer relative overflow-hidden"
                         >
                             {formData.image ? (
-                                <img src={formData.image} className="w-full h-full object-cover" alt="Preview" />
+                                <img src={getOptimizedImageUrl(formData.image, '16:9')} className="w-full h-full object-cover" alt="Preview" />
                             ) : (
                                 <>
                                     <Camera className="w-8 h-8 mb-2" />
@@ -796,28 +807,28 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
 };
 
 // Invite Modal Component
-const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite }) => {
+const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab, setChatTargetUser }) => {
     if (!isOpen || !profile) return null;
     const projects = (profile.projects || []).filter(project => project.title || project.description || project.link);
 
     return (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-4">
-            <div className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl overflow-hidden">
-                <div className="flex justify-between items-center p-6 border-b border-gray-100">
+            <div className="bg-[#121212] rounded-3xl max-w-4xl w-full shadow-2xl overflow-hidden">
+                <div className="flex justify-between items-center p-6 border-b border-gray-800">
                     <div>
                         <p className="text-xs uppercase tracking-[0.3em] text-gray-400">Profile Preview</p>
-                        <h3 className="text-2xl font-black text-gray-900">{profile.name || 'Student'}</h3>
+                        <h3 className="text-2xl font-black text-gray-200">{profile.name || 'Student'}</h3>
                     </div>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                    <button onClick={onClose} className="text-gray-500 hover:text-gray-400">
                         <X className="w-6 h-6" />
                     </button>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6 p-6">
                     <div className="space-y-4">
                         <div className="flex items-center gap-4">
-                            <div className="w-24 h-24 rounded-2xl overflow-hidden border-4 border-blue-50 shadow-lg">
+                            <div className="w-24 h-24 rounded-2xl overflow-hidden border-4 border-blue-50 shadow-lg aspect-square">
                                 <img
-                                    src={profile.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name || 'User'}`}
+                                    src={profile.profileImage ? getOptimizedImageUrl(profile.profileImage, '1:1') : `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name || 'User'}`}
                                     alt={profile.name}
                                     className="w-full h-full object-cover"
                                 />
@@ -835,9 +846,9 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite }) => {
                             </div>
                         </div>
                         {profile.bio && (
-                            <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">
+                            <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-4">
                                 <p className="text-xs font-bold text-gray-400 uppercase mb-2">About</p>
-                                <p className="text-sm text-gray-700 whitespace-pre-wrap">{profile.bio}</p>
+                                <p className="text-sm text-gray-400 whitespace-pre-wrap">{profile.bio}</p>
                             </div>
                         )}
                         {profile.skills && (
@@ -845,7 +856,7 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite }) => {
                                 <p className="text-xs uppercase font-bold text-gray-400 mb-2">Skills</p>
                                 <div className="flex flex-wrap gap-2">
                                     {profile.skills.split(',').map((skill, index) => (
-                                        <span key={index} className="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+                                        <span key={index} className="px-3 py-1 rounded-full text-xs font-bold bg-gray-900 text-gray-400">
                                             {skill.trim()}
                                         </span>
                                     ))}
@@ -856,7 +867,7 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite }) => {
                             {profile.github && (
                                 <button
                                     onClick={() => window.open(profile.github, '_blank')}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-100 text-gray-800 font-bold text-sm"
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-gray-300 font-bold text-sm"
                                 >
                                     <Github className="w-4 h-4" /> GitHub
                                 </button>
@@ -871,10 +882,17 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite }) => {
                             )}
                             {profile.email && (
                                 <button
-                                    onClick={() => window.location.href = `mailto:${profile.email}`}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white font-bold text-sm"
+                                    onClick={() => {
+                                        if (setChatTargetUser && setActiveTab) {
+                                            setChatTargetUser({ uid: profile.id, name: profile.name, email: profile.email });
+                                            setActiveTab('chat');
+                                        } else {
+                                            window.location.href = `mailto:${profile.email}`;
+                                        }
+                                    }}
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white font-bold text-sm hover:bg-gray-800 transition"
                                 >
-                                    <Mail className="w-4 h-4" /> Email
+                                    <MessageSquare className="w-4 h-4" /> Message
                                 </button>
                             )}
                         </div>
@@ -892,11 +910,11 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite }) => {
                         <div className="space-y-4">
                             {projects.length > 0 ? (
                                 projects.map((project, index) => (
-                                    <div key={index} className="border border-gray-200 rounded-2xl p-4 bg-white/80">
+                                    <div key={index} className="border border-gray-800 rounded-2xl p-4 bg-[#121212]/80">
                                         <p className="text-xs font-bold text-gray-400 uppercase">Project #{index + 1}</p>
-                                        <h4 className="text-lg font-bold text-gray-900 mt-1">{project.title || 'Untitled Project'}</h4>
+                                        <h4 className="text-lg font-bold text-gray-200 mt-1">{project.title || 'Untitled Project'}</h4>
                                         {project.description && (
-                                            <p className="text-sm text-gray-600 mt-1">{project.description}</p>
+                                            <p className="text-sm text-gray-400 mt-1">{project.description}</p>
                                         )}
                                         {project.link && (
                                             <button
@@ -909,7 +927,7 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite }) => {
                                     </div>
                                 ))
                             ) : (
-                                <div className="border border-dashed border-gray-200 rounded-2xl p-6 text-center text-gray-400 text-sm">
+                                <div className="border border-dashed border-gray-800 rounded-2xl p-6 text-center text-gray-400 text-sm">
                                     No showcased projects yet.
                                 </div>
                             )}
@@ -938,9 +956,9 @@ const InviteModal = ({ isOpen, onClose, profile, onSend }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-                <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                    <h3 className="font-bold text-lg text-gray-800">Invite {profile.name}</h3>
+            <div className="bg-[#121212] rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+                <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#1A1A1A]">
+                    <h3 className="font-bold text-lg text-gray-300">Invite {profile.name}</h3>
                     <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
                 </div>
 
@@ -951,7 +969,7 @@ const InviteModal = ({ isOpen, onClose, profile, onSend }) => {
                             required
                             value={projectName}
                             onChange={(e) => setProjectName(e.target.value)}
-                            className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm outline-none focus:border-blue-500"
+                            className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg p-3 text-sm outline-none focus:border-blue-500"
                             placeholder="e.g., Statewide Hackathon 2025"
                         />
                     </div>
@@ -1038,9 +1056,14 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
 
             // Send email
             if (creatorProfile?.email) {
-                const subject = encodeURIComponent(`Join Request for ${post.teamName}`);
-                const body = encodeURIComponent(`Hi ${post.createdByName},\n\nI'm interested in joining your team "${post.teamName}" for ${post.projectName}.\n\n${userData?.bio ? `About me: ${userData.bio}\n\n` : ''}Skills: ${userData?.skills || 'Not specified'}\n\nLooking forward to hearing from you!\n\nBest regards,\n${userData?.name || 'Student'}`);
-                window.location.href = `mailto:${creatorProfile.email}?subject=${subject}&body=${body}`;
+                if (setChatTargetUser && setActiveTab) {
+                    setChatTargetUser({ uid: post.createdBy, name: post.createdByName, email: creatorProfile.email });
+                    setActiveTab('chat');
+                } else {
+                    const subject = encodeURIComponent(`Join Request for ${post.teamName}`);
+                    const body = encodeURIComponent(`Hi ${post.createdByName},\n\nI'm interested in joining your team "${post.teamName}" for ${post.projectName}.\n\n${userData?.bio ? `About me: ${userData.bio}\n\n` : ''}Skills: ${userData?.skills || 'Not specified'}\n\nLooking forward to hearing from you!\n\nBest regards,\n${userData?.name || 'Student'}`);
+                    window.location.href = `mailto:${creatorProfile.email}?subject=${subject}&body=${body}`;
+                }
             }
 
             toast.success("Join request sent! The team leader will contact you soon.");
@@ -1121,7 +1144,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in overflow-y-auto">
-            <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl my-8">
+            <div className="bg-[#121212] rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl my-8">
                 {/* Header with Image */}
                 <div className="relative">
                     {post.image ? (
@@ -1135,15 +1158,15 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                     )}
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 bg-white/90 backdrop-blur-md p-2 rounded-full hover:bg-white transition shadow-lg"
+                        className="absolute top-4 right-4 bg-[#121212]/90 backdrop-blur-md p-2 rounded-full hover:bg-[#121212] transition shadow-lg"
                     >
-                        <X className="w-5 h-5 text-gray-700" />
+                        <X className="w-5 h-5 text-gray-400" />
                     </button>
                     <button
                         onClick={handleShare}
-                        className="absolute top-4 right-16 bg-white/90 backdrop-blur-md p-2 rounded-full hover:bg-white transition shadow-lg"
+                        className="absolute top-4 right-16 bg-[#121212]/90 backdrop-blur-md p-2 rounded-full hover:bg-[#121212] transition shadow-lg"
                     >
-                        <Share2 className="w-5 h-5 text-gray-700" />
+                        <Share2 className="w-5 h-5 text-gray-400" />
                     </button>
                 </div>
 
@@ -1153,7 +1176,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                     <div className="mb-6">
                         <div className="flex items-start justify-between mb-3">
                             <div className="flex-1">
-                                <h1 className="text-3xl md:text-4xl font-black text-gray-900 mb-2">{post.teamName}</h1>
+                                <h1 className="text-3xl md:text-4xl font-black text-gray-200 mb-2">{post.teamName}</h1>
                                 <div className="flex items-center gap-3 text-[#1C1917] font-bold text-lg">
                                     <Briefcase className="w-5 h-5" />
                                     <span>{post.projectName}</span>
@@ -1175,14 +1198,14 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
 
                     {/* Description */}
                     <div className="mb-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-3">About the Project</h2>
-                        <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{post.description}</p>
+                        <h2 className="text-xl font-bold text-gray-200 mb-3">About the Project</h2>
+                        <p className="text-gray-400 leading-relaxed whitespace-pre-wrap">{post.description}</p>
                     </div>
 
                     {/* Roles Needed */}
                     {post.rolesNeeded && post.rolesNeeded.length > 0 && (
                         <div className="mb-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-3">Roles We're Looking For</h2>
+                            <h2 className="text-xl font-bold text-gray-200 mb-3">Roles We're Looking For</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {post.rolesNeeded.map((role, index) => (
                                     <div key={index} className="bg-[#FAF9F6] border-2 border-[#E8E4D9] rounded-xl p-4">
@@ -1197,8 +1220,8 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                     )}
 
                     {/* Team Leader Section */}
-                    <div className="bg-gray-50 rounded-2xl p-6 mb-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">Team Leader</h2>
+                    <div className="bg-[#1A1A1A] rounded-2xl p-6 mb-6">
+                        <h2 className="text-xl font-bold text-gray-200 mb-4">Team Leader</h2>
                         {loadingProfile ? (
                             <div className="flex items-center gap-4">
                                 <div className="w-16 h-16 rounded-full bg-gray-200 animate-pulse"></div>
@@ -1218,18 +1241,18 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <h3 className="font-bold text-gray-900 text-lg">{post.createdByName}</h3>
+                                        <h3 className="font-bold text-gray-200 text-lg">{post.createdByName}</h3>
                                         {creatorProfile?.email && (creatorProfile.email.endsWith('@jec.ac.in') || creatorProfile.email.endsWith('@college.edu')) && (
                                             <CheckCircle2 className="w-5 h-5 text-[#1C1917]" />
                                         )}
                                     </div>
-                                    <p className="text-gray-600 text-sm">
+                                    <p className="text-gray-400 text-sm">
                                         {creatorProfile?.branch || 'Branch'} • {creatorProfile?.year || 'Year'}
                                     </p>
                                     {creatorProfile?.skills && (
                                         <div className="flex flex-wrap gap-2 mt-2">
                                             {creatorProfile.skills.split(',').slice(0, 3).map((skill, i) => (
-                                                <span key={i} className="px-2 py-1 bg-white text-gray-700 rounded-full text-xs font-bold border border-gray-200">
+                                                <span key={i} className="px-2 py-1 bg-[#121212] text-gray-400 rounded-full text-xs font-bold border border-gray-800">
                                                     {skill.trim()}
                                                 </span>
                                             ))}
@@ -1242,9 +1265,9 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                             href={creatorProfile.github}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="p-2 bg-white rounded-lg hover:bg-gray-100 transition"
+                                            className="p-2 bg-[#121212] rounded-lg hover:bg-gray-900 transition"
                                         >
-                                            <Github className="w-5 h-5 text-gray-700" />
+                                            <Github className="w-5 h-5 text-gray-400" />
                                         </a>
                                     )}
                                     {creatorProfile?.linkedin && (
@@ -1252,7 +1275,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                             href={creatorProfile.linkedin}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="p-2 bg-white rounded-lg hover:bg-gray-100 transition"
+                                            className="p-2 bg-[#121212] rounded-lg hover:bg-gray-900 transition"
                                         >
                                             <Linkedin className="w-5 h-5 text-[#1C1917]" />
                                         </a>
@@ -1286,11 +1309,16 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                 {creatorProfile?.email && (
                                     <button
                                         onClick={() => {
-                                            const subject = encodeURIComponent(`Inquiry about ${post.teamName}`);
-                                            const body = encodeURIComponent(`Hi ${post.createdByName},\n\nI'm interested in learning more about your team "${post.teamName}" for ${post.projectName}.\n\nBest regards,\n${userData?.name || 'Student'}`);
-                                            window.location.href = `mailto:${creatorProfile.email}?subject=${subject}&body=${body}`;
+                                            if (setChatTargetUser && setActiveTab) {
+                                                setChatTargetUser({ uid: post.createdBy, name: post.createdByName, email: creatorProfile.email });
+                                                setActiveTab('chat');
+                                            } else {
+                                                const subject = encodeURIComponent(`Inquiry about ${post.teamName}`);
+                                                const body = encodeURIComponent(`Hi ${post.createdByName},\n\nI'm interested in learning more about your team "${post.teamName}" for ${post.projectName}.\n\nBest regards,\n${userData?.name || 'Student'}`);
+                                                window.location.href = `mailto:${creatorProfile.email}?subject=${subject}&body=${body}`;
+                                            }
                                         }}
-                                        className="flex-1 bg-white border-2 border-[#1C1917] text-[#1C1917] font-bold py-4 rounded-xl hover:bg-[#FAF9F6] transition flex items-center justify-center gap-2 text-lg"
+                                        className="flex-1 bg-[#121212] border-2 border-[#1C1917] text-[#1C1917] font-bold py-4 rounded-xl hover:bg-[#FAF9F6] transition flex items-center justify-center gap-2 text-lg"
                                     >
                                         <Mail className="w-5 h-5" />
                                         Contact Leader
@@ -1308,4 +1336,5 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
         </div>
     );
 };
+
 

@@ -3,13 +3,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     Plus, Edit2, Trash2, Save, X, Shield, Lock,
-    Calendar, MapPin, Users, Image as ImageIcon,
-    Clock, Tag, AlertCircle, CheckCircle, FileText, Download, XCircle,
-    UserPlus, Loader2
+    Calendar, Users, Clock, Tag, AlertCircle, CheckCircle, FileText, Download, XCircle,
+    UserPlus, Loader2, MessageSquare, Hash, Check, Image as ImageIcon, MapPin
 } from 'lucide-react';
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, serverTimestamp, collectionGroup } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp, collectionGroup } from 'firebase/firestore';
 import { db, appId } from '../lib/firebase';
 import toast from 'react-hot-toast';
+import { uploadToCloudinary, getOptimizedImageUrl } from '../lib/cloudinary';
+import ClubsManagerWithProvider from './admin/ClubsManager';
 
 // ADMIN EMAILS - Sirf yeh emails wale users hi admin panel dekh sakte hain
 const ADMIN_EMAILS = [
@@ -19,7 +20,7 @@ const ADMIN_EMAILS = [
 
 const isAdminUser = (email) => ADMIN_EMAILS.includes(email);
 
-export default function Admin({ user, userData }) {
+export default function Admin({ user, userData, setActiveTab: setAppTab, setTargetClubId }) {
     const [activeTab, setActiveTab] = useState('events'); // 'events' or 'users'
     const [users, setUsers] = useState([]);
     const [usersLoading, setUsersLoading] = useState(true);
@@ -54,16 +55,36 @@ export default function Admin({ user, userData }) {
         subtitle: '',
         cta: '',
         link: '',
-        image: '',
+        desktopImage: '',
+        mobileImage: '',
+        image: '', // Legacy fallback
         color: 'from-blue-900 to-slate-900',
         badge: 'FEATURED'
     });
-    const bannerFileInputRef = useRef(null);
+    const desktopBannerFileInputRef = useRef(null);
+    const mobileBannerFileInputRef = useRef(null);
 
     // Notes State
     const [notes, setNotes] = useState([]);
     const [notesLoading, setNotesLoading] = useState(true);
     const [notesFilter, setNotesFilter] = useState('all'); // 'all', 'pending', 'approved', 'rejected'
+    
+    // Notes Categories State
+    const [notesCategories, setNotesCategories] = useState({});
+    const [notesCategoriesLoading, setNotesCategoriesLoading] = useState(true);
+    const [categoryFormData, setCategoryFormData] = useState({
+        branch: 'Computer Science (CSE)',
+        customBranch: '',
+        semester: 'Sem 1',
+        customSemester: '',
+        subject: ''
+    });
+
+    // Chat Groups State
+    const [chatGroups, setChatGroups] = useState([]);
+    const [chatGroupsLoading, setChatGroupsLoading] = useState(true);
+    const [newChatGroupName, setNewChatGroupName] = useState('');
+    const [newChatGroupDesc, setNewChatGroupDesc] = useState('');
 
     // Lost & Found State
     const [lostFoundItems, setLostFoundItems] = useState([]);
@@ -129,6 +150,8 @@ export default function Admin({ user, userData }) {
             fetchLostFoundItems();
             fetchScholarships();
             fetchAdmins();
+            fetchNotesCategories();
+            fetchChatGroups();
         }
     }, [isAdmin]);
 
@@ -166,18 +189,25 @@ export default function Admin({ user, userData }) {
         }
     };
 
-    const handleBannerImageUpload = (e) => {
+    const handleBannerImageUpload = async (e, type) => {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 500000) {
-                toast.error('Image too large! Max 500KB');
+            if (file.size > 2097152) { // 2MB
+                toast.error('Image too large! Max 2MB');
                 return;
             }
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setBannerFormData(prev => ({ ...prev, image: reader.result }));
-            };
-            reader.readAsDataURL(file);
+            try {
+                toast.loading(`Uploading ${type} banner...`, { id: 'adminUpload' });
+                const url = await uploadToCloudinary(file);
+                if (type === 'desktop') {
+                    setBannerFormData(prev => ({ ...prev, desktopImage: url }));
+                } else if (type === 'mobile') {
+                    setBannerFormData(prev => ({ ...prev, mobileImage: url }));
+                }
+                toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} banner uploaded!`, { id: 'adminUpload' });
+            } catch (error) {
+                toast.error('Upload failed', { id: 'adminUpload' });
+            }
         }
     };
 
@@ -205,6 +235,8 @@ export default function Admin({ user, userData }) {
                 subtitle: '',
                 cta: '',
                 link: '',
+                desktopImage: '',
+                mobileImage: '',
                 image: '',
                 color: 'from-blue-900 to-slate-900',
                 badge: 'FEATURED'
@@ -249,16 +281,140 @@ export default function Admin({ user, userData }) {
         try {
             const notesRef = collection(db, 'artifacts', appId, 'public', 'data', 'notes');
             const snapshot = await getDocs(notesRef);
-            const fetchedNotes = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            setNotes(fetchedNotes);
+            const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            // Sort by createdAt desc
+            items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            setNotes(items);
             setNotesLoading(false);
         } catch (error) {
             console.error('Error fetching notes:', error);
-            toast.error('Failed to load notes');
             setNotesLoading(false);
+        }
+    };
+
+    const fetchAdmins = async () => {
+        try {
+            const adminsRef = collection(db, 'artifacts', appId, 'admins');
+            const snapshot = await getDocs(adminsRef);
+            const adminsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setAdmins(adminsList);
+        } catch (error) {
+            console.error('Error fetching admins:', error);
+        } finally {
+            setAdminsLoading(false);
+        }
+    };
+
+    const fetchChatGroups = async () => {
+        try {
+            const groupsRef = collection(db, 'artifacts', appId, 'public', 'data', 'chat_groups');
+            const snapshot = await getDocs(groupsRef);
+            const fetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setChatGroups(fetched);
+        } catch (error) {
+            console.error('Error fetching chat groups:', error);
+        } finally {
+            setChatGroupsLoading(false);
+        }
+    };
+
+    const fetchNotesCategories = async () => {
+        try {
+            const docRef = doc(db, 'artifacts', appId, 'public', 'metadata_notes_categories');
+            const docSnap = await getDoc(docRef);
+            
+            if (docSnap.exists()) {
+                setNotesCategories(docSnap.data().categories || {});
+            } else {
+                // Initialize default categories
+                const DEFAULT_CATEGORIES = {
+                    "Computer Science (CSE)": {
+                        "Sem 1": ["Mathematics-I", "Physics", "Basic Electrical Engineering", "Engineering Graphics"],
+                        "Sem 2": ["Mathematics-II", "Chemistry", "Programming for Problem Solving", "English"],
+                        "Sem 3": ["Data Structures", "Digital Logic", "Computer Organization", "Discrete Mathematics"],
+                        "Sem 4": ["Operating Systems", "Design and Analysis of Algorithms", "Theory of Computation", "Object Oriented Programming"],
+                        "Sem 5": ["Database Management Systems", "Computer Networks", "Software Engineering", "Compiler Design"],
+                        "Sem 6": ["Web Technology", "Machine Learning", "Information Security", "Cloud Computing"],
+                        "Sem 7": ["Artificial Intelligence", "Cryptography", "Data Science", "Mobile Computing"],
+                        "Sem 8": ["Major Project", "Internet of Things", "Blockchain", "Cyber Security"]
+                    },
+                    "Cyber Security": {
+                        "Sem 1": ["Mathematics-I", "Physics", "Basic Electrical Engineering", "Engineering Graphics"],
+                        "Sem 2": ["Mathematics-II", "Chemistry", "Programming for Problem Solving", "English"],
+                        "Sem 3": ["Data Structures", "Fundamentals of Cyber Security", "Computer Organization"],
+                        "Sem 4": ["Operating Systems", "Network Security", "Cryptography"],
+                        "Sem 5": ["Database Security", "Ethical Hacking", "Digital Forensics"],
+                        "Sem 6": ["Web Application Security", "Malware Analysis", "Security Policies"],
+                        "Sem 7": ["Incident Response", "Cloud Security", "IoT Security"],
+                        "Sem 8": ["Major Project", "Advanced Cryptography"]
+                    },
+                    "AI & Data Science (AIDS)": {
+                        "Sem 1": ["Mathematics-I", "Physics", "Basic Electrical Engineering", "Engineering Graphics"],
+                        "Sem 2": ["Mathematics-II", "Chemistry", "Programming for Problem Solving", "English"],
+                        "Sem 3": ["Data Structures", "Statistics for Data Science", "Python Programming"],
+                        "Sem 4": ["Machine Learning Foundations", "Algorithms", "Data Visualization"],
+                        "Sem 5": ["Deep Learning", "Big Data Analytics", "Natural Language Processing"],
+                        "Sem 6": ["Computer Vision", "Reinforcement Learning", "Time Series Analysis"],
+                        "Sem 7": ["AI Ethics", "Predictive Modeling", "Recommendation Systems"],
+                        "Sem 8": ["Major Project", "Advanced AI"]
+                    },
+                    "Electronics & Comm (ECE)": {
+                        "Sem 1": ["Mathematics-I", "Physics", "Basic Electrical", "Engineering Graphics"],
+                        "Sem 2": ["Mathematics-II", "Chemistry", "Programming for Problem Solving", "English"],
+                        "Sem 3": ["Electronic Devices", "Network Theory", "Signals and Systems"],
+                        "Sem 4": ["Analog Circuits", "Digital Electronics", "Microprocessors"],
+                        "Sem 5": ["Electromagnetic Waves", "Control Systems", "Digital Signal Processing"],
+                        "Sem 6": ["Communication Systems", "VLSI Design", "Antennas"],
+                        "Sem 7": ["Wireless Communication", "Optical Networks", "Embedded Systems"],
+                        "Sem 8": ["Major Project", "Satellite Communication"]
+                    }
+                };
+                await setDoc(docRef, { categories: DEFAULT_CATEGORIES });
+                setNotesCategories(DEFAULT_CATEGORIES);
+            }
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        } finally {
+            setNotesCategoriesLoading(false);
+        }
+    };
+
+    const handleAddCategory = async (e) => {
+        e.preventDefault();
+        if (!categoryFormData.subject.trim()) return;
+
+        const branchToUse = categoryFormData.branch === 'NEW_BRANCH' ? categoryFormData.customBranch.trim() : categoryFormData.branch;
+        const semToUse = categoryFormData.semester === 'NEW_SEMESTER' ? categoryFormData.customSemester.trim() : categoryFormData.semester;
+
+        if (!branchToUse || !semToUse) {
+            toast.error('Please specify branch and semester');
+            return;
+        }
+
+        try {
+            const docRef = doc(db, 'artifacts', appId, 'public', 'metadata_notes_categories');
+            
+            // Clone current state deeply
+            const updatedCategories = JSON.parse(JSON.stringify(notesCategories));
+            
+            if (!updatedCategories[branchToUse]) {
+                updatedCategories[branchToUse] = {};
+            }
+            if (!updatedCategories[branchToUse][semToUse]) {
+                updatedCategories[branchToUse][semToUse] = [];
+            }
+            
+            if (!updatedCategories[branchToUse][semToUse].includes(categoryFormData.subject)) {
+                updatedCategories[branchToUse][semToUse].push(categoryFormData.subject);
+            }
+
+            await updateDoc(docRef, { categories: updatedCategories });
+            setNotesCategories(updatedCategories);
+            setCategoryFormData({ ...categoryFormData, subject: '', customBranch: '', customSemester: '' });
+            toast.success('Subject added successfully!');
+        } catch (error) {
+            console.error('Error updating categories:', error);
+            toast.error('Failed to add subject');
         }
     };
 
@@ -294,15 +450,58 @@ export default function Admin({ user, userData }) {
     };
 
     const handleDeleteNote = async (noteId) => {
-        if (!window.confirm('Are you sure you want to delete this note permanently?')) return;
+        if (!window.confirm('Are you sure you want to delete this note?')) return;
         try {
-            const noteDoc = doc(db, 'artifacts', appId, 'public', 'data', 'notes', noteId);
-            await deleteDoc(noteDoc);
-            toast.success('Note deleted successfully!');
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notes', noteId));
+            toast.success('Note deleted!');
             fetchNotes();
         } catch (error) {
-            console.error('Error deleting note:', error);
             toast.error('Failed to delete note');
+        }
+    };
+
+    const handleApproveChatGroup = async (groupId) => {
+        try {
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'chat_groups', groupId), {
+                status: 'active'
+            });
+            toast.success('Chat group approved!');
+            fetchChatGroups();
+        } catch (error) {
+            toast.error('Failed to approve chat group');
+        }
+    };
+
+    const handleCreateChatGroup = async (e) => {
+        e.preventDefault();
+        if (!newChatGroupName.trim() || !newChatGroupDesc.trim()) return;
+        try {
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'chat_groups'), {
+                name: newChatGroupName.trim(),
+                description: newChatGroupDesc.trim(),
+                createdBy: 'admin',
+                status: 'active',
+                type: 'group',
+                createdAt: serverTimestamp(),
+                members: []
+            });
+            toast.success('Chat group created!');
+            setNewChatGroupName('');
+            setNewChatGroupDesc('');
+            fetchChatGroups();
+        } catch (error) {
+            toast.error('Failed to create chat group');
+        }
+    };
+
+    const handleRejectChatGroup = async (groupId) => {
+        if (!window.confirm('Are you sure you want to reject and delete this group request?')) return;
+        try {
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'chat_groups', groupId));
+            toast.success('Chat group request rejected!');
+            fetchChatGroups();
+        } catch (error) {
+            toast.error('Failed to reject chat group');
         }
     };
 
@@ -428,20 +627,6 @@ export default function Admin({ user, userData }) {
         }
     };
 
-    // Admin Management Functions
-    const fetchAdmins = async () => {
-        try {
-            const adminsRef = collection(db, 'artifacts', appId, 'admins');
-            const snapshot = await getDocs(adminsRef);
-            const adminsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setAdmins(adminsList);
-        } catch (error) {
-            console.error('Error fetching admins:', error);
-        } finally {
-            setAdminsLoading(false);
-        }
-    };
-
     const handleGrantAdmin = async () => {
         if (!newAdminEmail || !newAdminEmail.trim()) {
             toast.error('Please enter an email address');
@@ -491,19 +676,6 @@ export default function Admin({ user, userData }) {
     const fetchUsers = async () => {
         try {
             // Use collectionGroup to query all profile/data documents
-            // Note: This requires a composite index in Firestore if filtering/sorting, but basic fetch is fine
-            // Path: artifacts/{appId}/users/{userId}/profile/data
-            // We need to query 'profile' collection group where the document ID is 'data' (usually) 
-            // OR just query collectionGroup('profile') and filter by path
-
-            // Actually, the collection name is 'profile', and the doc is 'data'. 
-            // So we query collectionGroup('profile') and get the 'data' doc inside it? 
-            // Wait, collectionGroup queries COLLECTIONS with that name.
-            // Our structure: artifacts/{appId}/users/{userId}/profile/data
-            // So 'profile' is a collection. 'data' is a doc.
-            // If we query collectionGroup('profile'), we get documents INSIDE 'profile' collections.
-            // The document inside 'profile' is 'data'.
-
             const usersQuery = collectionGroup(db, 'profile');
             const snapshot = await getDocs(usersQuery);
 
@@ -533,18 +705,21 @@ export default function Admin({ user, userData }) {
         }
     };
 
-    const handleImageUpload = (e) => {
+    const handleImageUpload = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 500000) {
-                toast.error('Image too large! Max 500KB');
+            if (file.size > 2097152) { // 2MB
+                toast.error('Image too large! Max 2MB');
                 return;
             }
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, image: reader.result }));
-            };
-            reader.readAsDataURL(file);
+            try {
+                toast.loading('Uploading image...', { id: 'adminEventUpload' });
+                const url = await uploadToCloudinary(file);
+                setFormData(prev => ({ ...prev, image: url }));
+                toast.success('Image uploaded!', { id: 'adminEventUpload' });
+            } catch (error) {
+                toast.error('Upload failed', { id: 'adminEventUpload' });
+            }
         }
     };
 
@@ -624,6 +799,20 @@ export default function Admin({ user, userData }) {
         }
     };
 
+    const handleToggleRegistration = async (eventId, currentStatus) => {
+        try {
+            const eventRef = doc(db, 'artifacts', appId, 'public', 'data', 'events', eventId);
+            await updateDoc(eventRef, {
+                isRegistrationOpen: !currentStatus
+            });
+            toast.success(`Registrations ${!currentStatus ? 'opened' : 'closed'}!`);
+            setEvents(events.map(e => e.id === eventId ? { ...e, isRegistrationOpen: !currentStatus } : e));
+        } catch (error) {
+            console.error('Error toggling registration:', error);
+            toast.error('Failed to update registration status');
+        }
+    };
+
     const handleDeleteUser = async (userId) => {
         if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
 
@@ -681,13 +870,13 @@ export default function Admin({ user, userData }) {
     // If not admin, show access denied
     if (!isAdmin) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+            <div className="min-h-screen bg-[#1A1A1A] flex items-center justify-center p-6">
                 <div className="text-center max-w-md">
                     <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <Lock className="w-10 h-10 text-red-600" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-3">Access Denied</h2>
-                    <p className="text-gray-600 mb-6">You don't have permission to access the Admin Panel.</p>
+                    <h2 className="text-2xl font-bold text-gray-200 mb-3">Access Denied</h2>
+                    <p className="text-gray-400 mb-6">You don't have permission to access the Admin Panel.</p>
                     <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
                         <div className="flex items-start gap-3">
                             <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
@@ -709,18 +898,18 @@ export default function Admin({ user, userData }) {
             <div className="mb-8">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full bg-[#2D5A27] flex items-center justify-center">
                             <Shield className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-2xl md:text-4xl font-black text-gray-900">Quantum Control</h1>
-                            <p className="text-sm md:text-base text-gray-600">Manage events and users</p>
+                            <h1 className="text-2xl md:text-4xl font-black text-gray-200">Quantum Control</h1>
+                            <p className="text-sm md:text-base text-gray-400">Manage events and users</p>
                         </div>
                     </div>
                     {activeTab === 'events' && (
                         <button
                             onClick={() => setIsAddingEvent(true)}
-                            className="w-full md:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2"
+                            className="w-full md:w-auto bg-[#2D5A27] hover:bg-[#386d31] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2"
                         >
                             <Plus className="w-5 h-5" /> Add Event
                         </button>
@@ -728,7 +917,7 @@ export default function Admin({ user, userData }) {
                     {activeTab === 'banners' && (
                         <button
                             onClick={() => setIsAddingBanner(true)}
-                            className="w-full md:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2"
+                            className="w-full md:w-auto bg-[#2D5A27] hover:bg-[#386d31] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2"
                         >
                             <Plus className="w-5 h-5" /> Add Banner
                         </button>
@@ -743,76 +932,101 @@ export default function Admin({ user, userData }) {
                     </div>
 
                     {/* Tabs */}
-                    <div className="w-full md:w-auto flex bg-white p-1 rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+                    <div className="w-full md:w-auto flex bg-[#121212] p-1 rounded-xl border border-gray-800 shadow-sm overflow-x-auto">
+                        <button
+                            onClick={() => setActiveTab('clubs')}
+                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'clubs' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
+                        >
+                            Clubs
+                        </button>
                         <button
                             onClick={() => setActiveTab('events')}
-                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'events' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'events' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
                         >
                             Events
                         </button>
                         <button
                             onClick={() => setActiveTab('users')}
-                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'users' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'users' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
                         >
                             Users ({users.length})
                         </button>
                         <button
                             onClick={() => setActiveTab('banners')}
-                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'banners' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'banners' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
                         >
                             Banners
                         </button>
                         <button
                             onClick={() => setActiveTab('notes')}
-                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'notes' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'notes' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
                         >
                             Notes
                         </button>
                         <button
+                            onClick={() => setActiveTab('notes_categories')}
+                            className={`min-w-[140px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'notes_categories' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
+                        >
+                            Notes Categories
+                        </button>
+                        <button
                             onClick={() => setActiveTab('lostfound')}
-                            className={`min-w-[120px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'lostfound' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                            className={`min-w-[120px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'lostfound' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
                         >
                             Lost & Found
                         </button>
                         <button
                             onClick={() => setActiveTab('scholarships')}
-                            className={`min-w-[128px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'scholarships' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                            className={`min-w-[128px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'scholarships' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
                         >
                             Scholarships
                         </button>
                         <button
                             onClick={() => setActiveTab('admins')}
-                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'admins' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                            className={`min-w-[92px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'admins' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
                         >
                             Admins
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('chat_groups')}
+                            className={`min-w-[120px] whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'chat_groups' ? 'bg-[#2D5A27]/20 text-[#2D5A27]' : 'text-gray-400 hover:bg-[#1A1A1A]'}`}
+                        >
+                            Chat Groups
                         </button>
                     </div>
                 </div>
             </div>
 
+            {/* Clubs Management Tab */}
+            {activeTab === 'clubs' && (
+                <div className="mt-6">
+                    <ClubsManagerWithProvider user={user} setAppTab={setAppTab} setTargetClubId={setTargetClubId} />
+                </div>
+            )}
+
             {/* Add/Edit Event Form */}
             {isAddingEvent && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-                        <div className="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
-                            <h3 className="font-bold text-xl text-gray-900">
+                    <div className="bg-[#121212] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+                        <div className="p-6 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-[#121212] z-10">
+                            <h3 className="font-bold text-xl text-gray-200">
                                 {editingEvent ? 'Edit Event' : 'Add New Event'}
                             </h3>
                             <button onClick={handleCancel}>
-                                <X className="w-6 h-6 text-gray-500 hover:text-gray-700" />
+                                <X className="w-6 h-6 text-gray-500 hover:text-gray-400" />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             {/* Image Upload */}
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Event Image</label>
+                                <label className="block text-sm font-bold text-gray-400 mb-2">Event Image</label>
                                 <div
                                     onClick={() => fileInputRef.current.click()}
-                                    className="border-2 border-dashed border-gray-300 rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 transition relative overflow-hidden"
+                                    className="border-2 border-dashed border-gray-700 bg-[#242424] text-white rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 transition relative overflow-hidden"
                                 >
                                     {formData.image ? (
-                                        <img src={formData.image} className="w-full h-full object-contain" alt="Preview" />
+                                        <img src={getOptimizedImageUrl(formData.image, '16:9')} className="w-full h-full object-contain" alt="Preview" />
                                     ) : (
                                         <>
                                             <ImageIcon className="w-10 h-10 text-gray-400 mb-2" />
@@ -834,22 +1048,22 @@ export default function Admin({ user, userData }) {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Event Title *</label>
+                                    <label className="block text-sm font-bold text-gray-400 mb-2">Event Title *</label>
                                     <input
                                         required
                                         value={formData.title}
                                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., Hackathon Night"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Event Type *</label>
+                                    <label className="block text-sm font-bold text-gray-400 mb-2">Event Type *</label>
                                     <input
                                         required
                                         value={formData.type}
                                         onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., Workshop, Competition"
                                     />
                                 </div>
@@ -857,45 +1071,45 @@ export default function Admin({ user, userData }) {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Date & Time *</label>
+                                    <label className="block text-sm font-bold text-gray-400 mb-2">Date & Time *</label>
                                     <input
                                         required
                                         value={formData.date}
                                         onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., Dec 5, 3 PM"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Location *</label>
+                                    <label className="block text-sm font-bold text-gray-400 mb-2">Location *</label>
                                     <input
                                         required
                                         value={formData.location}
                                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., CS Lab 301"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
+                                <label className="block text-sm font-bold text-gray-400 mb-2">Description</label>
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     rows="3"
-                                    className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent resize-none"
                                     placeholder="Event description..."
                                 />
                             </div>
 
                             <div className="grid grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
+                                    <label className="block text-sm font-bold text-gray-400 mb-2">Category</label>
                                     <select
                                         value={formData.category}
                                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                     >
                                         <option>Tech</option>
                                         <option>Arts</option>
@@ -905,11 +1119,11 @@ export default function Admin({ user, userData }) {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Color</label>
+                                    <label className="block text-sm font-bold text-gray-400 mb-2">Color</label>
                                     <select
                                         value={formData.color}
                                         onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                     >
                                         <option value="blue">Blue</option>
                                         <option value="orange">Orange</option>
@@ -920,12 +1134,12 @@ export default function Admin({ user, userData }) {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Attendees</label>
+                                    <label className="block text-sm font-bold text-gray-400 mb-2">Attendees</label>
                                     <input
                                         type="number"
                                         value={formData.attendees}
                                         onChange={(e) => setFormData({ ...formData, attendees: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="0"
                                     />
                                 </div>
@@ -937,15 +1151,15 @@ export default function Admin({ user, userData }) {
                                     id="featured"
                                     checked={formData.featured}
                                     onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                                    className="w-4 h-4 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
+                                    className="w-4 h-4 text-[#2D5A27] rounded focus:ring-2 focus:ring-[#2D5A27]"
                                 />
-                                <label htmlFor="featured" className="text-sm font-bold text-gray-700">Mark as Featured Event</label>
+                                <label htmlFor="featured" className="text-sm font-bold text-gray-400">Mark as Featured Event</label>
                             </div>
 
                             <div className="flex gap-3 pt-4">
                                 <button
                                     type="submit"
-                                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:shadow-lg transition"
+                                    className="flex-1 bg-[#2D5A27] hover:bg-[#386d31] text-white py-3 rounded-xl font-bold hover:shadow-lg transition"
                                 >
                                     <Save className="w-5 h-5 inline mr-2" />
                                     {editingEvent ? 'Update Event' : 'Add Event'}
@@ -953,7 +1167,7 @@ export default function Admin({ user, userData }) {
                                 <button
                                     type="button"
                                     onClick={handleCancel}
-                                    className="px-6 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition"
+                                    className="px-6 bg-gray-200 text-gray-400 rounded-xl font-bold hover:bg-gray-300 transition"
                                 >
                                     Cancel
                                 </button>
@@ -965,64 +1179,92 @@ export default function Admin({ user, userData }) {
 
             {/* Add/Edit Banner Modal */}
             {isAddingBanner && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-                        <div className="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
-                            <h3 className="font-bold text-xl text-gray-900">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-[#121212] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-800">
+                        <div className="p-6 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-[#121212] z-10">
+                            <h3 className="font-bold text-xl text-gray-200">
                                 {editingBanner ? 'Edit Banner' : 'Add New Banner'}
                             </h3>
                             <button onClick={() => { setIsAddingBanner(false); setEditingBanner(null); }}>
-                                <X className="w-6 h-6 text-gray-500 hover:text-gray-700" />
+                                <X className="w-6 h-6 text-gray-500 hover:text-gray-400" />
                             </button>
                         </div>
 
                         <form onSubmit={handleBannerSubmit} className="p-6 space-y-4">
                             {/* Image Upload */}
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Banner Image</label>
-                                <div
-                                    onClick={() => bannerFileInputRef.current.click()}
-                                    className="border-2 border-dashed border-gray-300 rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 transition relative overflow-hidden"
-                                >
-                                    {bannerFormData.image ? (
-                                        <img src={bannerFormData.image} className="w-full h-full object-contain" alt="Preview" />
-                                    ) : (
-                                        <>
-                                            <ImageIcon className="w-10 h-10 text-gray-400 mb-2" />
-                                            <span className="text-sm text-gray-500">Click to upload image</span>
-                                        </>
-                                    )}
-                                    <input
-                                        ref={bannerFileInputRef}
-                                        type="file"
-                                        className="hidden"
-                                        accept="image/*"
-                                        onChange={handleBannerImageUpload}
-                                    />
-                                    <p className="text-xs text-gray-500 mt-2">
-                                        💡 Suggested size: 1920×600 pixels (Images of other sizes will display without zooming)
-                                    </p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-300 mb-2">Desktop Banner Image *</label>
+                                    <div
+                                        onClick={() => desktopBannerFileInputRef.current.click()}
+                                        className="border-2 border-dashed border-gray-700 rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:border-[#2D5A27] transition relative overflow-hidden bg-[#1A1A1A]"
+                                    >
+                                        {bannerFormData.desktopImage || bannerFormData.image ? (
+                                            <img src={getOptimizedImageUrl(bannerFormData.desktopImage || bannerFormData.image, '16:9')} className="w-full h-full object-contain" alt="Preview" />
+                                        ) : (
+                                            <>
+                                                <ImageIcon className="w-10 h-10 text-gray-500 mb-2" />
+                                                <span className="text-sm text-gray-400">Click to upload</span>
+                                            </>
+                                        )}
+                                        <input
+                                            ref={desktopBannerFileInputRef}
+                                            type="file"
+                                            className="hidden"
+                                            accept="image/*"
+                                            onChange={(e) => handleBannerImageUpload(e, 'desktop')}
+                                        />
+                                        <p className="text-xs text-gray-500 mt-2 px-2 text-center">
+                                            💡 21:9 Ratio (e.g. 2100x900)
+                                        </p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-300 mb-2">Mobile Banner Image *</label>
+                                    <div
+                                        onClick={() => mobileBannerFileInputRef.current.click()}
+                                        className="border-2 border-dashed border-gray-700 rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:border-[#2D5A27] transition relative overflow-hidden bg-[#1A1A1A]"
+                                    >
+                                        {bannerFormData.mobileImage ? (
+                                            <img src={getOptimizedImageUrl(bannerFormData.mobileImage, '16:9')} className="w-full h-full object-contain" alt="Preview" />
+                                        ) : (
+                                            <>
+                                                <ImageIcon className="w-10 h-10 text-gray-500 mb-2" />
+                                                <span className="text-sm text-gray-400">Click to upload</span>
+                                            </>
+                                        )}
+                                        <input
+                                            ref={mobileBannerFileInputRef}
+                                            type="file"
+                                            className="hidden"
+                                            accept="image/*"
+                                            onChange={(e) => handleBannerImageUpload(e, 'mobile')}
+                                        />
+                                        <p className="text-xs text-gray-500 mt-2 px-2 text-center">
+                                            💡 16:9 Ratio
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Title *</label>
+                                    <label className="block text-sm font-bold text-gray-400 mb-2">Title *</label>
                                     <input
                                         required
                                         value={bannerFormData.title}
                                         onChange={(e) => setBannerFormData({ ...bannerFormData, title: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., Hackathon 2025"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Subtitle *</label>
+                                    <label className="block text-sm font-bold text-gray-400 mb-2">Subtitle *</label>
                                     <input
                                         required
                                         value={bannerFormData.subtitle}
                                         onChange={(e) => setBannerFormData({ ...bannerFormData, subtitle: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., Win big prizes!"
                                     />
                                 </div>
@@ -1030,21 +1272,21 @@ export default function Admin({ user, userData }) {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">CTA Text</label>
+                                    <label className="block text-sm font-bold text-gray-400 mb-2">CTA Text</label>
                                     <input
                                         value={bannerFormData.cta}
                                         onChange={(e) => setBannerFormData({ ...bannerFormData, cta: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., Register Now"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">CTA Link</label>
+                                    <label className="block text-sm font-bold text-gray-400 mb-2">CTA Link</label>
                                     <input
                                         type="url"
                                         value={bannerFormData.link}
                                         onChange={(e) => setBannerFormData({ ...bannerFormData, link: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="https://example.com/register"
                                     />
                                 </div>
@@ -1052,22 +1294,22 @@ export default function Admin({ user, userData }) {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Badge Text</label>
+                                    <label className="block text-sm font-bold text-gray-400 mb-2">Badge Text</label>
                                     <input
                                         value={bannerFormData.badge}
                                         onChange={(e) => setBannerFormData({ ...bannerFormData, badge: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                         placeholder="e.g., FEATURED"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Gradient Color</label>
+                                <label className="block text-sm font-bold text-gray-400 mb-2">Gradient Color</label>
                                 <select
                                     value={bannerFormData.color}
                                     onChange={(e) => setBannerFormData({ ...bannerFormData, color: e.target.value })}
-                                    className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent"
                                 >
                                     <option value="from-blue-900 to-slate-900">Blue Night</option>
                                     <option value="from-purple-900 to-indigo-900">Purple Haze</option>
@@ -1080,7 +1322,7 @@ export default function Admin({ user, userData }) {
                             <div className="flex gap-3 pt-4">
                                 <button
                                     type="submit"
-                                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:shadow-lg transition"
+                                    className="flex-1 bg-[#2D5A27] hover:bg-[#386d31] text-white py-3 rounded-xl font-bold hover:shadow-lg transition"
                                 >
                                     <Save className="w-5 h-5 inline mr-2" />
                                     {editingBanner ? 'Update Banner' : 'Add Banner'}
@@ -1088,7 +1330,7 @@ export default function Admin({ user, userData }) {
                                 <button
                                     type="button"
                                     onClick={() => { setIsAddingBanner(false); setEditingBanner(null); }}
-                                    className="px-6 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition"
+                                    className="px-6 bg-gray-200 text-gray-400 rounded-xl font-bold hover:bg-gray-300 transition"
                                 >
                                     Cancel
                                 </button>
@@ -1101,7 +1343,7 @@ export default function Admin({ user, userData }) {
             {/* User Detail Modal */}
             {isUserModalOpen && selectedUser && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95">
+                    <div className="bg-[#121212] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95">
                         <div className="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600">
                             <button
                                 onClick={() => setIsUserModalOpen(false)}
@@ -1116,40 +1358,40 @@ export default function Admin({ user, userData }) {
                                     {selectedUser.profileImage ? (
                                         <img src={selectedUser.profileImage} className="w-full h-full object-cover" alt={selectedUser.name} />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                                        <div className="w-full h-full flex items-center justify-center bg-gray-900 text-gray-400">
                                             <Users className="w-12 h-12" />
                                         </div>
                                     )}
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mt-2">{selectedUser.name}</h3>
+                                <h3 className="text-xl font-bold text-gray-200 mt-2">{selectedUser.name}</h3>
                                 <p className="text-blue-600 font-medium text-sm">@{selectedUser.username || 'username'}</p>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4 text-center">
-                                    <div className="bg-gray-50 p-3 rounded-xl">
+                                    <div className="bg-[#1A1A1A] p-3 rounded-xl">
                                         <p className="text-xs text-gray-500 uppercase font-bold">Branch</p>
-                                        <p className="font-bold text-gray-900">{selectedUser.branch || 'N/A'}</p>
+                                        <p className="font-bold text-gray-200">{selectedUser.branch || 'N/A'}</p>
                                     </div>
-                                    <div className="bg-gray-50 p-3 rounded-xl">
+                                    <div className="bg-[#1A1A1A] p-3 rounded-xl">
                                         <p className="text-xs text-gray-500 uppercase font-bold">Year</p>
-                                        <p className="font-bold text-gray-900">{selectedUser.year || 'N/A'}</p>
+                                        <p className="font-bold text-gray-200">{selectedUser.year || 'N/A'}</p>
                                     </div>
                                 </div>
 
                                 <div>
                                     <p className="text-xs text-gray-500 uppercase font-bold mb-1">Email</p>
-                                    <p className="text-gray-900 text-sm font-medium">{selectedUser.email}</p>
+                                    <p className="text-gray-200 text-sm font-medium">{selectedUser.email}</p>
                                 </div>
 
                                 <div>
                                     <p className="text-xs text-gray-500 uppercase font-bold mb-1">Bio</p>
-                                    <p className="text-gray-700 text-sm bg-gray-50 p-3 rounded-xl">{selectedUser.bio || 'No bio available.'}</p>
+                                    <p className="text-gray-400 text-sm bg-[#1A1A1A] p-3 rounded-xl">{selectedUser.bio || 'No bio available.'}</p>
                                 </div>
 
                                 <div className="pt-2">
                                     <p className="text-xs text-gray-500 uppercase font-bold mb-2">Visibility</p>
-                                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${selectedUser.isVisibleInTeams !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${selectedUser.isVisibleInTeams !== false ? 'bg-green-100 text-green-700' : 'bg-gray-900 text-gray-400'}`}>
                                         {selectedUser.isVisibleInTeams !== false ? <CheckCircle className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
                                         {selectedUser.isVisibleInTeams !== false ? 'Visible in Teams' : 'Hidden from Teams'}
                                     </div>
@@ -1163,12 +1405,12 @@ export default function Admin({ user, userData }) {
             {/* Content Area */}
             {activeTab === 'events' ? (
                 /* Events List */
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">All Events ({events.length})</h2>
+                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
+                    <h2 className="text-xl font-bold text-gray-200 mb-4">All Events ({events.length})</h2>
 
                     {loading ? (
                         <div className="text-center py-12">
-                            <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                            <div className="w-12 h-12 border-4 border-[#2D5A27] border-t-transparent rounded-full animate-spin mx-auto"></div>
                             <p className="text-gray-500 mt-4">Loading events...</p>
                         </div>
                     ) : events.length === 0 ? (
@@ -1179,26 +1421,26 @@ export default function Admin({ user, userData }) {
                     ) : (
                         <div className="space-y-4">
                             {events.map(event => (
-                                <div key={event.id} className="border border-gray-200 rounded-xl p-4 flex items-center gap-4 hover:shadow-md transition">
+                                <div key={event.id} className="border border-gray-800 rounded-xl p-4 flex items-center gap-4 hover:shadow-md transition">
                                     {event.image && (
-                                        <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
-                                            <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+                                        <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-900">
+                                            <img src={getOptimizedImageUrl(event.image, '16:9')} alt={event.title} className="w-full h-full object-cover" />
                                         </div>
                                     )}
                                     <div className="flex-1">
                                         <div className="flex items-start justify-between mb-2">
                                             <div>
-                                                <h3 className="font-bold text-gray-900 text-lg">{event.title}</h3>
+                                                <h3 className="font-bold text-gray-200 text-lg">{event.title}</h3>
                                                 <div className="flex gap-2 mt-1">
                                                     <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">{event.type}</span>
-                                                    <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full font-bold">{event.category}</span>
+                                                    <span className="text-xs bg-gray-900 text-gray-400 px-2 py-1 rounded-full font-bold">{event.category}</span>
                                                     {event.featured && (
                                                         <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-bold">Featured</span>
                                                     )}
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex gap-4 text-sm text-gray-600">
+                                        <div className="flex gap-4 text-sm text-gray-400">
                                             <span className="flex items-center gap-1">
                                                 <Clock className="w-4 h-4" /> {event.date}
                                             </span>
@@ -1210,7 +1452,17 @@ export default function Admin({ user, userData }) {
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 flex-wrap justify-end">
+                                        <button
+                                            onClick={() => handleToggleRegistration(event.id, event.isRegistrationOpen)}
+                                            className={`px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                                                event.isRegistrationOpen !== false
+                                                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                                    : 'bg-red-100 text-red-700 hover:bg-red-200'
+                                            }`}
+                                        >
+                                            {event.isRegistrationOpen !== false ? 'Open' : 'Closed'}
+                                        </button>
                                         <button
                                             onClick={() => handleEdit(event)}
                                             className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
@@ -1231,12 +1483,12 @@ export default function Admin({ user, userData }) {
                 </div>
             ) : activeTab === 'banners' ? (
                 /* Banners List */
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">Homepage Banners ({banners.length})</h2>
+                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
+                    <h2 className="text-xl font-bold text-gray-200 mb-4">Homepage Banners ({banners.length})</h2>
 
                     {bannersLoading ? (
                         <div className="text-center py-12">
-                            <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                            <div className="w-12 h-12 border-4 border-[#2D5A27] border-t-transparent rounded-full animate-spin mx-auto"></div>
                             <p className="text-gray-500 mt-4">Loading banners...</p>
                         </div>
                     ) : banners.length === 0 ? (
@@ -1249,10 +1501,10 @@ export default function Admin({ user, userData }) {
                             {banners.map(banner => (
                                 <div key={banner.id} className={`relative rounded-2xl overflow-hidden shadow-lg aspect-[2/1] bg-gradient-to-r ${banner.color}`}>
                                     {banner.image && (
-                                        <img src={banner.image} alt={banner.title} className="absolute inset-0 w-full h-full object-cover opacity-50" />
+                                        <img src={getOptimizedImageUrl(banner.image, '16:9')} alt={banner.title} className="absolute inset-0 w-full h-full object-cover opacity-50" />
                                     )}
                                     <div className="absolute inset-0 p-6 flex flex-col justify-center text-white z-10">
-                                        <span className="text-xs font-bold bg-white/20 backdrop-blur-md px-2 py-1 rounded-full self-start mb-2">{banner.badge}</span>
+                                        <span className="text-xs font-bold bg-[#121212]/20 backdrop-blur-md px-2 py-1 rounded-full self-start mb-2">{banner.badge}</span>
                                         <h3 className="text-2xl font-bold mb-1">{banner.title}</h3>
                                         <p className="text-sm opacity-90 mb-4">{banner.subtitle}</p>
                                         <button
@@ -1261,7 +1513,7 @@ export default function Admin({ user, userData }) {
                                                     window.open(banner.link, '_blank', 'noopener,noreferrer');
                                                 }
                                             }}
-                                            className="bg-white text-gray-900 px-4 py-2 rounded-lg text-xs font-bold self-start disabled:opacity-70"
+                                            className="bg-[#121212] text-gray-200 px-4 py-2 rounded-lg text-xs font-bold self-start disabled:opacity-70"
                                             disabled={!banner.link}
                                             title={banner.link ? 'Open CTA link' : 'Add CTA link to make this clickable'}
                                         >
@@ -1269,7 +1521,7 @@ export default function Admin({ user, userData }) {
                                         </button>
                                     </div>
                                     <div className="absolute top-4 right-4 flex gap-2 z-20">
-                                        <button onClick={() => handleEditBanner(banner)} className="p-2 bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-md text-white transition">
+                                        <button onClick={() => handleEditBanner(banner)} className="p-2 bg-[#121212]/20 hover:bg-[#121212]/30 rounded-full backdrop-blur-md text-white transition">
                                             <Edit2 className="w-4 h-4" />
                                         </button>
                                         <button onClick={() => handleDeleteBanner(banner.id)} className="p-2 bg-red-500/20 hover:bg-red-500/40 rounded-full backdrop-blur-md text-white transition">
@@ -1283,31 +1535,31 @@ export default function Admin({ user, userData }) {
                 </div>
             ) : activeTab === 'notes' ? (
                 /* Notes Review */
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
-                        <h2 className="text-xl font-bold text-gray-900">Notes Management ({notes.length})</h2>
-                        <div className="flex gap-2 bg-gray-100 rounded-lg p-1 overflow-x-auto">
+                        <h2 className="text-xl font-bold text-gray-200">Notes Management ({notes.length})</h2>
+                        <div className="flex gap-2 bg-gray-900 rounded-lg p-1 overflow-x-auto">
                             <button
                                 onClick={() => setNotesFilter('all')}
-                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'all' ? 'bg-white text-gray-900 shadow' : 'text-gray-600'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'all' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}
                             >
                                 All
                             </button>
                             <button
                                 onClick={() => setNotesFilter('pending')}
-                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'pending' ? 'bg-white text-gray-900 shadow' : 'text-gray-600'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'pending' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}
                             >
                                 Pending
                             </button>
                             <button
                                 onClick={() => setNotesFilter('approved')}
-                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'approved' ? 'bg-white text-gray-900 shadow' : 'text-gray-600'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'approved' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}
                             >
                                 Approved
                             </button>
                             <button
                                 onClick={() => setNotesFilter('rejected')}
-                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'rejected' ? 'bg-white text-gray-900 shadow' : 'text-gray-600'}`}
+                                className={`px-3 py-1 text-xs font-bold rounded transition ${notesFilter === 'rejected' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}
                             >
                                 Rejected
                             </button>
@@ -1316,7 +1568,7 @@ export default function Admin({ user, userData }) {
 
                     {notesLoading ? (
                         <div className="text-center py-12">
-                            <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                            <div className="w-12 h-12 border-4 border-[#2D5A27] border-t-transparent rounded-full animate-spin mx-auto"></div>
                             <p className="text-gray-500 mt-4">Loading notes...</p>
                         </div>
                     ) : notes.filter(n => notesFilter === 'all' || n.status === notesFilter).length === 0 ? (
@@ -1327,15 +1579,15 @@ export default function Admin({ user, userData }) {
                     ) : (
                         <div className="space-y-4">
                             {notes.filter(n => notesFilter === 'all' || n.status === notesFilter).map(note => (
-                                <div key={note.id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition">
+                                <div key={note.id} className="border border-gray-800 rounded-xl p-4 hover:shadow-md transition">
                                     <div className="flex items-start gap-4">
-                                        <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <div className="w-16 h-16 bg-gray-900 rounded-lg flex items-center justify-center flex-shrink-0">
                                             <FileText className="w-8 h-8 text-gray-400" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between mb-2">
                                                 <div>
-                                                    <h3 className="font-bold text-gray-900 text-lg mb-1">{note.title}</h3>
+                                                    <h3 className="font-bold text-gray-200 text-lg mb-1">{note.title}</h3>
                                                     <div className="flex gap-2 mb-2">
                                                         <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">
                                                             {note.subject}
@@ -1358,7 +1610,7 @@ export default function Admin({ user, userData }) {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <p className="text-sm text-gray-600 mb-2 line-clamp-2">{note.description || 'No description'}</p>
+                                            <p className="text-sm text-gray-400 mb-2 line-clamp-2">{note.description || 'No description'}</p>
                                             <div className="flex gap-4 text-xs text-gray-500 mb-3">
                                                 <span>Uploaded by: {note.uploadedByName}</span>
                                                 <span>File: {note.fileName}</span>
@@ -1375,7 +1627,7 @@ export default function Admin({ user, userData }) {
                                                         </button>
                                                         <button
                                                             onClick={() => handleRejectNote(note.id)}
-                                                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-bold transition flex items-center gap-2"
+                                                            className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-bold transition flex items-center gap-2"
                                                         >
                                                             <XCircle className="w-4 h-4" />
                                                             Reject
@@ -1383,18 +1635,10 @@ export default function Admin({ user, userData }) {
                                                     </>
                                                 )}
                                                 <button
-                                                    onClick={() => handleDownloadNote(note)}
-                                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold transition flex items-center gap-2"
-                                                >
-                                                    <Download className="w-4 h-4" />
-                                                    Preview
-                                                </button>
-                                                <button
                                                     onClick={() => handleDeleteNote(note.id)}
-                                                    className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-bold transition flex items-center gap-2"
+                                                    className="px-3 py-2 bg-gray-900 hover:bg-gray-200 text-gray-400 rounded-lg text-sm transition ml-auto"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
-                                                    Delete
                                                 </button>
                                             </div>
                                         </div>
@@ -1404,30 +1648,129 @@ export default function Admin({ user, userData }) {
                         </div>
                     )}
                 </div>
+            ) : activeTab === 'notes_categories' ? (
+                /* Notes Categories Management */
+                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
+                    <h2 className="text-xl font-bold text-gray-200 mb-6">Manage Notes Categories</h2>
+                    
+                    <form onSubmit={handleAddCategory} className="bg-[#1A1A1A] rounded-xl p-6 mb-8 border border-gray-800">
+                        <h3 className="font-bold text-gray-300 mb-4 flex items-center gap-2">
+                            <Plus className="w-5 h-5 text-[#2D5A27]" />
+                            Add Missing Subject
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-400 mb-2">Branch</label>
+                                <select
+                                    value={categoryFormData.branch}
+                                    onChange={(e) => setCategoryFormData({ ...categoryFormData, branch: e.target.value })}
+                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27] mb-2"
+                                >
+                                    {Object.keys(notesCategories).map(branch => (
+                                        <option key={branch} value={branch}>{branch}</option>
+                                    ))}
+                                    <option value="NEW_BRANCH">+ Add New Branch</option>
+                                </select>
+                                {categoryFormData.branch === 'NEW_BRANCH' && (
+                                    <input
+                                        type="text"
+                                        value={categoryFormData.customBranch}
+                                        onChange={(e) => setCategoryFormData({ ...categoryFormData, customBranch: e.target.value })}
+                                        placeholder="Enter new branch name..."
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27]"
+                                    />
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-400 mb-2">Semester</label>
+                                <select
+                                    value={categoryFormData.semester}
+                                    onChange={(e) => setCategoryFormData({ ...categoryFormData, semester: e.target.value })}
+                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27] mb-2"
+                                >
+                                    {['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6', 'Sem 7', 'Sem 8'].map(sem => (
+                                        <option key={sem} value={sem}>{sem}</option>
+                                    ))}
+                                    <option value="NEW_SEMESTER">+ Add Custom Semester</option>
+                                </select>
+                                {categoryFormData.semester === 'NEW_SEMESTER' && (
+                                    <input
+                                        type="text"
+                                        value={categoryFormData.customSemester}
+                                        onChange={(e) => setCategoryFormData({ ...categoryFormData, customSemester: e.target.value })}
+                                        placeholder="e.g. Sem 9"
+                                        className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27]"
+                                    />
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-400 mb-2">New Subject Name</label>
+                                <input
+                                    required
+                                    type="text"
+                                    value={categoryFormData.subject}
+                                    onChange={(e) => setCategoryFormData({ ...categoryFormData, subject: e.target.value })}
+                                    placeholder="e.g. Advanced AI"
+                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-2.5 focus:ring-2 focus:ring-[#2D5A27]"
+                                />
+                            </div>
+                        </div>
+                        <button type="submit" className="mt-4 bg-[#2D5A27] hover:bg-[#386d31] text-white px-6 py-2 rounded-lg font-bold transition">
+                            Add Subject
+                        </button>
+                    </form>
+
+                    {notesCategoriesLoading ? (
+                        <div className="text-center py-8 text-gray-500"><Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" /> Loading categories...</div>
+                    ) : (
+                        <div className="space-y-6">
+                            {Object.entries(notesCategories).map(([branch, semesters]) => (
+                                <div key={branch} className="border border-gray-800 rounded-xl overflow-hidden">
+                                    <div className="bg-[#1A1A1A] px-4 py-3 border-b border-gray-800">
+                                        <h4 className="font-black text-gray-200">{branch}</h4>
+                                    </div>
+                                    <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        {Object.entries(semesters).map(([sem, subjects]) => (
+                                            <div key={sem} className="bg-[#121212] border border-gray-800 shadow-sm rounded-lg p-3">
+                                                <h5 className="font-bold text-[#2D5A27] text-sm mb-2">{sem}</h5>
+                                                <ul className="text-sm text-gray-400 space-y-1">
+                                                    {subjects.map((sub, idx) => (
+                                                        <li key={idx} className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-[#2D5A27]"></div>{sub}</li>
+                                                    ))}
+                                                    {subjects.length === 0 && <li className="text-gray-400 italic">No subjects added</li>}
+                                                </ul>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             ) : activeTab === 'lostfound' ? (
                 /* Lost & Found Management */
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Lost & Found Items</h2>
-                        <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
-                            <button onClick={() => setLostFoundFilter('all')} className={`px-3 py-1 text-xs font-bold rounded transition ${lostFoundFilter === 'all' ? 'bg-white text-gray-900 shadow' : 'text-gray-600'}`}>All</button>
-                            <button onClick={() => setLostFoundFilter('pending')} className={`px-3 py-1 text-xs font-bold rounded transition ${lostFoundFilter === 'pending' ? 'bg-white text-gray-900 shadow' : 'text-gray-600'}`}>Pending</button>
-                            <button onClick={() => setLostFoundFilter('approved')} className={`px-3 py-1 text-xs font-bold rounded transition ${lostFoundFilter === 'approved' ? 'bg-white text-gray-900 shadow' : 'text-gray-600'}`}>Approved</button>
+                        <h2 className="text-2xl font-bold text-gray-200">Lost & Found Items</h2>
+                        <div className="flex gap-2 bg-gray-900 p-1 rounded-lg">
+                            <button onClick={() => setLostFoundFilter('all')} className={`px-3 py-1 text-xs font-bold rounded transition ${lostFoundFilter === 'all' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}>All</button>
+                            <button onClick={() => setLostFoundFilter('pending')} className={`px-3 py-1 text-xs font-bold rounded transition ${lostFoundFilter === 'pending' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}>Pending</button>
+                            <button onClick={() => setLostFoundFilter('approved')} className={`px-3 py-1 text-xs font-bold rounded transition ${lostFoundFilter === 'approved' ? 'bg-[#121212] text-gray-200 shadow' : 'text-gray-400'}`}>Approved</button>
                         </div>
                     </div>
                     {lostFoundLoading ? (
-                        <div className="text-center py-12"><Loader2 className="w-12 h-12 animate-spin text-indigo-600 mx-auto mb-4" /><p className="text-gray-500">Loading...</p></div>
+                        <div className="text-center py-12"><Loader2 className="w-12 h-12 animate-spin text-[#2D5A27] mx-auto mb-4" /><p className="text-gray-500">Loading...</p></div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {lostFoundItems.filter(item => lostFoundFilter === 'all' || item.status === lostFoundFilter).map(item => (
-                                <div key={item.id} className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                                    {item.image && <img src={item.image} className="w-full h-32 object-cover rounded-lg mb-3" alt={item.itemName} />}
+                                <div key={item.id} className="bg-[#1A1A1A] rounded-xl p-4 border border-gray-800">
+                                    {item.image && <img src={getOptimizedImageUrl(item.image, '4:3')} className="w-full h-32 object-cover rounded-lg mb-3" alt={item.itemName} />}
                                     <div className="flex items-center gap-2 mb-2">
                                         <span className={`text-xs font-bold px-2 py-1 rounded-full ${item.type === 'lost' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>{item.type.toUpperCase()}</span>
                                         <span className={`text-xs font-bold px-2 py-1 rounded-full ${item.status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>{item.status}</span>
                                     </div>
-                                    <h3 className="font-bold text-gray-900 mb-1">{item.itemName}</h3>
-                                    <p className="text-xs text-gray-600 mb-2 line-clamp-2">{item.description}</p>
+                                    <h3 className="font-bold text-gray-200 mb-1">{item.itemName}</h3>
+                                    <p className="text-xs text-gray-400 mb-2 line-clamp-2">{item.description}</p>
                                     <p className="text-xs text-gray-500 mb-2">📍 {item.location} • 📅 {new Date(item.date).toLocaleDateString()}</p>
                                     <p className="text-xs text-gray-500 mb-3">👤 {item.postedByName}</p>
                                     <div className="flex gap-2">
@@ -1443,53 +1786,53 @@ export default function Admin({ user, userData }) {
                 </div>
             ) : activeTab === 'scholarships' ? (
                 /* Scholarship Management */
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Scholarships</h2>
+                        <h2 className="text-2xl font-bold text-gray-200">Scholarships</h2>
                         {!isAddingScholarship && (
-                            <button onClick={() => setIsAddingScholarship(true)} className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition flex items-center gap-2">
+                            <button onClick={() => setIsAddingScholarship(true)} className="bg-[#2D5A27] hover:bg-[#386d31] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition flex items-center gap-2">
                                 <Plus className="w-5 h-5" /> Add Scholarship
                             </button>
                         )}
                     </div>
 
                     {isAddingScholarship && (
-                        <div className="bg-gray-50 rounded-xl p-6 mb-6 border border-gray-200">
-                            <h3 className="font-bold text-gray-900 mb-4">{editingScholarship ? 'Edit Scholarship' : 'Add New Scholarship'}</h3>
+                        <div className="bg-[#1A1A1A] rounded-xl p-6 mb-6 border border-gray-800">
+                            <h3 className="font-bold text-gray-200 mb-4">{editingScholarship ? 'Edit Scholarship' : 'Add New Scholarship'}</h3>
                             <div className="grid grid-cols-2 gap-4">
-                                <input type="text" placeholder="Title *" value={scholarshipFormData.title} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, title: e.target.value })} className="border border-gray-300 rounded-lg p-3" />
-                                <input type="text" placeholder="Provider" value={scholarshipFormData.provider} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, provider: e.target.value })} className="border border-gray-300 rounded-lg p-3" />
-                                <input type="text" placeholder="Amount (₹50,000)" value={scholarshipFormData.amount} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, amount: e.target.value })} className="border border-gray-300 rounded-lg p-3" />
-                                <input type="date" placeholder="Deadline" value={scholarshipFormData.deadline} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, deadline: e.target.value })} className="border border-gray-300 rounded-lg p-3" />
-                                <input type="url" placeholder="Website URL" value={scholarshipFormData.website} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, website: e.target.value })} className="col-span-2 border border-gray-300 rounded-lg p-3" />
-                                <textarea placeholder="Description" value={scholarshipFormData.description} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, description: e.target.value })} className="col-span-2 border border-gray-300 rounded-lg p-3" rows="2"></textarea>
-                                <textarea placeholder="Eligibility Criteria" value={scholarshipFormData.eligibility} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, eligibility: e.target.value })} className="col-span-2 border border-gray-300 rounded-lg p-3" rows="2"></textarea>
+                                <input type="text" placeholder="Title *" value={scholarshipFormData.title} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, title: e.target.value })} className="border border-gray-700 bg-[#242424] text-white rounded-lg p-3" />
+                                <input type="text" placeholder="Provider" value={scholarshipFormData.provider} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, provider: e.target.value })} className="border border-gray-700 bg-[#242424] text-white rounded-lg p-3" />
+                                <input type="text" placeholder="Amount (₹50,000)" value={scholarshipFormData.amount} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, amount: e.target.value })} className="border border-gray-700 bg-[#242424] text-white rounded-lg p-3" />
+                                <input type="date" placeholder="Deadline" value={scholarshipFormData.deadline} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, deadline: e.target.value })} className="border border-gray-700 bg-[#242424] text-white rounded-lg p-3" />
+                                <input type="url" placeholder="Website URL" value={scholarshipFormData.website} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, website: e.target.value })} className="col-span-2 border border-gray-700 bg-[#242424] text-white rounded-lg p-3" />
+                                <textarea placeholder="Description" value={scholarshipFormData.description} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, description: e.target.value })} className="col-span-2 border border-gray-700 bg-[#242424] text-white rounded-lg p-3" rows="2"></textarea>
+                                <textarea placeholder="Eligibility Criteria" value={scholarshipFormData.eligibility} onChange={(e) => setScholarshipFormData({ ...scholarshipFormData, eligibility: e.target.value })} className="col-span-2 border border-gray-700 bg-[#242424] text-white rounded-lg p-3" rows="2"></textarea>
                             </div>
                             <div className="flex gap-2 mt-4">
                                 <button onClick={handleAddScholarship} className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition">
                                     {editingScholarship ? 'Update' : 'Save'}
                                 </button>
-                                <button onClick={() => { setIsAddingScholarship(false); setEditingScholarship(null); setScholarshipFormData({ title: '', description: '', amount: '', deadline: '', eligibility: '', website: '', provider: '' }); }} className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-bold transition">Cancel</button>
+                                <button onClick={() => { setIsAddingScholarship(false); setEditingScholarship(null); setScholarshipFormData({ title: '', description: '', amount: '', deadline: '', eligibility: '', website: '', provider: '' }); }} className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-400 rounded-lg font-bold transition">Cancel</button>
                             </div>
                         </div>
                     )}
 
                     {scholarshipsLoading ? (
-                        <div className="text-center py-12"><Loader2 className="w-12 h-12 animate-spin text-indigo-600 mx-auto mb-4" /><p className="text-gray-500">Loading...</p></div>
+                        <div className="text-center py-12"><Loader2 className="w-12 h-12 animate-spin text-[#2D5A27] mx-auto mb-4" /><p className="text-gray-500">Loading...</p></div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {scholarships.map(scholarship => (
-                                <div key={scholarship.id} className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
-                                    <h3 className="font-bold text-gray-900 mb-2">{scholarship.title}</h3>
-                                    <p className="text-sm text-gray-700 mb-2">{scholarship.provider}</p>
-                                    <p className="text-xs text-gray-600 mb-2 line-clamp-2">{scholarship.description}</p>
-                                    <div className="space-y-1 text-xs text-gray-600 mb-3">
+                                <div key={scholarship.id} className="bg-gradient-to-br from-[#1A1A1A] to-[#242424] rounded-xl p-4 border border-[#333]">
+                                    <h3 className="font-bold text-gray-200 mb-2">{scholarship.title}</h3>
+                                    <p className="text-sm text-gray-400 mb-2">{scholarship.provider}</p>
+                                    <p className="text-xs text-gray-400 mb-2 line-clamp-2">{scholarship.description}</p>
+                                    <div className="space-y-1 text-xs text-gray-400 mb-3">
                                         <p>💰 {scholarship.amount}</p>
                                         <p>📅 Deadline: {new Date(scholarship.deadline).toLocaleDateString()}</p>
                                         <p className="line-clamp-1">✓ {scholarship.eligibility}</p>
                                     </div>
                                     {scholarship.website && (
-                                        <a href={scholarship.website} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-600 hover:underline mb-2 block">Visit Website →</a>
+                                        <a href={scholarship.website} target="_blank" rel="noopener noreferrer" className="text-xs text-[#2D5A27] hover:underline mb-2 block">Visit Website →</a>
                                     )}
                                     <div className="flex gap-2 mt-3">
                                         <button onClick={() => handleEditScholarship(scholarship)} className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
@@ -1506,18 +1849,18 @@ export default function Admin({ user, userData }) {
                 </div>
             ) : activeTab === 'admins' ? (
                 /* Admin Management */
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                            <Shield className="w-6 h-6 text-indigo-600" />
+                        <h2 className="text-2xl font-bold text-gray-200 flex items-center gap-2">
+                            <Shield className="w-6 h-6 text-[#2D5A27]" />
                             Admin Management
                         </h2>
                     </div>
 
                     {/* Add Admin Form */}
-                    <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-6 mb-6">
-                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <UserPlus className="w-5 h-5 text-indigo-600" />
+                    <div className="bg-gradient-to-r from-[#1A1A1A] to-[#242424] border border-[#333] rounded-xl p-6 mb-6">
+                        <h3 className="font-bold text-gray-200 mb-4 flex items-center gap-2">
+                            <UserPlus className="w-5 h-5 text-[#2D5A27]" />
                             Grant Admin Access
                         </h3>
                         <div className="flex gap-3">
@@ -1527,31 +1870,31 @@ export default function Admin({ user, userData }) {
                                 value={newAdminEmail}
                                 onChange={(e) => setNewAdminEmail(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleGrantAdmin()}
-                                className="flex-1 border border-indigo-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="flex-1 border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2D5A27]"
                             />
                             <button
                                 onClick={handleGrantAdmin}
-                                className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg transition flex items-center gap-2"
+                                className="px-6 py-3 bg-[#2D5A27] hover:bg-[#386d31] text-white rounded-lg font-bold hover:shadow-lg transition flex items-center gap-2"
                             >
                                 <Plus className="w-5 h-5" />
                                 Grant Access
                             </button>
                         </div>
-                        <p className="text-xs text-gray-600 mt-2">
+                        <p className="text-xs text-gray-400 mt-2">
                             💡 Tip: Enter the full email address of the user you want to make an admin
                         </p>
                     </div>
 
                     {/* Current Admins List */}
                     <div>
-                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <Users className="w-5 h-5 text-gray-700" />
+                        <h3 className="font-bold text-gray-200 mb-4 flex items-center gap-2">
+                            <Users className="w-5 h-5 text-gray-400" />
                             Current Admins ({admins.length + 2})
                         </h3>
 
                         {adminsLoading ? (
                             <div className="text-center py-8">
-                                <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mx-auto mb-4" />
+                                <Loader2 className="w-8 h-8 animate-spin text-[#2D5A27] mx-auto mb-4" />
                                 <p className="text-gray-500">Loading admins...</p>
                             </div>
                         ) : (
@@ -1561,8 +1904,8 @@ export default function Admin({ user, userData }) {
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold">SA</div>
                                         <div>
-                                            <p className="font-bold text-gray-900">{ADMIN_EMAILS[0]}</p>
-                                            <p className="text-xs text-gray-600">Super Admin (Protected)</p>
+                                            <p className="font-bold text-gray-200">{ADMIN_EMAILS[0]}</p>
+                                            <p className="text-xs text-gray-400">Super Admin (Protected)</p>
                                         </div>
                                     </div>
                                     <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Protected</span>
@@ -1572,8 +1915,8 @@ export default function Admin({ user, userData }) {
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold">SA</div>
                                         <div>
-                                            <p className="font-bold text-gray-900">{ADMIN_EMAILS[1]}</p>
-                                            <p className="text-xs text-gray-600">Super Admin (Protected)</p>
+                                            <p className="font-bold text-gray-200">{ADMIN_EMAILS[1]}</p>
+                                            <p className="text-xs text-gray-400">Super Admin (Protected)</p>
                                         </div>
                                     </div>
                                     <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Protected</span>
@@ -1581,13 +1924,13 @@ export default function Admin({ user, userData }) {
 
                                 {/* Dynamic Admins from Database */}
                                 {admins.map((admin) => (
-                                    <div key={admin.id} className="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between hover:shadow-md transition">
+                                    <div key={admin.id} className="bg-[#121212] border border-gray-800 rounded-xl p-4 flex items-center justify-between hover:shadow-md transition">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
+                                            <div className="w-10 h-10 rounded-full bg-[#2D5A27]/20 flex items-center justify-center text-[#2D5A27] font-bold">
                                                 {admin.email[0].toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-gray-900">{admin.email}</p>
+                                                <p className="font-bold text-gray-200">{admin.email}</p>
                                                 <p className="text-xs text-gray-500">
                                                     Added by {admin.grantedBy} •{' '}
                                                     {admin.grantedAt?.seconds ? new Date(admin.grantedAt.seconds * 1000).toLocaleDateString() : 'N/A'}
@@ -1605,7 +1948,7 @@ export default function Admin({ user, userData }) {
                                 ))}
 
                                 {admins.length === 0 && (
-                                    <div className="text-center py-8 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                                    <div className="text-center py-8 text-gray-400 bg-[#1A1A1A] rounded-xl border border-dashed border-gray-700 bg-[#242424] text-white">
                                         <Shield className="w-12 h-12 mx-auto mb-2 opacity-20" />
                                         <p className="text-sm font-medium">No additional admins yet</p>
                                         <p className="text-xs mt-1">Use the form above to grant admin access</p>
@@ -1615,14 +1958,107 @@ export default function Admin({ user, userData }) {
                         )}
                     </div>
                 </div>
+            ) : activeTab === 'chat_groups' ? (
+                /* Chat Groups Management */
+                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
+                    <h2 className="text-2xl font-bold text-gray-200 mb-6 flex items-center gap-2">
+                        <MessageSquare className="w-6 h-6 text-[#2D5A27]" />
+                        Chat Groups Management
+                    </h2>
+
+                    {/* Create New Group Form */}
+                    <form onSubmit={handleCreateChatGroup} className="bg-gradient-to-r from-[#1A1A1A] to-[#242424] border border-[#333] rounded-xl p-6 mb-8">
+                        <h3 className="font-bold text-gray-200 mb-4 flex items-center gap-2">
+                            <Plus className="w-5 h-5 text-[#2D5A27]" />
+                            Create New Public Channel
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-400 mb-2">Channel Name</label>
+                                <input
+                                    required
+                                    type="text"
+                                    value={newChatGroupName}
+                                    onChange={(e) => setNewChatGroupName(e.target.value)}
+                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2D5A27]"
+                                    placeholder="e.g. Competitive Programming"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-400 mb-2">Description</label>
+                                <input
+                                    required
+                                    type="text"
+                                    value={newChatGroupDesc}
+                                    onChange={(e) => setNewChatGroupDesc(e.target.value)}
+                                    className="w-full border border-gray-700 bg-[#242424] text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2D5A27]"
+                                    placeholder="What is this channel about?"
+                                />
+                            </div>
+                        </div>
+                        <button
+                            type="submit"
+                            className="bg-[#2D5A27] hover:bg-[#386d31] text-white px-6 py-2 rounded-lg font-bold hover:shadow-lg transition"
+                        >
+                            Create Channel
+                        </button>
+                    </form>
+
+                    {/* Pending Requests */}
+                    <div className="mb-8">
+                        <h3 className="font-bold text-gray-200 mb-4">Pending Requests</h3>
+                        {chatGroupsLoading ? (
+                            <div className="text-center py-4"><Loader2 className="w-6 h-6 animate-spin text-[#2D5A27] mx-auto" /></div>
+                        ) : chatGroups.filter(g => g.status === 'pending').length === 0 ? (
+                            <p className="text-gray-500 text-sm">No pending requests.</p>
+                        ) : (
+                            <div className="space-y-3">
+                                {chatGroups.filter(g => g.status === 'pending').map(group => (
+                                    <div key={group.id} className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div>
+                                            <p className="font-bold text-gray-200">{group.name}</p>
+                                            <p className="text-sm text-gray-400">{group.description}</p>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => handleApproveChatGroup(group.id)} className="px-4 py-2 bg-green-100 text-green-700 font-bold rounded-lg text-sm hover:bg-green-200 transition">Approve</button>
+                                            <button onClick={() => handleRejectChatGroup(group.id)} className="px-4 py-2 bg-red-100 text-red-700 font-bold rounded-lg text-sm hover:bg-red-200 transition">Reject</button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Active Channels */}
+                    <div>
+                        <h3 className="font-bold text-gray-200 mb-4">Active Public Channels</h3>
+                        {chatGroupsLoading ? (
+                            <div className="text-center py-4"><Loader2 className="w-6 h-6 animate-spin text-[#2D5A27] mx-auto" /></div>
+                        ) : chatGroups.filter(g => g.status === 'active' && g.type === 'group').length === 0 ? (
+                            <p className="text-gray-500 text-sm">No active channels.</p>
+                        ) : (
+                            <div className="space-y-3">
+                                {chatGroups.filter(g => g.status === 'active' && g.type === 'group').map(group => (
+                                    <div key={group.id} className="bg-[#121212] border border-gray-800 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div>
+                                            <p className="font-bold text-gray-200">{group.name}</p>
+                                            <p className="text-sm text-gray-400">{group.description}</p>
+                                        </div>
+                                        <button onClick={() => handleRejectChatGroup(group.id)} className="px-3 py-1.5 bg-red-50 text-red-600 text-sm font-bold rounded hover:bg-red-100 transition">Delete</button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
             ) : (
                 /* Users List */
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">All Users ({users.length})</h2>
+                <div className="bg-[#121212] rounded-2xl shadow-lg border border-gray-800 p-6">
+                    <h2 className="text-xl font-bold text-gray-200 mb-4">All Users ({users.length})</h2>
 
                     {usersLoading ? (
                         <div className="text-center py-12">
-                            <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                            <div className="w-12 h-12 border-4 border-[#2D5A27] border-t-transparent rounded-full animate-spin mx-auto"></div>
                             <p className="text-gray-500 mt-4">Loading users...</p>
                         </div>
                     ) : users.length === 0 ? (
@@ -1634,23 +2070,23 @@ export default function Admin({ user, userData }) {
                         <>
                             <div className="md:hidden space-y-3">
                                 {users.map(user => (
-                                    <div key={user.id} className="border border-gray-200 rounded-xl p-4 bg-gray-50">
+                                    <div key={user.id} className="border border-gray-800 rounded-xl p-4 bg-[#1A1A1A]">
                                         <div className="flex items-center gap-3 mb-3">
                                             <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
                                                 {user.profileImage ? (
                                                     <img src={user.profileImage} className="w-full h-full object-cover" alt={user.name} />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center bg-indigo-100 text-indigo-600 font-bold">
+                                                    <div className="w-full h-full flex items-center justify-center bg-[#2D5A27]/20 text-[#2D5A27] font-bold">
                                                         {user.name ? user.name[0] : 'U'}
                                                     </div>
                                                 )}
                                             </div>
                                             <div className="min-w-0">
-                                                <p className="font-bold text-gray-900 text-sm truncate">{user.name}</p>
+                                                <p className="font-bold text-gray-200 text-sm truncate">{user.name}</p>
                                                 <p className="text-xs text-gray-500 truncate">@{user.username || 'username'}</p>
                                             </div>
                                         </div>
-                                        <div className="space-y-1 text-xs text-gray-600 mb-3">
+                                        <div className="space-y-1 text-xs text-gray-400 mb-3">
                                             <p className="truncate">Email: {user.email}</p>
                                             <p>Branch/Year: {user.branch || '-'} / {user.year || '-'}</p>
                                         </div>
@@ -1660,7 +2096,7 @@ export default function Admin({ user, userData }) {
                                                     <CheckCircle className="w-3 h-3" /> Visible
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-bold">
+                                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-900 text-gray-400 text-xs font-bold">
                                                     <Lock className="w-3 h-3" /> Hidden
                                                 </span>
                                             )}
@@ -1670,7 +2106,7 @@ export default function Admin({ user, userData }) {
                                                         setSelectedUser(user);
                                                         setIsUserModalOpen(true);
                                                     }}
-                                                    className="text-indigo-600 hover:text-indigo-800 font-bold text-xs"
+                                                    className="text-[#2D5A27] hover:text-indigo-800 font-bold text-xs"
                                                 >
                                                     View
                                                 </button>
@@ -1689,7 +2125,7 @@ export default function Admin({ user, userData }) {
                             <div className="hidden md:block overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="border-b border-gray-200">
+                                    <tr className="border-b border-gray-800">
                                         <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase">User</th>
                                         <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase">Branch/Year</th>
                                         <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase">Email</th>
@@ -1699,36 +2135,36 @@ export default function Admin({ user, userData }) {
                                 </thead>
                                 <tbody>
                                     {users.map(user => (
-                                        <tr key={user.id} className="border-b border-gray-50 hover:bg-gray-50 transition">
+                                        <tr key={user.id} className="border-b border-gray-50 hover:bg-[#1A1A1A] transition">
                                             <td className="py-3 px-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
                                                         {user.profileImage ? (
                                                             <img src={user.profileImage} className="w-full h-full object-cover" alt={user.name} />
                                                         ) : (
-                                                            <div className="w-full h-full flex items-center justify-center bg-indigo-100 text-indigo-600 font-bold">
+                                                            <div className="w-full h-full flex items-center justify-center bg-[#2D5A27]/20 text-[#2D5A27] font-bold">
                                                                 {user.name ? user.name[0] : 'U'}
                                                             </div>
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <p className="font-bold text-gray-900 text-sm">{user.name}</p>
+                                                        <p className="font-bold text-gray-200 text-sm">{user.name}</p>
                                                         <p className="text-xs text-gray-500">@{user.username || 'username'}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="py-3 px-4">
-                                                <p className="text-sm text-gray-700">{user.branch || '-'}</p>
+                                                <p className="text-sm text-gray-400">{user.branch || '-'}</p>
                                                 <p className="text-xs text-gray-500">{user.year || '-'}</p>
                                             </td>
-                                            <td className="py-3 px-4 text-sm text-gray-600">{user.email}</td>
+                                            <td className="py-3 px-4 text-sm text-gray-400">{user.email}</td>
                                             <td className="py-3 px-4">
                                                 {user.isVisibleInTeams !== false ? (
                                                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">
                                                         <CheckCircle className="w-3 h-3" /> Visible
                                                     </span>
                                                 ) : (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-bold">
+                                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-900 text-gray-400 text-xs font-bold">
                                                         <Lock className="w-3 h-3" /> Hidden
                                                     </span>
                                                 )}
@@ -1740,7 +2176,7 @@ export default function Admin({ user, userData }) {
                                                             setSelectedUser(user);
                                                             setIsUserModalOpen(true);
                                                         }}
-                                                        className="text-indigo-600 hover:text-indigo-800 font-bold text-xs"
+                                                        className="text-[#2D5A27] hover:text-indigo-800 font-bold text-xs"
                                                     >
                                                         View Profile
                                                     </button>
@@ -1765,3 +2201,5 @@ export default function Admin({ user, userData }) {
         </div>
     );
 }
+
+
