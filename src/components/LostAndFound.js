@@ -160,7 +160,7 @@ export default function LostAndFound({ user, userData }) {
             <div className="bg-surface-base rounded-xl border border-border-strong p-1 mb-6 flex gap-2">
                 <button
                     onClick={() => setActiveTab('lost')}
-                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'lost' ? 'bg-orange-600 text-white' : 'text-text-muted hover:bg-surface-elevated'
+                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'lost' ? 'bg-orange-600 text-[#111827]' : 'text-text-muted hover:bg-surface-elevated'
                         }`}
                 >
                     <XCircle className="w-4 h-4 inline mr-2" />
@@ -168,7 +168,7 @@ export default function LostAndFound({ user, userData }) {
                 </button>
                 <button
                     onClick={() => setActiveTab('found')}
-                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'found' ? 'bg-green-600 text-white' : 'text-text-muted hover:bg-surface-elevated'
+                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'found' ? 'bg-green-600 text-[#111827]' : 'text-text-muted hover:bg-surface-elevated'
                         }`}
                 >
                     <CheckCircle className="w-4 h-4 inline mr-2" />
@@ -176,7 +176,7 @@ export default function LostAndFound({ user, userData }) {
                 </button>
                 <button
                     onClick={() => setActiveTab('post')}
-                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'post' ? 'bg-blue-600 text-white' : 'text-text-muted hover:bg-surface-elevated'
+                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'post' ? 'bg-blue-600 text-[#111827]' : 'text-text-muted hover:bg-surface-elevated'
                         }`}
                 >
                     <Plus className="w-4 h-4 inline mr-2" />
@@ -198,7 +198,7 @@ export default function LostAndFound({ user, userData }) {
                                         placeholder="Search items..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                        className="w-full pl-10 pr-4 py-2 border border-border-strong rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                     />
                                 </div>
                             </div>
@@ -206,7 +206,7 @@ export default function LostAndFound({ user, userData }) {
                                 <select
                                     value={selectedCategory}
                                     onChange={(e) => setSelectedCategory(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 border border-border-strong rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 >
                                     {categories.map(cat => (
                                         <option key={cat} value={cat}>{cat}</option>
@@ -220,24 +220,24 @@ export default function LostAndFound({ user, userData }) {
                     {loading ? (
                         <div className="text-center py-12">
                             <Loader2 className="w-12 h-12 animate-spin text-orange-600 mx-auto mb-4" />
-                            <p className="text-gray-500">Loading items...</p>
+                            <p className="text-text-muted">Loading items...</p>
                         </div>
                     ) : filteredItems.length === 0 ? (
                         <div className="text-center py-12 bg-surface-base rounded-xl border border-border-strong">
-                            <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-500">No {activeTab} items found</p>
+                            <Package className="w-16 h-16 text-text-muted mx-auto mb-4" />
+                            <p className="text-text-muted">No {activeTab} items found</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {filteredItems.map(item => (
                                 <div key={item.id} className="bg-surface-base rounded-xl border border-border-strong overflow-hidden hover:shadow-md transition">
                                     {item.image ? (
-                                        <div className="bg-gray-900 overflow-hidden aspect-[4/3] w-full">
+                                        <div className="bg-surface-elevated overflow-hidden aspect-[4/3] w-full">
                                             <img src={getOptimizedImageUrl(item.image, '4:3')} className="w-full h-full object-cover" alt={item.itemName} />
                                         </div>
                                     ) : (
                                         <div className="bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center aspect-[4/3] w-full">
-                                            <Package className="w-16 h-16 text-gray-300" />
+                                            <Package className="w-16 h-16 text-text-muted" />
                                         </div>
                                     )}
                                     <div className="p-4">
@@ -252,7 +252,7 @@ export default function LostAndFound({ user, userData }) {
                                         </div>
                                         <h3 className="font-bold text-text-main mb-2">{item.itemName}</h3>
                                         <p className="text-sm text-text-muted mb-3 line-clamp-2">{item.description}</p>
-                                        <div className="space-y-1 text-xs text-gray-500 mb-3">
+                                        <div className="space-y-1 text-xs text-text-muted mb-3">
                                             {item.location && (
                                                 <div className="flex items-center gap-1">
                                                     <MapPin className="w-3 h-3" />
@@ -267,7 +267,7 @@ export default function LostAndFound({ user, userData }) {
                                             )}
                                         </div>
                                         <div className="pt-3 border-t border-border-strong">
-                                            <p className="text-xs text-gray-500 mb-2">Contact: {item.postedByName}</p>
+                                            <p className="text-xs text-text-muted mb-2">Contact: {item.postedByName}</p>
                                             {item.contactInfo && (
                                                 <p className="text-xs text-blue-600 font-medium">{item.contactInfo}</p>
                                             )}
@@ -292,7 +292,7 @@ export default function LostAndFound({ user, userData }) {
                                 <button
                                     type="button"
                                     onClick={() => setFormData({ ...formData, type: 'lost' })}
-                                    className={`px-4 py-3 rounded-lg text-sm font-bold transition ${formData.type === 'lost' ? 'bg-red-600 text-white' : 'bg-gray-900 text-text-muted'
+                                    className={`px-4 py-3 rounded-lg text-sm font-bold transition ${formData.type === 'lost' ? 'bg-red-600 text-[#111827]' : 'bg-surface-elevated text-text-muted'
                                         }`}
                                 >
                                     <XCircle className="w-4 h-4 inline mr-2" />
@@ -301,7 +301,7 @@ export default function LostAndFound({ user, userData }) {
                                 <button
                                     type="button"
                                     onClick={() => setFormData({ ...formData, type: 'found' })}
-                                    className={`px-4 py-3 rounded-lg text-sm font-bold transition ${formData.type === 'found' ? 'bg-green-600 text-white' : 'bg-gray-900 text-text-muted'
+                                    className={`px-4 py-3 rounded-lg text-sm font-bold transition ${formData.type === 'found' ? 'bg-green-600 text-[#111827]' : 'bg-surface-elevated text-text-muted'
                                         }`}
                                 >
                                     <CheckCircle className="w-4 h-4 inline mr-2" />
@@ -317,7 +317,7 @@ export default function LostAndFound({ user, userData }) {
                                 type="text"
                                 value={formData.itemName}
                                 onChange={(e) => setFormData({ ...formData, itemName: e.target.value })}
-                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="w-full border border-border-strong rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 placeholder="e.g., iPhone 13, Black Wallet"
                             />
                         </div>
@@ -329,7 +329,7 @@ export default function LostAndFound({ user, userData }) {
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 rows="3"
-                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                                className="w-full border border-border-strong rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
                                 placeholder="Describe the item in detail..."
                             />
                         </div>
@@ -340,7 +340,7 @@ export default function LostAndFound({ user, userData }) {
                                 <select
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                    className="w-full border border-border-strong rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 >
                                     {categories.filter(c => c !== 'All').map(cat => (
                                         <option key={cat} value={cat}>{cat}</option>
@@ -354,7 +354,7 @@ export default function LostAndFound({ user, userData }) {
                                     type="date"
                                     value={formData.date}
                                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                    className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                    className="w-full border border-border-strong rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 />
                             </div>
                         </div>
@@ -366,7 +366,7 @@ export default function LostAndFound({ user, userData }) {
                                 type="text"
                                 value={formData.location}
                                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="w-full border border-border-strong rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 placeholder="Where was it lost/found?"
                             />
                         </div>
@@ -378,7 +378,7 @@ export default function LostAndFound({ user, userData }) {
                                 type="text"
                                 value={formData.contactInfo}
                                 onChange={(e) => setFormData({ ...formData, contactInfo: e.target.value })}
-                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="w-full border border-border-strong rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 placeholder="Email or phone number"
                             />
                         </div>
@@ -387,7 +387,7 @@ export default function LostAndFound({ user, userData }) {
                             <label className="block text-sm font-bold text-text-muted mb-2">Item Image (Optional, max 500KB)</label>
                             <div
                                 onClick={() => imageInputRef.current?.click()}
-                                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-orange-500 transition"
+                                className="border-2 border-dashed border-border-strong rounded-lg p-8 text-center cursor-pointer hover:border-orange-500 transition"
                             >
                                 {formData.image ? (
                                     <div className="space-y-2">
@@ -408,7 +408,7 @@ export default function LostAndFound({ user, userData }) {
                                     onChange={handleImageUpload}
                                 />
                             </div>
-                            <p className="text-xs text-gray-500 mt-2">
+                            <p className="text-xs text-text-muted mt-2">
                                 💡 Suggested size: 800×600 pixels (Images of other sizes will display without zooming)
                             </p>
                         </div>
@@ -426,7 +426,7 @@ export default function LostAndFound({ user, userData }) {
                         <button
                             type="submit"
                             disabled={posting}
-                            className="w-full bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-bold transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full bg-orange-600 hover:bg-orange-700 text-[#111827] px-6 py-3 rounded-lg font-bold transition disabled:bg-surface-highlight disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {posting ? (
                                 <>

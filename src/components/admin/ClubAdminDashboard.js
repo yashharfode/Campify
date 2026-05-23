@@ -363,10 +363,10 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
         <div className="w-16 h-16 bg-surface-elevated border border-border-strong rounded-2xl flex items-center justify-center mb-4">
-          <ShieldCheck className="w-8 h-8 text-gray-500" />
+          <ShieldCheck className="w-8 h-8 text-text-muted" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-300 mb-2">No Club Assigned</h2>
-        <p className="text-gray-500 max-w-md">
+        <h2 className="text-2xl font-bold text-text-muted mb-2">No Club Assigned</h2>
+        <p className="text-text-muted max-w-md">
           Your account has the 'club_admin' role, but you haven't been assigned as the president of any active club yet.
         </p>
       </div>
@@ -376,15 +376,15 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
   return (
     <div className="bg-surface-base min-h-screen">
       {/* Admin Dashboard Header (Dark Theme - Silent Coder) */}
-      <div className="bg-[#141414] border-b border-border-strong text-white">
+      <div className="bg-[#141414] border-b border-border-strong text-[#111827]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="flex items-center gap-6">
-              <div className="w-24 h-24 rounded-2xl bg-gray-800 border-2 border-border-subtle overflow-hidden shadow-xl shrink-0 flex items-center justify-center">
+              <div className="w-24 h-24 rounded-2xl bg-surface-highlight border-2 border-border-subtle overflow-hidden shadow-lg shrink-0 flex items-center justify-center">
                 {club.logoUrl ? (
                   <img src={getOptimizedImageUrl(club.logoUrl, '1:1')} alt={club.name} className="w-full h-full object-cover" />
                 ) : (
-                  <ImageIcon className="w-10 h-10 text-gray-500" />
+                  <ImageIcon className="w-10 h-10 text-text-muted" />
                 )}
               </div>
               <div>
@@ -394,18 +394,18 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                 </div>
                 <p className="text-text-muted text-lg mb-2">{club.tagline}</p>
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-accent/20 text-[#4CAF50] border border-[#2D5A27]/30">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-accent/20 text-[#4CAF50] border border-[#C08457]/30">
                     <span className="w-2 h-2 rounded-full bg-[#4CAF50] animate-pulse"></span>
                     President View
                   </span>
-                  <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-300 border border-border-subtle">
+                  <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-surface-highlight text-text-muted border border-border-subtle">
                     {club.category}
                   </span>
                 </div>
               </div>
             </div>
 
-            <button className="bg-gray-800 hover:bg-gray-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2 border border-border-subtle">
+            <button className="bg-surface-highlight hover:bg-border-strong text-[#111827] px-5 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2 border border-border-subtle">
               <Settings size={18} /> Settings
             </button>
           </div>
@@ -422,7 +422,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
               <Users size={24} />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Total Members</p>
+              <p className="text-sm font-medium text-text-muted">Total Members</p>
               <h3 className="text-2xl font-bold text-text-main">42</h3>
             </div>
           </div>
@@ -431,7 +431,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
               <Calendar size={24} />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Active Events</p>
+              <p className="text-sm font-medium text-text-muted">Active Events</p>
               <h3 className="text-2xl font-bold text-text-main">{events.length}</h3>
             </div>
           </div>
@@ -440,7 +440,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
               <ShieldCheck size={24} />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Club Status</p>
+              <p className="text-sm font-medium text-text-muted">Club Status</p>
               <h3 className="text-2xl font-bold text-text-main">{club.status}</h3>
             </div>
           </div>
@@ -453,7 +453,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
               key={tab}
               onClick={() => setDashboardTab(tab)}
               className={`px-4 py-2 rounded-xl text-sm font-bold capitalize transition whitespace-nowrap ${
-                dashboardTab === tab ? 'bg-surface-elevated text-white' : 'bg-surface-base text-gray-500 hover:bg-surface-elevated border border-border-strong'
+                dashboardTab === tab ? 'bg-surface-elevated text-[#111827]' : 'bg-surface-base text-text-muted hover:bg-surface-elevated border border-border-strong'
               }`}
             >
               {tab === 'events' ? 'Events' :
@@ -471,11 +471,11 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
             <div className="p-6 border-b border-border-strong flex items-center justify-between bg-surface-elevated/50">
               <div>
                 <h2 className="text-lg font-bold text-text-main">Events Management</h2>
-                <p className="text-sm text-gray-500">Create and manage your club's upcoming events.</p>
+                <p className="text-sm text-text-muted">Create and manage your club's upcoming events.</p>
               </div>
               <button
                 onClick={() => setIsEventModalOpen(true)}
-                className="bg-brand-accent hover:bg-brand-accent-hover text-white px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 shadow-lg shadow-green-900/20"
+                className="bg-brand-accent hover:bg-brand-accent-hover text-[#111827] px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 shadow-md shadow-green-900/20"
               >
                 <Plus size={18} /> New Event
               </button>
@@ -483,8 +483,8 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
 
             <div className="divide-y divide-gray-100">
               {events.length === 0 ? (
-                <div className="p-12 text-center text-gray-500">
-                  <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <div className="p-12 text-center text-text-muted">
+                  <Calendar className="w-12 h-12 text-text-muted mx-auto mb-3" />
                   <p>No events found. Create your first event!</p>
                 </div>
               ) : (
@@ -493,7 +493,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                     <div>
                       <h4 className="font-bold text-text-main text-lg mb-1">{event.title}</h4>
                       <p className="text-text-muted text-sm mb-2 max-w-2xl">{event.description}</p>
-                      <div className="inline-flex items-center gap-2 bg-gray-900 px-3 py-1.5 rounded-lg text-xs font-semibold text-text-muted">
+                      <div className="inline-flex items-center gap-2 bg-surface-elevated px-3 py-1.5 rounded-lg text-xs font-semibold text-text-muted">
                         <Calendar size={14} />
                         {new Date(event.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
                       </div>
@@ -516,12 +516,12 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                         <Users size={14} /> Registrations
                       </button>
                       <div className="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                        <button className="p-2 text-text-muted hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
                           <Edit2 size={18} />
                         </button>
                         <button
                           onClick={() => handleDeleteEvent(event.id)}
-                          className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                          className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -542,30 +542,30 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                 <label className="block text-sm font-medium text-text-muted mb-1">Club Name</label>
                 <input 
                   type="text" value={basicInfo.name} onChange={e => setBasicInfo({...basicInfo, name: e.target.value})} 
-                  className="w-full bg-surface-elevated border border-border-strong rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#2D5A27] outline-none" 
+                  className="w-full bg-surface-elevated border border-border-strong rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#C08457] outline-none" 
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-text-muted mb-1">Tagline</label>
                 <input 
                   type="text" value={basicInfo.tagline} onChange={e => setBasicInfo({...basicInfo, tagline: e.target.value})} 
-                  className="w-full bg-surface-elevated border border-border-strong rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#2D5A27] outline-none" 
+                  className="w-full bg-surface-elevated border border-border-strong rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#C08457] outline-none" 
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-text-muted mb-1">Club Logo</label>
                 <div className="flex items-center gap-4">
-                  <div className="w-20 h-20 rounded-xl bg-gray-900 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
+                  <div className="w-20 h-20 rounded-xl bg-surface-elevated border-2 border-dashed border-border-strong flex items-center justify-center overflow-hidden">
                     {club.logoUrl ? <img src={club.logoUrl} alt="Logo" className="w-full h-full object-cover" /> : <ImageIcon className="w-8 h-8 text-text-muted" />}
                   </div>
-                  <label className="bg-gray-900 hover:bg-gray-200 text-text-muted px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition flex items-center gap-2">
+                  <label className="bg-surface-elevated hover:bg-surface-highlight text-text-muted px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition flex items-center gap-2">
                     {logoUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Change Logo'}
                     <input type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} disabled={logoUploading} />
                   </label>
                 </div>
               </div>
               <div className="pt-4">
-                <button type="submit" disabled={isSubmitting} className="bg-surface-elevated hover:bg-black text-white px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+                <button type="submit" disabled={isSubmitting} className="bg-surface-elevated hover:bg-black text-[#111827] px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
                   {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Changes'}
                 </button>
               </div>
@@ -581,7 +581,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                 <label className="block text-sm font-medium text-text-muted mb-1">Description</label>
                 <textarea 
                   rows={4} value={aboutInfo.description} onChange={e => setAboutInfo({...aboutInfo, description: e.target.value})} 
-                  className="w-full bg-surface-elevated border border-border-strong rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#2D5A27] outline-none" 
+                  className="w-full bg-surface-elevated border border-border-strong rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#C08457] outline-none" 
                   placeholder="Detailed description of the club..."
                 />
               </div>
@@ -589,7 +589,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                 <label className="block text-sm font-medium text-text-muted mb-1">Mission Statement</label>
                 <textarea 
                   rows={2} value={aboutInfo.mission} onChange={e => setAboutInfo({...aboutInfo, mission: e.target.value})} 
-                  className="w-full bg-surface-elevated border border-border-strong rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#2D5A27] outline-none" 
+                  className="w-full bg-surface-elevated border border-border-strong rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#C08457] outline-none" 
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -597,19 +597,19 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                   <label className="block text-sm font-medium text-text-muted mb-1">Contact Email</label>
                   <input 
                     type="email" value={aboutInfo.contactEmail} onChange={e => setAboutInfo({...aboutInfo, contactEmail: e.target.value})} 
-                    className="w-full bg-surface-elevated border border-border-strong rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#2D5A27] outline-none" 
+                    className="w-full bg-surface-elevated border border-border-strong rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#C08457] outline-none" 
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-text-muted mb-1">Contact Phone</label>
                   <input 
                     type="tel" value={aboutInfo.contactPhone} onChange={e => setAboutInfo({...aboutInfo, contactPhone: e.target.value})} 
-                    className="w-full bg-surface-elevated border border-border-strong rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#2D5A27] outline-none" 
+                    className="w-full bg-surface-elevated border border-border-strong rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#C08457] outline-none" 
                   />
                 </div>
               </div>
               <div className="pt-4">
-                <button type="submit" disabled={isSubmitting} className="bg-surface-elevated hover:bg-black text-white px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+                <button type="submit" disabled={isSubmitting} className="bg-surface-elevated hover:bg-black text-[#111827] px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
                   {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Changes'}
                 </button>
               </div>
@@ -622,12 +622,12 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
             <div className="bg-surface-base rounded-2xl shadow-sm border border-border-strong p-6">
               <h2 className="text-lg font-bold text-text-main mb-4">Add Team Member</h2>
               <form onSubmit={handleAddTeamMember} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input required type="text" placeholder="Name" value={newTeamMember.name} onChange={e => setNewTeamMember({...newTeamMember, name: e.target.value})} className="bg-surface-elevated border border-border-strong rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#2D5A27]" />
-                <input required type="text" placeholder="Position (e.g., Vice President)" value={newTeamMember.position} onChange={e => setNewTeamMember({...newTeamMember, position: e.target.value})} className="bg-surface-elevated border border-border-strong rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#2D5A27]" />
-                <input type="url" placeholder="LinkedIn URL" value={newTeamMember.linkedInUrl} onChange={e => setNewTeamMember({...newTeamMember, linkedInUrl: e.target.value})} className="bg-surface-elevated border border-border-strong rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#2D5A27]" />
-                <input type="url" placeholder="Instagram URL" value={newTeamMember.instagramUrl} onChange={e => setNewTeamMember({...newTeamMember, instagramUrl: e.target.value})} className="bg-surface-elevated border border-border-strong rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#2D5A27]" />
+                <input required type="text" placeholder="Name" value={newTeamMember.name} onChange={e => setNewTeamMember({...newTeamMember, name: e.target.value})} className="bg-surface-elevated border border-border-strong rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#C08457]" />
+                <input required type="text" placeholder="Position (e.g., Vice President)" value={newTeamMember.position} onChange={e => setNewTeamMember({...newTeamMember, position: e.target.value})} className="bg-surface-elevated border border-border-strong rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#C08457]" />
+                <input type="url" placeholder="LinkedIn URL" value={newTeamMember.linkedInUrl} onChange={e => setNewTeamMember({...newTeamMember, linkedInUrl: e.target.value})} className="bg-surface-elevated border border-border-strong rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#C08457]" />
+                <input type="url" placeholder="Instagram URL" value={newTeamMember.instagramUrl} onChange={e => setNewTeamMember({...newTeamMember, instagramUrl: e.target.value})} className="bg-surface-elevated border border-border-strong rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#C08457]" />
                 <div className="md:col-span-2 mt-2">
-                  <button type="submit" disabled={isAddingTeam} className="bg-surface-elevated hover:bg-black transition text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2">
+                  <button type="submit" disabled={isAddingTeam} className="bg-surface-elevated hover:bg-black transition text-[#111827] px-6 py-2.5 rounded-xl font-bold flex items-center gap-2">
                     {isAddingTeam ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus size={18} />} Add Member
                   </button>
                 </div>
@@ -639,13 +639,13 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                 <div key={member.id} className="bg-surface-base rounded-2xl p-4 shadow-sm border border-border-strong flex items-center justify-between group">
                   <div>
                     <h4 className="font-bold text-text-main">{member.name}</h4>
-                    <p className="text-sm text-gray-500 mb-1">{member.position}</p>
+                    <p className="text-sm text-text-muted mb-1">{member.position}</p>
                     <div className="flex gap-2">
                       {member.linkedInUrl && <a href={member.linkedInUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs">LinkedIn</a>}
                       {member.instagramUrl && <a href={member.instagramUrl} target="_blank" rel="noreferrer" className="text-pink-600 hover:underline text-xs">Instagram</a>}
                     </div>
                   </div>
-                  <button onClick={() => handleRemoveTeamMember(member)} className="text-gray-300 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition opacity-0 group-hover:opacity-100">
+                  <button onClick={() => handleRemoveTeamMember(member)} className="text-text-muted hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition opacity-0 group-hover:opacity-100">
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -665,9 +665,9 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-lg font-bold text-text-main">Media Gallery</h2>
-                <p className="text-sm text-gray-500">Upload photos from events and activities.</p>
+                <p className="text-sm text-text-muted">Upload photos from events and activities.</p>
               </div>
-              <label className="bg-brand-accent hover:bg-brand-accent-hover text-white px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 cursor-pointer shadow-lg shadow-green-900/20">
+              <label className="bg-brand-accent hover:bg-brand-accent-hover text-[#111827] px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 cursor-pointer shadow-md shadow-green-900/20">
                 {galleryUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus size={18} />} Upload Image
                 <input type="file" className="hidden" accept="image/*" onChange={handleGalleryUpload} disabled={galleryUploading} />
               </label>
@@ -678,7 +678,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                 <div key={idx} className="relative aspect-video rounded-xl overflow-hidden group border border-border-strong">
                   <img src={getOptimizedImageUrl(url, '16:9')} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                    <button onClick={() => handleDeleteGalleryImage(url)} className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition shadow-lg">
+                    <button onClick={() => handleDeleteGalleryImage(url)} className="bg-red-500 text-[#111827] p-2 rounded-full hover:scale-110 transition shadow-md">
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -701,42 +701,42 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-surface-elevated border border-border-strong rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
             <div className="p-6 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
-              <h3 className="font-bold text-xl text-white">Create Event</h3>
-              <button onClick={() => setIsEventModalOpen(false)} className="text-text-muted hover:text-white transition">
+              <h3 className="font-bold text-xl text-[#111827]">Create Event</h3>
+              <button onClick={() => setIsEventModalOpen(false)} className="text-text-muted hover:text-[#111827] transition">
                 <Trash2 size={20} className="hidden" /> {/* Placeholder for X icon if needed, though usually X is imported from lucide-react. I'll just use text. */}
                 <span className="text-2xl leading-none">&times;</span>
               </button>
             </div>
             <form onSubmit={handleAddEvent} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Event Title *</label>
+                <label className="block text-sm font-medium text-text-muted mb-1">Event Title *</label>
                 <input
                   type="text"
                   required
                   value={newEventTitle}
                   onChange={(e) => setNewEventTitle(e.target.value)}
-                  className="w-full bg-gray-900 border border-border-subtle rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                  className="w-full bg-surface-elevated border border-border-subtle rounded-xl px-4 py-3 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
                   placeholder="e.g., Intro to Cybersecurity"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Date *</label>
+                <label className="block text-sm font-medium text-text-muted mb-1">Date *</label>
                 <input
                   type="date"
                   required
                   value={newEventDate}
                   onChange={(e) => setNewEventDate(e.target.value)}
-                  className="w-full bg-gray-900 border border-border-subtle rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                  className="w-full bg-surface-elevated border border-border-subtle rounded-xl px-4 py-3 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Description *</label>
+                <label className="block text-sm font-medium text-text-muted mb-1">Description *</label>
                 <textarea
                   required
                   rows={4}
                   value={newEventDesc}
                   onChange={(e) => setNewEventDesc(e.target.value)}
-                  className="w-full bg-gray-900 border border-border-subtle rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                  className="w-full bg-surface-elevated border border-border-subtle rounded-xl px-4 py-3 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
                   placeholder="What is this event about?"
                 />
               </div>
@@ -744,14 +744,14 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                 <button
                   type="button"
                   onClick={() => setIsEventModalOpen(false)}
-                  className="flex-1 bg-gray-800 text-white font-bold py-3 rounded-xl hover:bg-gray-700 transition"
+                  className="flex-1 bg-surface-highlight text-[#111827] font-bold py-3 rounded-xl hover:bg-border-strong transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-brand-accent text-white font-bold py-3 rounded-xl hover:bg-brand-accent-hover transition disabled:opacity-70 flex items-center justify-center gap-2"
+                  className="flex-1 bg-brand-accent text-[#111827] font-bold py-3 rounded-xl hover:bg-brand-accent-hover transition disabled:opacity-70 flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Save Event'}
                 </button>
@@ -767,33 +767,33 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
           <div className="bg-surface-elevated rounded-2xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             <div className="p-6 border-b border-border-strong flex justify-between items-center bg-[#141414]">
               <div>
-                <h3 className="text-xl font-bold text-white">Event Registrations</h3>
+                <h3 className="text-xl font-bold text-[#111827]">Event Registrations</h3>
                 <p className="text-sm text-text-muted">{selectedEventForRegistrations?.title}</p>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleDownloadCSV}
                   disabled={!eventRegistrations.length || loadingRegistrations}
-                  className="bg-brand-accent hover:bg-brand-accent-hover disabled:opacity-50 text-white px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2"
+                  className="bg-brand-accent hover:bg-brand-accent-hover disabled:opacity-50 text-[#111827] px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2"
                 >
                   <FileText size={18} /> Download CSV
                 </button>
                 <button
                   onClick={() => setIsRegistrationsModalOpen(false)}
-                  className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-bold transition"
+                  className="bg-surface-highlight hover:bg-border-strong text-[#111827] px-4 py-2 rounded-xl text-sm font-bold transition"
                 >
                   Close
                 </button>
               </div>
             </div>
-            <div className="p-6 overflow-y-auto bg-surface-elevated text-white flex-1">
+            <div className="p-6 overflow-y-auto bg-surface-elevated text-[#111827] flex-1">
               {loadingRegistrations ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-brand-accent mb-4" />
                   <p className="text-text-muted">Loading registrations...</p>
                 </div>
               ) : eventRegistrations.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12 text-text-muted">
                   <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
                   <p>No one has registered for this event yet.</p>
                 </div>
@@ -812,7 +812,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                         <tr key={idx} className="hover:bg-[#202020] transition">
                           <td className="py-3 px-4 font-medium">{reg.name}</td>
                           <td className="py-3 px-4 text-text-muted">{reg.email}</td>
-                          <td className="py-3 px-4 text-gray-500 text-sm">
+                          <td className="py-3 px-4 text-text-muted text-sm">
                             {new Date(reg.joinedAt).toLocaleString()}
                           </td>
                         </tr>

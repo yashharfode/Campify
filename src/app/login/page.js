@@ -29,10 +29,11 @@ import Discover from '../../components/Discover';
 import Admin from '../../components/Admin';
 import Notes from '../../components/Notes';
 import Chat from '../../components/Chat';
+import Academics from '../../components/Academics';
 import LostAndFound from '../../components/LostAndFound';
 import MentorChatBubble from '../../components/MentorChatBubble';
 import ClubAdminDashboard from '../../components/admin/ClubAdminDashboard';
-
+import ThemeToggle from '../../components/ThemeToggle';
 
 import toast from 'react-hot-toast';
 import { uploadToCloudinary, getOptimizedImageUrl } from '../../lib/cloudinary';
@@ -244,23 +245,23 @@ const AuthScreen = () => {
 
             <div className="bg-surface-elevated border border-border-strong p-8 rounded-3xl w-full max-w-md shadow-2xl z-10">
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4 overflow-hidden shadow-lg">
+                    <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4 overflow-hidden shadow-md">
                         <img src="/logo.ico" alt="Campify Logo" className="w-full h-full object-cover" />
                     </div>
                     <h1 className="text-3xl font-black text-text-main mb-2">{mode === 'login' ? 'Welcome back' : 'Create your account'}</h1>
-                    <p className="text-gray-500">Enter your credentials to continue</p>
+                    <p className="text-text-muted">Enter your credentials to continue</p>
                 </div>
 
                 <div className="flex gap-2 mb-6 bg-surface-base p-1 rounded-xl">
                     <button
                         onClick={() => switchMode('login')}
-                        className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${mode === 'login' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:text-text-muted'}`}
+                        className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${mode === 'login' ? 'bg-blue-600 text-[#111827] shadow-sm' : 'text-text-muted hover:text-text-muted'}`}
                     >
                         Login
                     </button>
                     <button
                         onClick={() => switchMode('signup')}
-                        className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${mode === 'signup' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:text-text-muted'}`}
+                        className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${mode === 'signup' ? 'bg-blue-600 text-[#111827] shadow-sm' : 'text-text-muted hover:text-text-muted'}`}
                     >
                         Sign Up
                     </button>
@@ -359,16 +360,16 @@ const AuthScreen = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/10 transition-all transform active:scale-95 flex items-center justify-center gap-2"
+                        className="w-full bg-gradient-to-r from-brand-accent to-brand-accent-hover text-white font-black py-4 rounded-xl shadow-md transition-all transform hover:-translate-y-1 hover:shadow-[0_0_25px_var(--glow-primary)] active:scale-95 flex items-center justify-center gap-2"
                     >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (mode === 'login' ? 'Login Securely' : 'Create Account')}
                     </button>
                 </form>
 
                 <div className="my-4 flex items-center gap-2 text-text-muted text-xs">
-                    <div className="flex-1 h-px bg-gray-200"></div>
+                    <div className="flex-1 h-px bg-surface-highlight"></div>
                     OR
-                    <div className="flex-1 h-px bg-gray-200"></div>
+                    <div className="flex-1 h-px bg-surface-highlight"></div>
                 </div>
 
                 <button
@@ -391,12 +392,12 @@ const AuthScreen = () => {
                                 required
                                 value={forgotPasswordEmail}
                                 onChange={(e) => setForgotPasswordEmail(e.target.value)}
-                                className="w-full border border-gray-300 rounded-lg p-3 bg-surface-base text-text-main placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                                className="w-full border border-border-strong rounded-lg p-3 bg-surface-base text-text-main placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                                 placeholder="Enter your email"
                             />
                             <div className="flex gap-3">
                                 <button type="button" onClick={() => setForgotPasswordOpen(false)} className="flex-1 bg-surface-elevated text-text-muted font-bold py-3 rounded-lg">Cancel</button>
-                                <button type="submit" className="flex-1 bg-blue-600 text-white font-bold py-3 rounded-lg">Send Reset Link</button>
+                                <button type="submit" className="flex-1 bg-blue-600 text-[#111827] font-bold py-3 rounded-lg">Send Reset Link</button>
                             </div>
                         </form>
                     </div>
@@ -656,7 +657,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
     return (
         <div className="pb-24 pt-0 min-h-screen bg-surface-base max-w-7xl mx-auto animate-in fade-in">
             {/* Header Dark Card */}
-            <div className="bg-surface-elevated pt-8 pb-20 px-6 rounded-b-[3rem] relative shadow-lg border-b border-border-strong">
+            <div className="bg-surface-elevated pt-8 pb-20 px-6 rounded-b-[3rem] relative shadow-md border-b border-border-strong">
                 <div className="flex justify-between items-start text-text-main mb-4 max-w-2xl mx-auto">
                     <Settings className="w-6 h-6 cursor-pointer hover:rotate-90 transition opacity-80 hover:opacity-100" onClick={() => setIsEditing(prev => !prev)} />
                     <div className="bg-brand-accent/20 backdrop-blur-md p-2 rounded-full cursor-pointer hover:bg-brand-accent/40 transition text-brand-accent">
@@ -667,7 +668,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                 <div className="flex flex-col items-center max-w-md mx-auto relative z-10">
                     {/* Profile Image with Camera Icon */}
                     <div className="relative group mb-4">
-                        <div className="w-32 h-32 rounded-full border-[6px] border-[#121212] bg-surface-elevated overflow-hidden shadow-2xl flex items-center justify-center text-white relative">
+                        <div className="w-32 h-32 rounded-full border-[6px] border-[#FAF7F2] bg-surface-elevated overflow-hidden shadow-2xl flex items-center justify-center text-[#111827] relative">
                             {formData.profileImage ? (
                                 <img
                                     src={getOptimizedImageUrl(formData.profileImage, '1:1')}
@@ -686,7 +687,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                 onClick={() => fileInputRef.current.click()}
                                 className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition duration-300"
                             >
-                                <Camera className="text-white w-8 h-8" />
+                                <Camera className="text-[#111827] w-8 h-8" />
                             </div>
                         )}
                         <input
@@ -704,7 +705,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                 name="name"
                                 value={formData.name || ''}
                                 onChange={handleChange}
-                                className="w-full bg-surface-base border border-border-subtle rounded-lg py-2 px-3 text-text-main placeholder-gray-500 text-center font-bold focus:outline-none focus:border-[#2D5A27] transition"
+                                className="w-full bg-surface-base border border-border-subtle rounded-lg py-2 px-3 text-text-main placeholder-gray-500 text-center font-bold focus:outline-none focus:border-[#C08457] transition"
                                 placeholder="Full Name"
                             />
                             <div className="flex gap-2">
@@ -712,14 +713,14 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                     name="branch"
                                     value={formData.branch || ''}
                                     onChange={handleChange}
-                                    className="w-1/2 bg-surface-base border border-border-subtle rounded-lg py-2 px-3 text-text-main text-sm placeholder-gray-500 text-center focus:outline-none focus:border-[#2D5A27]"
+                                    className="w-1/2 bg-surface-base border border-border-subtle rounded-lg py-2 px-3 text-text-main text-sm placeholder-gray-500 text-center focus:outline-none focus:border-[#C08457]"
                                     placeholder="Branch (e.g. CSE)"
                                 />
                                 <input
                                     name="year"
                                     value={formData.year || ''}
                                     onChange={handleChange}
-                                    className="w-1/2 bg-surface-base border border-border-subtle rounded-lg py-2 px-3 text-text-main text-sm placeholder-gray-500 text-center focus:outline-none focus:border-[#2D5A27]"
+                                    className="w-1/2 bg-surface-base border border-border-subtle rounded-lg py-2 px-3 text-text-main text-sm placeholder-gray-500 text-center focus:outline-none focus:border-[#C08457]"
                                     placeholder="Year (e.g. 3rd)"
                                 />
                             </div>
@@ -729,7 +730,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                             <div className="flex items-center justify-center gap-2 mb-2">
                                 <h2 className="text-text-main font-bold text-2xl tracking-tight">{formData.name || 'New Student'}</h2>
                                 {(formData.email && (formData.email.endsWith('@jec.ac.in') || formData.email.endsWith('@college.edu'))) && (
-                                    <div className="inline-flex items-center gap-1 bg-brand-accent/20 border border-[#2D5A27]/30 px-2 py-0.5 rounded-full">
+                                    <div className="inline-flex items-center gap-1 bg-brand-accent/20 border border-[#C08457]/30 px-2 py-0.5 rounded-full">
                                         <CheckCircle2 className="w-4 h-4 text-brand-accent" />
                                         <span className="text-brand-accent text-[10px] font-bold">Verified</span>
                                     </div>
@@ -737,17 +738,17 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                             </div>
                             <p className="text-text-muted text-sm font-medium mt-1 opacity-90">{formData.branch || 'Branch'} • {formData.year || 'Year'}</p>
                             {formData.username && (
-                                <p className="text-gray-500 text-xs font-semibold mt-1 opacity-80">@{formData.username}</p>
+                                <p className="text-text-muted text-xs font-semibold mt-1 opacity-80">@{formData.username}</p>
                             )}
                             {formData.email && (
-                                <p className="text-gray-500 text-xs opacity-70">{formData.email}</p>
+                                <p className="text-text-muted text-xs opacity-70">{formData.email}</p>
                             )}
                             {formData.email && !(formData.email.endsWith('@jec.ac.in') || formData.email.endsWith('@college.edu')) && (
-                                <p className="text-gray-500 text-xs mt-1 opacity-75">Guest User</p>
+                                <p className="text-text-muted text-xs mt-1 opacity-75">Guest User</p>
                             )}
                             <div className="mt-3 inline-flex items-center gap-1 bg-surface-base px-4 py-1 rounded-full border border-border-strong shadow-sm">
                                 <span className="text-brand-accent">★</span>
-                                <span className="text-gray-300 text-xs font-bold tracking-wide">Trust Score: 4.9</span>
+                                <span className="text-text-muted text-xs font-bold tracking-wide">Trust Score: 4.9</span>
                             </div>
                         </div>
                     )}
@@ -769,7 +770,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="flex-1 bg-brand-accent hover:bg-brand-accent-hover text-white py-3 rounded-xl font-bold text-sm shadow-lg transition flex items-center justify-center gap-2"
+                            className="flex-1 bg-brand-accent hover:bg-brand-accent-hover text-[#111827] py-3 rounded-xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2"
                         >
                             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Save className="w-4 h-4" /> Save Profile</>}
                         </button>
@@ -778,7 +779,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                 setIsEditing(false);
                                 setFormData(normalizeProfile(userData)); // Reset changes
                             }}
-                            className="px-4 bg-gray-800 text-gray-300 rounded-xl font-bold text-sm hover:bg-gray-700 transition"
+                            className="px-4 bg-surface-highlight text-text-muted rounded-xl font-bold text-sm hover:bg-border-strong transition"
                         >
                             Cancel
                         </button>
@@ -786,7 +787,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                 ) : (
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="w-full bg-surface-elevated text-brand-accent border-2 border-[#2D5A27]/20 py-3 rounded-xl font-bold text-sm shadow-sm hover:bg-surface-base transition flex items-center justify-center gap-2"
+                        className="w-full bg-surface-elevated text-brand-accent border-2 border-[#C08457]/20 py-3 rounded-xl font-bold text-sm shadow-sm hover:bg-surface-base transition flex items-center justify-center gap-2"
                     >
                         <Edit3 className="w-4 h-4" /> Edit Profile
                     </button>
@@ -797,7 +798,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                     <button
                         onClick={() => setActiveProfileTab('about')}
                         className={`flex-1 px-4 py-2 rounded-lg font-bold text-sm transition ${activeProfileTab === 'about'
-                            ? 'bg-brand-accent text-white shadow-md'
+                            ? 'bg-brand-accent text-[#111827] shadow-md'
                             : 'text-text-muted hover:bg-surface-base'
                             }`}
                     >
@@ -806,7 +807,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                     <button
                         onClick={() => setActiveProfileTab('orders')}
                         className={`flex-1 px-4 py-2 rounded-lg font-bold text-sm transition ${activeProfileTab === 'orders'
-                            ? 'bg-brand-accent text-white shadow-md'
+                            ? 'bg-brand-accent text-[#111827] shadow-md'
                             : 'text-text-muted hover:bg-surface-base'
                             }`}
                     >
@@ -815,7 +816,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                     <button
                         onClick={() => setActiveProfileTab('sales')}
                         className={`flex-1 px-4 py-2 rounded-lg font-bold text-sm transition ${activeProfileTab === 'sales'
-                            ? 'bg-brand-accent text-white shadow-md'
+                            ? 'bg-brand-accent text-[#111827] shadow-md'
                             : 'text-text-muted hover:bg-surface-base'
                             }`}
                     >
@@ -836,7 +837,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                         className={`w-6 h-6 cursor-pointer transition ${formData.isVisibleInTeams ? 'text-brand-accent' : 'text-text-muted'}`}
                                         onClick={() => setFormData(prev => ({ ...prev, isVisibleInTeams: !prev.isVisibleInTeams }))}
                                     />
-                                    <span className="text-sm font-bold text-gray-300">Show me in Teams</span>
+                                    <span className="text-sm font-bold text-text-muted">Show me in Teams</span>
                                 </div>
                             )}
                         </div>
@@ -844,14 +845,14 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                         <div className="space-y-6">
                             {/* BIO */}
                             <div>
-                                <p className="text-xs text-gray-500 font-bold uppercase mb-2 tracking-wider">Bio</p>
+                                <p className="text-xs text-text-muted font-bold uppercase mb-2 tracking-wider">Bio</p>
                                 {isEditing ? (
                                     <textarea
                                         name="bio"
                                         value={formData.bio || ''}
                                         onChange={handleChange}
                                         rows="4"
-                                        className="w-full bg-surface-base border border-border-subtle rounded-xl p-3 text-sm text-gray-300 focus:outline-none focus:border-[#2D5A27] resize-none transition"
+                                        className="w-full bg-surface-base border border-border-subtle rounded-xl p-3 text-sm text-text-muted focus:outline-none focus:border-[#C08457] resize-none transition"
                                         placeholder="Tell us about yourself..."
                                     />
                                 ) : (
@@ -889,7 +890,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                 {isEditing ? (
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 bg-surface-base p-2 rounded-lg border border-border-strong">
-                                            <Github className="w-4 h-4 text-gray-500" />
+                                            <Github className="w-4 h-4 text-text-muted" />
                                             <input
                                                 name="github"
                                                 value={formData.github || ''}
@@ -934,7 +935,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                         {(formData.projects || [createEmptyProject()]).map((project, index) => (
                                             <div key={index} className="border-2 border-border-strong rounded-xl p-4 space-y-2 bg-surface-base">
                                                 <div className="flex justify-between items-center mb-2">
-                                                    <span className="text-xs font-bold text-gray-500">Project #{index + 1}</span>
+                                                    <span className="text-xs font-bold text-text-muted">Project #{index + 1}</span>
                                                     {(formData.projects || []).length > 1 && (
                                                         <button
                                                             onClick={() => handleRemoveProject(index)}
@@ -947,18 +948,18 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                                 <input
                                                     value={project.title || ''}
                                                     onChange={(e) => handleProjectChange(index, 'title', e.target.value)}
-                                                    className="w-full bg-surface-elevated border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    className="w-full bg-surface-elevated border border-border-strong rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     placeholder="Project Title (e.g., E-commerce Website)"
                                                 />
                                                 <textarea
                                                     value={project.description || ''}
                                                     onChange={(e) => handleProjectChange(index, 'description', e.target.value)}
                                                     rows="2"
-                                                    className="w-full bg-surface-elevated border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                                    className="w-full bg-surface-elevated border border-border-strong rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                                                     placeholder="Brief description..."
                                                 />
-                                                <div className="flex items-center gap-2 bg-surface-elevated p-2 rounded-lg border border-gray-300">
-                                                    <LinkIcon className="w-4 h-4 text-gray-500" />
+                                                <div className="flex items-center gap-2 bg-surface-elevated p-2 rounded-lg border border-border-strong">
+                                                    <LinkIcon className="w-4 h-4 text-text-muted" />
                                                     <input
                                                         value={project.link || ''}
                                                         onChange={(e) => handleProjectChange(index, 'link', e.target.value)}
@@ -999,8 +1000,8 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="text-center py-8 bg-surface-base rounded-xl border border-dashed border-gray-300">
-                                                <Briefcase className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                                            <div className="text-center py-8 bg-surface-base rounded-xl border border-dashed border-border-strong">
+                                                <Briefcase className="w-8 h-8 mx-auto mb-2 text-text-muted" />
                                                 <p className="text-xs text-text-muted italic">No projects added yet. Click edit to showcase your work!</p>
                                             </div>
                                         )}
@@ -1042,12 +1043,12 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 {wishlistItems.map((item) => (
                                     <div key={item.id} className="bg-surface-base p-3 rounded-xl border border-border-strong">
-                                        <div className="h-24 rounded-lg overflow-hidden bg-gray-200 mb-2">
+                                        <div className="h-24 rounded-lg overflow-hidden bg-surface-highlight mb-2">
                                             {item.image ? (
                                                 <img src={item.image} className="w-full h-full object-cover" alt={item.title} />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
-                                                    <ShoppingBag className="w-6 h-6 text-gray-300" />
+                                                    <ShoppingBag className="w-6 h-6 text-text-muted" />
                                                 </div>
                                             )}
                                         </div>
@@ -1081,7 +1082,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {wishlistEvents.map((event) => (
                                     <div key={event.id} className="bg-surface-base p-4 rounded-xl border border-border-strong flex gap-4">
-                                        <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                                        <div className="w-20 h-20 rounded-lg overflow-hidden bg-surface-highlight flex-shrink-0">
                                             {event.image ? (
                                                 <img src={event.image} className="w-full h-full object-cover" alt={event.title} />
                                             ) : (
@@ -1097,7 +1098,7 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                                 </span>
                                             </div>
                                             <h4 className="font-bold text-text-main text-sm line-clamp-1 mb-1">{event.title}</h4>
-                                            <div className="text-xs text-gray-500 space-y-1">
+                                            <div className="text-xs text-text-muted space-y-1">
                                                 <div className="flex items-center gap-1">
                                                     <Clock className="w-3 h-3" /> {event.date}
                                                 </div>
@@ -1162,7 +1163,7 @@ const QuickActionBtn = ({ icon, label, color, onClick }) => (
 const StatCard = ({ number, label, color = "text-blue-600 bg-blue-50" }) => (
     <div className={`p-4 rounded-2xl text-center bg-surface-elevated shadow-sm border border-border-strong`}>
         <h4 className={`text-2xl font-bold ${color.split(' ')[0]}`}>{number}</h4>
-        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mt-1">{label}</p>
+        <p className="text-xs font-medium text-text-muted uppercase tracking-wide mt-1">{label}</p>
     </div>
 );
 
@@ -1210,7 +1211,7 @@ const OrdersView = ({ orders, loading, user }) => {
                             </div>
                         ) : (
                             <div className="w-20 h-20 rounded-xl bg-surface-elevated flex items-center justify-center flex-shrink-0">
-                                <ShoppingBag className="w-8 h-8 text-gray-300" />
+                                <ShoppingBag className="w-8 h-8 text-text-muted" />
                             </div>
                         )}
                         <div className="flex-1 min-w-0">
@@ -1228,7 +1229,7 @@ const OrdersView = ({ orders, loading, user }) => {
                             </div>
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-blue-600 font-bold text-xl">₹{order.amount}</span>
-                                <span className="text-xs text-gray-500">{formatDate(order.createdAt)}</span>
+                                <span className="text-xs text-text-muted">{formatDate(order.createdAt)}</span>
                             </div>
                             {order.status === 'pending_meetup' && order.deliveryOtp && (
                                 <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mt-3">
@@ -1352,7 +1353,7 @@ const PendingSalesView = ({ sales, user }) => {
                             </div>
                         ) : (
                             <div className="w-20 h-20 rounded-xl bg-surface-elevated flex items-center justify-center flex-shrink-0">
-                                <ShoppingBag className="w-8 h-8 text-gray-300" />
+                                <ShoppingBag className="w-8 h-8 text-text-muted" />
                             </div>
                         )}
                         <div className="flex-1 min-w-0">
@@ -1367,7 +1368,7 @@ const PendingSalesView = ({ sales, user }) => {
                             </div>
                             <div className="flex items-center justify-between">
                                 <span className="text-blue-600 font-bold text-xl">₹{order.amount}</span>
-                                <span className="text-xs text-gray-500">{formatDate(order.createdAt)}</span>
+                                <span className="text-xs text-text-muted">{formatDate(order.createdAt)}</span>
                             </div>
                             {order.meetupLocation && (
                                 <div className="mt-2 flex items-center gap-2 text-xs text-text-muted">
@@ -1399,7 +1400,7 @@ const PendingSalesView = ({ sales, user }) => {
                                 <button
                                     onClick={() => handleVerifyOTP(order.id, otpInputs[order.id])}
                                     disabled={verifyingOtp[order.id] || !otpInputs[order.id] || otpInputs[order.id].length !== 4}
-                                    className="px-6 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
+                                    className="px-6 bg-green-600 hover:bg-green-700 text-[#111827] font-bold rounded-lg transition disabled:bg-surface-highlight disabled:cursor-not-allowed flex items-center gap-2"
                                 >
                                     {verifyingOtp[order.id] ? (
                                         <Loader2 className="w-5 h-5 animate-spin" />
@@ -1427,7 +1428,7 @@ const SettingsItem = ({ icon, label, color = "text-text-muted", onClick }) => (
 );
 
 const DesktopNavLink = ({ icon, label, active, onClick }) => (
-    <button onClick={onClick} className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all ${active ? 'bg-blue-600 text-white shadow-md' : 'text-gray-500 hover:bg-blue-50 hover:text-blue-600'}`}>
+    <button onClick={onClick} className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all ${active ? 'bg-blue-600 text-[#111827] shadow-md' : 'text-text-muted hover:bg-blue-50 hover:text-blue-600'}`}>
         {icon} {label}
     </button>
 );
@@ -1442,7 +1443,7 @@ const NavBtn = ({ icon, label, active, onClick }) => (
 const DrawerNavLink = ({ icon, label, active, onClick, color }) => (
     <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
         active 
-            ? 'bg-blue-600 text-white shadow-sm' 
+            ? 'bg-blue-600 text-[#111827] shadow-sm' 
             : color || 'text-text-muted hover:bg-surface-elevated hover:text-brand-accent'
     }`}>
         {icon}
@@ -1536,13 +1537,15 @@ export default function App() {
                     <DesktopNavLink icon={<Home className="w-5 h-5" />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
                     <DesktopNavLink icon={<ShoppingBag className="w-5 h-5" />} label="Market" active={activeTab === 'market'} onClick={() => setActiveTab('market')} />
                     <DesktopNavLink icon={<FileText className="w-5 h-5" />} label="Notes" active={activeTab === 'notes'} onClick={() => setActiveTab('notes')} />
+                    <DesktopNavLink icon={<GraduationCap className="w-5 h-5" />} label="Academics" active={activeTab === 'academics'} onClick={() => setActiveTab('academics')} />
                     <DesktopNavLink icon={<MessageSquare className="w-5 h-5" />} label="Chat" active={activeTab === 'chat'} onClick={() => setActiveTab('chat')} />
                     <DesktopNavLink icon={<Users className="w-5 h-5" />} label="Teams" active={activeTab === 'teams'} onClick={() => setActiveTab('teams')} />
                     <DesktopNavLink icon={<Compass className="w-5 h-5" />} label="Discover" active={activeTab === 'discover'} onClick={() => setActiveTab('discover')} />
                     <DesktopNavLink icon={<Package className="w-5 h-5" />} label="Lost & Found" active={activeTab === 'lost'} onClick={() => setActiveTab('lost')} />
                 </div>
-                <div className="flex items-center gap-4 cursor-pointer" onClick={() => setActiveTab('profile')}>
-                    <div className="flex items-center gap-2 hover:bg-surface-base p-1.5 rounded-lg transition">
+                <div className="flex items-center gap-4">
+                    <ThemeToggle />
+                    <div onClick={() => setActiveTab('profile')} className="flex items-center gap-2 hover:bg-surface-base p-1.5 rounded-lg transition cursor-pointer">
                         <div className="w-8 h-8 rounded-full overflow-hidden bg-surface-elevated">
                             <img
                                 src={userData?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData?.name || 'User'}`}
@@ -1563,13 +1566,16 @@ export default function App() {
                     </div>
                     <h1 className="text-lg font-bold text-text-main">CAMPIFY</h1>
                 </div>
-                <button
-                    onClick={() => setHamburgerOpen(!hamburgerOpen)}
-                    className="p-2 text-text-muted hover:bg-surface-elevated rounded-lg transition-colors focus:outline-none"
-                    aria-label="Toggle menu"
-                >
-                    <Menu className="w-6 h-6 text-[#2f2a26]" />
-                </button>
+                <div className="flex items-center gap-2">
+                    <ThemeToggle />
+                    <button
+                        onClick={() => setHamburgerOpen(!hamburgerOpen)}
+                        className="p-2 text-text-muted hover:bg-surface-elevated rounded-lg transition-colors focus:outline-none"
+                        aria-label="Toggle menu"
+                    >
+                        <Menu className="w-6 h-6 text-text-main" />
+                    </button>
+                </div>
             </div>
 
             {/* Slide Drawer Backdrop */}
@@ -1593,7 +1599,7 @@ export default function App() {
                         onClick={() => setHamburgerOpen(false)}
                         className="p-1.5 hover:bg-surface-elevated rounded-full transition-colors text-text-muted"
                     >
-                        <X className="w-5 h-5 text-gray-500" />
+                        <X className="w-5 h-5 text-text-muted" />
                     </button>
                 </div>
 
@@ -1609,7 +1615,7 @@ export default function App() {
                         </div>
                         <div className="min-w-0 flex-1">
                             <h4 className="text-sm font-bold text-text-main truncate">{userData?.name || 'Student'}</h4>
-                            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                            <p className="text-xs text-text-muted truncate">{user?.email}</p>
                             {(userData?.branch || userData?.year) && (
                                 <p className="text-[10px] font-bold text-blue-600 mt-1 uppercase tracking-wide">
                                     {userData.branch} • {userData.year}
@@ -1634,6 +1640,7 @@ export default function App() {
                         Additional Tools
                     </div>
                     <DrawerNavLink icon={<FileText className="w-5 h-5" />} label="Notes" active={activeTab === 'notes'} onClick={() => { setActiveTab('notes'); setHamburgerOpen(false); }} />
+                    <DrawerNavLink icon={<GraduationCap className="w-5 h-5" />} label="Academics" active={activeTab === 'academics'} onClick={() => { setActiveTab('academics'); setHamburgerOpen(false); }} />
                     <DrawerNavLink icon={<MessageSquare className="w-5 h-5" />} label="Chat" active={activeTab === 'chat'} onClick={() => { setActiveTab('chat'); setHamburgerOpen(false); }} />
                     <DrawerNavLink icon={<Package className="w-5 h-5" />} label="Lost & Found" active={activeTab === 'lost'} onClick={() => { setActiveTab('lost'); setHamburgerOpen(false); }} />
                     
@@ -1658,6 +1665,7 @@ export default function App() {
                 {activeTab === 'teams' && <Teams user={user} userData={userData} setActiveTab={setActiveTab} setChatTargetUser={setChatTargetUser} />}
                 {activeTab === 'discover' && <Discover user={user} />}
                 {activeTab === 'notes' && <Notes user={user} userData={userData} />}
+                {activeTab === 'academics' && <Academics user={user} userData={userData} />}
                 {activeTab === 'chat' && <Chat user={user} userData={userData} chatTargetUser={chatTargetUser} setChatTargetUser={setChatTargetUser} />}
                 {activeTab === 'lost' && <LostAndFound user={user} userData={userData} />}
                 {activeTab === 'profile' && <Profile user={user} userData={userData} setActiveTab={setActiveTab} isDbAdmin={isDbAdmin} />}
@@ -1677,7 +1685,7 @@ export default function App() {
             </div>
 
             {/* Mobile Nav */}
-            <div className="md:hidden fixed bottom-0 w-full bg-surface-elevated border-t border-border-strong px-6 py-3 flex justify-between items-center z-50 pb-safe shadow-lg">
+            <div className="md:hidden fixed bottom-0 w-full bg-surface-elevated border-t border-border-strong px-6 py-3 flex justify-between items-center z-50 pb-safe shadow-md">
                 <NavBtn icon={<Home className="w-6 h-6" />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
                 <NavBtn icon={<ShoppingBag className="w-6 h-6" />} label="Market" active={activeTab === 'market'} onClick={() => setActiveTab('market')} />
                 <NavBtn icon={<Users className="w-6 h-6" />} label="Teams" active={activeTab === 'teams'} onClick={() => setActiveTab('teams')} />

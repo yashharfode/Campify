@@ -72,7 +72,7 @@ export default function MentorChatBubble() {
                 type="button"
                 aria-label="Open CAMPIFY Mentor"
                 onClick={() => setOpen(true)}
-                className={`fixed z-[55] flex h-14 w-14 items-center justify-center text-white shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-[0_20px_40px_-12px_rgba(28,25,23,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-2 md:right-8 ${
+                className={`fixed z-[55] flex h-14 w-14 items-center justify-center text-[#111827] shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-[0_20px_40px_-12px_rgba(28,25,23,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-2 md:right-8 ${
                     open ? 'pointer-events-none scale-0 opacity-0' : 'scale-100 opacity-100'
                 } right-4 bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:bottom-8`}
                 style={{
@@ -92,15 +92,15 @@ export default function MentorChatBubble() {
                     />
                     <div className="pointer-events-none absolute inset-0 flex flex-col justify-end p-4 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:items-end md:pb-8 md:pr-8">
                     <div
-                        className="pointer-events-auto flex max-h-[min(72vh,560px)] w-full max-w-md flex-col overflow-hidden rounded-[1.75rem] border border-stone-200/90 bg-white/95 shadow-2xl backdrop-blur-md ring-1 ring-black/5"
+                        className="pointer-events-auto flex max-h-[min(72vh,560px)] w-full max-w-md flex-col overflow-hidden rounded-[1.75rem] border border-border-strong/90 bg-surface-elevated/95 shadow-2xl backdrop-blur-md ring-1 ring-black/5"
                         style={{
                             borderRadius: '1.75rem 1.75rem 1.25rem 1.75rem',
                         }}
                     >
-                        <div className="flex items-center justify-between gap-3 border-b border-stone-100 bg-gradient-to-r from-stone-900 to-stone-800 px-4 py-3 text-white">
+                        <div className="flex items-center justify-between gap-3 border-b border-stone-100 bg-gradient-to-r from-stone-900 to-stone-800 px-4 py-3 text-[#111827]">
                             <div className="flex items-center gap-2 min-w-0">
                                 <div
-                                    className="flex h-9 w-9 shrink-0 items-center justify-center bg-white/10"
+                                    className="flex h-9 w-9 shrink-0 items-center justify-center bg-surface-elevated/10"
                                     style={{ borderRadius: '50% 50% 50% 50% / 55% 55% 45% 45%' }}
                                 >
                                     <Sparkles className="h-4 w-4" />
@@ -115,7 +115,7 @@ export default function MentorChatBubble() {
                             <button
                                 type="button"
                                 onClick={() => setOpen(false)}
-                                className="rounded-full p-2 hover:bg-white/10 transition"
+                                className="rounded-full p-2 hover:bg-surface-elevated/10 transition"
                                 aria-label="Close mentor chat"
                             >
                                 <X className="h-5 w-5" />
@@ -134,8 +134,8 @@ export default function MentorChatBubble() {
                                     <div
                                         className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm ${
                                             m.role === 'user'
-                                                ? 'rounded-br-md bg-stone-900 text-white'
-                                                : 'rounded-bl-md border border-stone-200/80 bg-white text-stone-800'
+                                                ? 'rounded-br-md bg-stone-900 text-[#111827]'
+                                                : 'rounded-bl-md border border-border-strong/80 bg-surface-elevated text-stone-800'
                                         }`}
                                     >
                                         {m.text}
@@ -144,7 +144,7 @@ export default function MentorChatBubble() {
                             ))}
                             {loading && (
                                 <div className="flex justify-start">
-                                    <div className="flex items-center gap-2 rounded-2xl rounded-bl-md border border-stone-200/80 bg-white px-3 py-2 text-stone-500 text-sm">
+                                    <div className="flex items-center gap-2 rounded-2xl rounded-bl-md border border-border-strong/80 bg-surface-elevated px-3 py-2 text-stone-500 text-sm">
                                         <Loader2 className="h-4 w-4 animate-spin" />
                                         Thinking…
                                     </div>
@@ -152,7 +152,7 @@ export default function MentorChatBubble() {
                             )}
                         </div>
 
-                        <div className="border-t border-stone-100 bg-white p-3">
+                        <div className="border-t border-stone-100 bg-surface-elevated p-3">
                             <div className="flex gap-2">
                                 <input
                                     type="text"
@@ -160,13 +160,13 @@ export default function MentorChatBubble() {
                                     onChange={(e) => setInput(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && send()}
                                     placeholder="Ask your mentor…"
-                                    className="min-w-0 flex-1 rounded-full border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-300/50"
+                                    className="min-w-0 flex-1 rounded-full border border-border-strong bg-stone-50 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-border-strong focus:outline-none focus:ring-2 focus:ring-stone-300/50"
                                 />
                                 <button
                                     type="button"
                                     onClick={send}
                                     disabled={loading || !input.trim()}
-                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-stone-900 text-white shadow-md transition hover:bg-stone-800 disabled:opacity-40"
+                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-stone-900 text-[#111827] shadow-md transition hover:bg-stone-800 disabled:opacity-40"
                                     aria-label="Send message"
                                 >
                                     {loading ? (

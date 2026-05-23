@@ -165,15 +165,15 @@ export default function OverviewDashboard({ users, events, notes }) {
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={last7Days}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                                    <XAxis dataKey="date" stroke="#9ca3af" axisLine={false} tickLine={false} />
-                                    <YAxis stroke="#9ca3af" axisLine={false} tickLine={false} />
+                                    <XAxis dataKey="date" stroke="#B3B4BD" axisLine={false} tickLine={false} />
+                                    <YAxis stroke="#B3B4BD" axisLine={false} tickLine={false} />
                                     <Tooltip
-                                        contentStyle={{ backgroundColor: '#1A1A1A', borderColor: '#333', borderRadius: '12px' }}
+                                        contentStyle={{ backgroundColor: '#2C2E3A', borderColor: '#333', borderRadius: '12px' }}
                                         itemStyle={{ color: '#E5E7EB' }}
                                     />
                                     <Legend />
                                     <Bar dataKey="users" name="New Users" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                                    <Bar dataKey="events" name="Events" fill="#2D5A27" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="events" name="Events" fill="#C08457" radius={[4, 4, 0, 0]} />
                                     <Bar dataKey="notes" name="Notes" fill="#f97316" radius={[4, 4, 0, 0]} />
                                 </BarChart>
                             </ResponsiveContainer>
@@ -187,10 +187,10 @@ export default function OverviewDashboard({ users, events, notes }) {
                             <ResponsiveContainer width="100%" height="100%">
                                 <LineChart data={growthData}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                                    <XAxis dataKey="name" stroke="#9ca3af" axisLine={false} tickLine={false} />
-                                    <YAxis stroke="#9ca3af" axisLine={false} tickLine={false} />
+                                    <XAxis dataKey="name" stroke="#B3B4BD" axisLine={false} tickLine={false} />
+                                    <YAxis stroke="#B3B4BD" axisLine={false} tickLine={false} />
                                     <Tooltip
-                                        contentStyle={{ backgroundColor: '#1A1A1A', borderColor: '#333', borderRadius: '12px' }}
+                                        contentStyle={{ backgroundColor: '#2C2E3A', borderColor: '#333', borderRadius: '12px' }}
                                     />
                                     <Line type="monotone" dataKey="Total" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6', strokeWidth: 0 }} />
                                 </LineChart>
@@ -221,7 +221,7 @@ export default function OverviewDashboard({ users, events, notes }) {
                                     <div className="flex-1">
                                         <p className="text-sm font-bold text-text-main">{act.title}</p>
                                         <p className="text-xs text-text-muted">{act.desc}</p>
-                                        <p className="text-[10px] text-gray-500 mt-1">
+                                        <p className="text-[10px] text-text-muted mt-1">
                                             {new Date(act.time * 1000).toLocaleString()}
                                         </p>
                                     </div>

@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from 'react-hot-toast';
+import { ThemeProvider } from '../components/ThemeProvider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,41 +47,43 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
-        <Toaster
-          position="top-center"
-          containerStyle={{
-            top: '20px',
-            zIndex: 999999,
-          }}
-          toastOptions={{
-            duration: 3000,
-            style: {
-              background: '#242424',
-              color: '#E0E0E0',
-              borderRadius: '12px',
-              padding: '12px 16px',
-              border: '1px solid #333',
-              boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
-            },
-            success: {
-              iconTheme: {
-                primary: '#10b981',
-                secondary: '#fff',
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem themes={['light', 'dark', 'zen']}>
+          {children}
+          <Toaster
+            position="top-center"
+            containerStyle={{
+              top: '20px',
+              zIndex: 999999,
+            }}
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: 'var(--surface-elevated)',
+                color: 'var(--text-main)',
+                borderRadius: '12px',
+                padding: '12px 16px',
+                border: '1px solid var(--border-strong)',
+                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
               },
-            },
-            error: {
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff',
+              success: {
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#fff',
+                },
               },
-            },
-          }}
-        />
+              error: {
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

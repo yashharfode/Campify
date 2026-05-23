@@ -18,14 +18,14 @@ const isAdminUser = (email) => ADMIN_EMAILS.includes(email);
 // Skeleton Loader Component
 const SkeletonCard = () => (
     <div className="bg-surface-base p-3 md:p-4 rounded-2xl shadow-sm border border-border-strong flex flex-col h-full animate-pulse">
-        <div className="h-40 rounded-xl bg-gray-200 mb-3"></div>
-        <div className="h-4 bg-gray-200 rounded mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
+        <div className="h-40 rounded-xl bg-surface-highlight mb-3"></div>
+        <div className="h-4 bg-surface-highlight rounded mb-2"></div>
+        <div className="h-4 bg-surface-highlight rounded w-3/4 mb-3"></div>
         <div className="mt-auto pt-3 border-t border-gray-50">
-            <div className="h-6 bg-gray-200 rounded w-20 mb-2"></div>
+            <div className="h-6 bg-surface-highlight rounded w-20 mb-2"></div>
             <div className="flex justify-between items-center">
-                <div className="h-4 bg-gray-200 rounded w-16"></div>
-                <div className="h-8 w-8 bg-gray-200 rounded-lg"></div>
+                <div className="h-4 bg-surface-highlight rounded w-16"></div>
+                <div className="h-8 w-8 bg-surface-highlight rounded-lg"></div>
             </div>
         </div>
     </div>
@@ -47,8 +47,8 @@ const ProductImage = ({ src, alt, className = "" }) => {
     if (!src || src.trim() === '') {
         return (
             <div className={`relative ${className}`}>
-                <div className="w-full h-full flex items-center justify-center bg-gray-900">
-                    <ShoppingBag className="w-10 h-10 text-gray-300" />
+                <div className="w-full h-full flex items-center justify-center bg-surface-elevated">
+                    <ShoppingBag className="w-10 h-10 text-text-muted" />
                 </div>
             </div>
         );
@@ -57,13 +57,13 @@ const ProductImage = ({ src, alt, className = "" }) => {
     return (
         <div className={`relative ${className}`}>
             {!imageLoaded && !imageError && (
-                <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-                    <ShoppingBag className="w-10 h-10 text-gray-300" />
+                <div className="absolute inset-0 bg-surface-highlight animate-pulse flex items-center justify-center">
+                    <ShoppingBag className="w-10 h-10 text-text-muted" />
                 </div>
             )}
             {imageError ? (
-                <div className="w-full h-full flex items-center justify-center bg-gray-900">
-                    <ShoppingBag className="w-10 h-10 text-gray-300" />
+                <div className="w-full h-full flex items-center justify-center bg-surface-elevated">
+                    <ShoppingBag className="w-10 h-10 text-text-muted" />
                 </div>
             ) : (
                 <img
@@ -103,18 +103,18 @@ const ProductCard = ({ item, user, onWishlistToggle, isWishlisted, onReport, isO
             onClick={onClick}
             className={`bg-surface-base p-3 md:p-4 rounded-2xl shadow-sm border border-border-strong flex flex-col h-full group hover:shadow-md transition-all cursor-pointer ${isOutOfStock ? 'opacity-75' : ''}`}
         >
-            <div className="rounded-xl overflow-hidden bg-gray-900 mb-3 relative aspect-[4/3] w-full">
+            <div className="rounded-xl overflow-hidden bg-surface-elevated mb-3 relative aspect-[4/3] w-full">
                 <ProductImage
                     src={getOptimizedImageUrl(item.image, '4:3')}
                     alt={item.title}
                     className="w-full h-full group-hover:scale-105 transition duration-500"
                 />
-                <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-1 rounded backdrop-blur-md text-white ${item.type === 'Sell' ? 'bg-blue-500/80' : item.type === 'Rent' ? 'bg-purple-500/80' : 'bg-green-500/80'}`}>
+                <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-1 rounded backdrop-blur-md text-[#111827] ${item.type === 'Sell' ? 'bg-blue-500/80' : item.type === 'Rent' ? 'bg-purple-500/80' : 'bg-green-500/80'}`}>
                     {item.type}
                 </span>
                 {isOutOfStock && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">Out of Stock</span>
+                        <span className="bg-red-600 text-[#111827] px-3 py-1 rounded-full text-xs font-bold">Out of Stock</span>
                     </div>
                 )}
                 {!isOwner && (
@@ -123,7 +123,7 @@ const ProductCard = ({ item, user, onWishlistToggle, isWishlisted, onReport, isO
                             e.stopPropagation();
                             onWishlistToggle(item.id);
                         }}
-                        className={`absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition ${isWishlisted ? 'bg-red-500/90 text-white' : 'bg-surface-base/80 text-text-muted hover:bg-surface-base'
+                        className={`absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition ${isWishlisted ? 'bg-red-500/90 text-[#111827]' : 'bg-surface-base/80 text-text-muted hover:bg-surface-base'
                             }`}
                     >
                         <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
@@ -137,12 +137,12 @@ const ProductCard = ({ item, user, onWishlistToggle, isWishlisted, onReport, isO
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-blue-600 font-bold text-lg">₹{item.price}</span>
                     {item.quantity > 0 && (
-                        <span className="text-xs text-gray-500 font-medium">{item.quantity} left</span>
+                        <span className="text-xs text-text-muted font-medium">{item.quantity} left</span>
                     )}
                 </div>
                 <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <div className="w-5 h-5 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="flex items-center gap-1.5 text-xs text-text-muted">
+                        <div className="w-5 h-5 bg-surface-highlight rounded-full overflow-hidden">
                             <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${item.sellerName}`} alt="u" />
                         </div>
                         <div className="flex flex-col">
@@ -171,7 +171,7 @@ const ProductCard = ({ item, user, onWishlistToggle, isWishlisted, onReport, isO
                                         e.stopPropagation();
                                         onReport(item);
                                     }}
-                                    className="text-gray-500 bg-surface-elevated p-1.5 rounded-lg hover:bg-gray-900 transition"
+                                    className="text-text-muted bg-surface-elevated p-1.5 rounded-lg hover:bg-surface-elevated transition"
                                 >
                                     <Flag className="w-4 h-4" />
                                 </button>
@@ -368,7 +368,7 @@ export default function Marketplace({ user, userData, setActiveTab, setChatTarge
                         <button
                             key={cat}
                             onClick={() => setFilter(cat)}
-                            className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${filter === cat ? 'bg-blue-600 text-white shadow-lg' : 'bg-surface-base text-text-muted border border-border-strong hover:bg-gray-900'}`}
+                            className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${filter === cat ? 'bg-blue-600 text-[#111827] shadow-md' : 'bg-surface-base text-text-muted border border-border-strong hover:bg-surface-elevated'}`}
                         >
                             {cat}
                         </button>
@@ -379,7 +379,7 @@ export default function Marketplace({ user, userData, setActiveTab, setChatTarge
                 {showFilters && (
                     <div className="bg-surface-base p-4 rounded-xl border border-border-strong mb-4 space-y-4">
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Sort By</label>
+                            <label className="block text-xs font-bold text-text-muted uppercase mb-2">Sort By</label>
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
@@ -391,7 +391,7 @@ export default function Marketplace({ user, userData, setActiveTab, setChatTarge
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Price Range: ₹{priceRange.min} - ₹{priceRange.max}</label>
+                            <label className="block text-xs font-bold text-text-muted uppercase mb-2">Price Range: ₹{priceRange.min} - ₹{priceRange.max}</label>
                             <div className="grid grid-cols-2 gap-2">
                                 <input
                                     type="number"
@@ -451,7 +451,7 @@ export default function Marketplace({ user, userData, setActiveTab, setChatTarge
             {/* Post Ad FAB */}
             <button
                 onClick={() => setIsPostModalOpen(true)}
-                className="fixed bottom-24 right-6 md:bottom-10 md:right-10 bg-blue-600 text-white p-4 rounded-full shadow-xl shadow-blue-600/30 hover:scale-110 transition active:scale-95 z-30 flex items-center gap-2 pr-6"
+                className="fixed bottom-24 right-6 md:bottom-10 md:right-10 bg-blue-600 text-[#111827] p-4 rounded-full shadow-md shadow-blue-600/30 hover:scale-110 transition active:scale-95 z-30 flex items-center gap-2 pr-6"
             >
                 <Plus className="w-6 h-6" /> <span className="hidden md:block font-bold">Post Ad</span>
             </button>
@@ -639,14 +639,14 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
             <div className="bg-surface-base rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
                 <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
-                    <h3 className="font-bold text-lg text-gray-300">{editingItem ? 'Edit Listing' : 'Create Listing'}</h3>
-                    <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
+                    <h3 className="font-bold text-lg text-text-muted">{editingItem ? 'Edit Listing' : 'Create Listing'}</h3>
+                    <button onClick={onClose}><X className="w-5 h-5 text-text-muted" /></button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
                     <div
                         onClick={() => fileInputRef.current.click()}
-                        className="border-2 border-dashed border-gray-300 rounded-xl h-32 flex flex-col items-center justify-center text-text-muted hover:bg-surface-elevated transition cursor-pointer relative overflow-hidden"
+                        className="border-2 border-dashed border-border-strong rounded-xl h-32 flex flex-col items-center justify-center text-text-muted hover:bg-surface-elevated transition cursor-pointer relative overflow-hidden"
                     >
                         {formData.image && formData.image.trim() !== '' ? (
                             <img src={getOptimizedImageUrl(formData.image, '4:3')} className="w-full h-full object-cover" alt="Preview" />
@@ -658,17 +658,17 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
                         )}
                         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImage} />
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-text-muted mt-1">
                         💡 Suggested size: 800×600 pixels (Images of other sizes will display without zooming)
                     </p>
 
-                    <div className="grid grid-cols-3 gap-2 bg-gray-900 p-1 rounded-lg">
+                    <div className="grid grid-cols-3 gap-2 bg-surface-elevated p-1 rounded-lg">
                         {['Sell', 'Rent', 'Donate'].map(t => (
                             <button
                                 key={t}
                                 type="button"
                                 onClick={() => setFormData({ ...formData, type: t })}
-                                className={`text-xs font-bold py-2 rounded-md transition ${formData.type === t ? 'bg-surface-base shadow text-blue-600' : 'text-gray-500 hover:text-text-muted'}`}
+                                className={`text-xs font-bold py-2 rounded-md transition ${formData.type === t ? 'bg-surface-base shadow text-blue-600' : 'text-text-muted hover:text-text-muted'}`}
                             >
                                 {t}
                             </button>
@@ -676,21 +676,21 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Title</label>
+                        <label className="block text-xs font-bold text-text-muted uppercase mb-1">Title</label>
                         <input required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500" placeholder="e.g. Drafter" />
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
                         <div className="col-span-1">
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Price (₹)</label>
+                            <label className="block text-xs font-bold text-text-muted uppercase mb-1">Price (₹)</label>
                             <input type="number" required value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500" placeholder="0" />
                         </div>
                         <div className="col-span-1">
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Quantity</label>
+                            <label className="block text-xs font-bold text-text-muted uppercase mb-1">Quantity</label>
                             <input type="number" min="1" required value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })} className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500" placeholder="1" />
                         </div>
                         <div className="col-span-1">
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Category</label>
+                            <label className="block text-xs font-bold text-text-muted uppercase mb-1">Category</label>
                             <select value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} className="w-full bg-surface-elevated border border-border-strong rounded-lg p-3 text-sm outline-none focus:border-blue-500">
                                 <option>Electronics</option><option>Books</option><option>Stationery</option><option>Other</option>
                             </select>
@@ -698,7 +698,7 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+                        <label className="block text-xs font-bold text-text-muted uppercase mb-1">Description</label>
                         <textarea
                             value={formData.description}
                             onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -709,7 +709,7 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                        <label className="block text-xs font-bold text-text-muted uppercase mb-1">
                             <MapPin className="w-3 h-3 inline mr-1" />
                             Safe Meet-up Location (Optional)
                         </label>
@@ -735,7 +735,7 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
                                 </div>
                             )}
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">Suggest a safe public location for meet-up</p>
+                        <p className="text-xs text-text-muted mt-1">Suggest a safe public location for meet-up</p>
                     </div>
 
                     {/* Map Picker Modal */}
@@ -757,7 +757,7 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
                         />
                     )}
 
-                    <button type="submit" disabled={submitting} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition flex justify-center">
+                    <button type="submit" disabled={submitting} className="w-full bg-blue-600 hover:bg-blue-700 text-[#111827] font-bold py-3 rounded-xl shadow-md transition flex justify-center">
                         {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : (editingItem ? "Update Item" : "Post Item")}
                     </button>
                 </form>
@@ -774,8 +774,8 @@ const MyListingsModal = ({ isOpen, onClose, listings, onDelete, onEdit }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
             <div className="bg-surface-base rounded-2xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
                 <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
-                    <h3 className="font-bold text-lg text-gray-300">My Listings ({listings.length})</h3>
-                    <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
+                    <h3 className="font-bold text-lg text-text-muted">My Listings ({listings.length})</h3>
+                    <button onClick={onClose}><X className="w-5 h-5 text-text-muted" /></button>
                 </div>
 
                 <div className="p-6 overflow-y-auto">
@@ -789,12 +789,12 @@ const MyListingsModal = ({ isOpen, onClose, listings, onDelete, onEdit }) => {
                             {listings.map((item) => (
                                 <div key={item.id} className="bg-surface-elevated p-4 rounded-xl border border-border-strong">
                                     <div className="flex gap-4">
-                                        <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0 aspect-square">
+                                        <div className="w-20 h-20 rounded-lg overflow-hidden bg-surface-highlight flex-shrink-0 aspect-square">
                                             {item.image && item.image.trim() !== '' ? (
                                                 <img src={getOptimizedImageUrl(item.image, '1:1')} className="w-full h-full object-cover" alt={item.title} />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
-                                                    <ShoppingBag className="w-8 h-8 text-gray-300" />
+                                                    <ShoppingBag className="w-8 h-8 text-text-muted" />
                                                 </div>
                                             )}
                                         </div>
@@ -804,13 +804,13 @@ const MyListingsModal = ({ isOpen, onClose, listings, onDelete, onEdit }) => {
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => onEdit(item)}
-                                                    className="flex-1 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 transition flex items-center justify-center gap-1"
+                                                    className="flex-1 bg-blue-600 text-[#111827] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 transition flex items-center justify-center gap-1"
                                                 >
                                                     <Edit3 className="w-3 h-3" /> Edit
                                                 </button>
                                                 <button
                                                     onClick={() => onDelete(item.id)}
-                                                    className="flex-1 bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 transition flex items-center justify-center gap-1"
+                                                    className="flex-1 bg-red-600 text-[#111827] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 transition flex items-center justify-center gap-1"
                                                 >
                                                     <Trash2 className="w-3 h-3" /> Delete
                                                 </button>
@@ -848,8 +848,8 @@ const ReportModal = ({ isOpen, onClose, onSubmit, item }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
             <div className="bg-surface-base rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
                 <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
-                    <h3 className="font-bold text-lg text-gray-300">Report Item</h3>
-                    <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
+                    <h3 className="font-bold text-lg text-text-muted">Report Item</h3>
+                    <button onClick={onClose}><X className="w-5 h-5 text-text-muted" /></button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -871,7 +871,7 @@ const ReportModal = ({ isOpen, onClose, onSubmit, item }) => {
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-lg transition"
+                        className="w-full bg-red-600 hover:bg-red-700 text-[#111827] font-bold py-3 rounded-xl shadow-md transition"
                     >
                         Submit Report
                     </button>
@@ -1014,21 +1014,21 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
             <div className="bg-surface-base rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl my-8">
                 <div className="relative">
                     {item.image && item.image.trim() !== '' ? (
-                        <div className="h-64 md:h-80 bg-gray-900 overflow-hidden">
+                        <div className="h-64 md:h-80 bg-surface-elevated overflow-hidden">
                             <img src={item.image} alt={item.title || 'Product image'} className="w-full h-full object-cover" />
                         </div>
                     ) : (
                         <div className="h-64 md:h-80 bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
-                            <ShoppingBag className="w-24 h-24 text-white/30" />
+                            <ShoppingBag className="w-24 h-24 text-[#111827]/30" />
                         </div>
                     )}
-                    <button onClick={onClose} className="absolute top-4 right-4 bg-surface-base/90 backdrop-blur-md p-2 rounded-full hover:bg-surface-base transition shadow-lg z-10">
+                    <button onClick={onClose} className="absolute top-4 right-4 bg-surface-base/90 backdrop-blur-md p-2 rounded-full hover:bg-surface-base transition shadow-md z-10">
                         <X className="w-5 h-5 text-text-muted" />
                     </button>
-                    <button onClick={handleShare} className="absolute top-4 right-16 bg-surface-base/90 backdrop-blur-md p-2 rounded-full hover:bg-surface-base transition shadow-lg z-10">
+                    <button onClick={handleShare} className="absolute top-4 right-16 bg-surface-base/90 backdrop-blur-md p-2 rounded-full hover:bg-surface-base transition shadow-md z-10">
                         <Share2 className="w-5 h-5 text-text-muted" />
                     </button>
-                    <span className={`absolute top-4 left-4 text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-md text-white ${typeColors[item.type] || 'bg-blue-500/80'}`}>
+                    <span className={`absolute top-4 left-4 text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-md text-[#111827] ${typeColors[item.type] || 'bg-blue-500/80'}`}>
                         {item.type}
                     </span>
                 </div>
@@ -1038,10 +1038,10 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <span className="text-blue-600 font-bold text-3xl">₹{item.price}</span>
-                                <span className="text-gray-500 text-sm">Category: {item.category}</span>
+                                <span className="text-text-muted text-sm">Category: {item.category}</span>
                             </div>
                             {!isOwner && (
-                                <button onClick={() => onWishlistToggle(item.id)} className={`p-2 rounded-full transition ${isWishlisted ? 'bg-red-100 text-red-600' : 'bg-gray-900 text-text-muted hover:bg-gray-200'}`}>
+                                <button onClick={() => onWishlistToggle(item.id)} className={`p-2 rounded-full transition ${isWishlisted ? 'bg-red-100 text-red-600' : 'bg-surface-elevated text-text-muted hover:bg-surface-highlight'}`}>
                                     <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
                                 </button>
                             )}
@@ -1057,10 +1057,10 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
                         <h2 className="text-xl font-bold text-text-main mb-4">Seller Information</h2>
                         {loadingProfile ? (
                             <div className="flex items-center gap-4">
-                                <div className="w-16 h-16 rounded-full bg-gray-200 animate-pulse"></div>
+                                <div className="w-16 h-16 rounded-full bg-surface-highlight animate-pulse"></div>
                                 <div className="flex-1">
-                                    <div className="h-5 bg-gray-200 rounded mb-2 animate-pulse"></div>
-                                    <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse"></div>
+                                    <div className="h-5 bg-surface-highlight rounded mb-2 animate-pulse"></div>
+                                    <div className="h-4 bg-surface-highlight rounded w-2/3 animate-pulse"></div>
                                 </div>
                             </div>
                         ) : (
@@ -1134,7 +1134,7 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
                     <div className="flex flex-col sm:flex-row gap-3">
                         {!isOwner ? (
                             <>
-                                <button onClick={onBuy} className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-lg">
+                                <button onClick={onBuy} className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-[#111827] font-bold py-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-lg">
                                     <ShoppingCart className="w-5 h-5" />
                                     {item.type === 'Rent' ? 'Rent Now' : item.type === 'Exchange' ? 'Request Exchange' : item.type === 'Donate' ? 'Request Item' : 'Buy Now'}
                                 </button>
@@ -1152,7 +1152,7 @@ const ItemDetailModal = ({ isOpen, onClose, item, user, userData, onWishlistTogg
                                         Contact Seller
                                     </button>
                                 )}
-                                <button onClick={() => onReport(item)} className="px-4 bg-gray-900 text-text-muted font-bold py-4 rounded-xl hover:bg-gray-200 transition">
+                                <button onClick={() => onReport(item)} className="px-4 bg-surface-elevated text-text-muted font-bold py-4 rounded-xl hover:bg-surface-highlight transition">
                                     <Flag className="w-5 h-5" />
                                 </button>
                             </>
@@ -1268,12 +1268,12 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
             <div className="bg-surface-base rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
                 <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
-                    <h3 className="font-bold text-lg text-gray-300">
+                    <h3 className="font-bold text-lg text-text-muted">
                         {step === 1 && 'Select Payment Method'}
                         {step === 2 && 'Confirm Order'}
                         {step === 3 && 'Order Created!'}
                     </h3>
-                    <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
+                    <button onClick={onClose}><X className="w-5 h-5 text-text-muted" /></button>
                 </div>
 
                 <div className="p-6">
@@ -1302,7 +1302,7 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
                                         <CreditCard className="w-5 h-5 text-text-muted" />
                                         <div className="flex-1">
                                             <div className="font-bold text-text-main">Cash on Delivery</div>
-                                            <div className="text-xs text-gray-500">Pay when you meet the seller</div>
+                                            <div className="text-xs text-text-muted">Pay when you meet the seller</div>
                                         </div>
                                     </label>
 
@@ -1318,7 +1318,7 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
                                         <QrCode className="w-5 h-5 text-text-muted" />
                                         <div className="flex-1">
                                             <div className="font-bold text-text-main">UPI / QR Pay</div>
-                                            <div className="text-xs text-gray-500">Pay via UPI before meeting</div>
+                                            <div className="text-xs text-text-muted">Pay via UPI before meeting</div>
                                         </div>
                                     </label>
                                 </div>
@@ -1331,7 +1331,7 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
                                     <div className="bg-surface-base p-4 rounded-lg border border-blue-200 flex items-center justify-center">
                                         <div className="text-center">
                                             <QrCode className="w-24 h-24 text-text-muted mx-auto mb-2" />
-                                            <div className="text-xs text-gray-500">QR Code Placeholder</div>
+                                            <div className="text-xs text-text-muted">QR Code Placeholder</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1346,7 +1346,7 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
                             <button
                                 onClick={() => setStep(2)}
                                 disabled={paymentMethod === 'upi' && !sellerProfile?.upiId}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-[#111827] font-bold py-3 rounded-xl shadow-md transition disabled:bg-surface-highlight disabled:cursor-not-allowed"
                             >
                                 Continue
                             </button>
@@ -1383,14 +1383,14 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => setStep(1)}
-                                    className="flex-1 bg-gray-200 text-text-muted font-bold py-3 rounded-xl hover:bg-gray-300 transition"
+                                    className="flex-1 bg-surface-highlight text-text-muted font-bold py-3 rounded-xl hover:bg-surface-highlight transition"
                                 >
                                     Back
                                 </button>
                                 <button
                                     onClick={handleConfirmOrder}
                                     disabled={loading}
-                                    className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2 disabled:bg-gray-300"
+                                    className="flex-1 bg-green-600 hover:bg-green-700 text-[#111827] font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 disabled:bg-surface-highlight"
                                 >
                                     {loading ? (
                                         <>
@@ -1440,7 +1440,7 @@ const BuyNowModal = ({ isOpen, onClose, item, user, userData }) => {
 
                             <button
                                 onClick={onClose}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition"
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-[#111827] font-bold py-3 rounded-xl shadow-md transition"
                             >
                                 Done
                             </button>
@@ -1516,8 +1516,8 @@ const MapPickerModal = ({ isOpen, onClose, onSelect, initialLocation }) => {
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
             <div className="bg-surface-base rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
                 <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
-                    <h3 className="font-bold text-lg text-gray-300">Pick Location on Map</h3>
-                    <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
+                    <h3 className="font-bold text-lg text-text-muted">Pick Location on Map</h3>
+                    <button onClick={onClose}><X className="w-5 h-5 text-text-muted" /></button>
                 </div>
 
                 <div className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-120px)]">
@@ -1563,7 +1563,7 @@ const MapPickerModal = ({ isOpen, onClose, onSelect, initialLocation }) => {
                                 type="button"
                                 onClick={handleGetCurrentLocation}
                                 disabled={gettingLocation}
-                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition disabled:bg-gray-300 flex items-center justify-center gap-2"
+                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-[#111827] font-bold py-3 rounded-lg transition disabled:bg-surface-highlight flex items-center justify-center gap-2"
                             >
                                 {gettingLocation ? (
                                     <>
@@ -1593,7 +1593,7 @@ const MapPickerModal = ({ isOpen, onClose, onSelect, initialLocation }) => {
                                 <button
                                     type="button"
                                     onClick={handleSearchLocation}
-                                    className="bg-gray-200 hover:bg-gray-300 text-text-muted font-bold px-4 rounded-lg transition"
+                                    className="bg-surface-highlight hover:bg-surface-highlight text-text-muted font-bold px-4 rounded-lg transition"
                                 >
                                     Search
                                 </button>
@@ -1621,14 +1621,14 @@ const MapPickerModal = ({ isOpen, onClose, onSelect, initialLocation }) => {
                     <div className="flex gap-3 pt-4 border-t border-border-strong">
                         <button
                             onClick={onClose}
-                            className="flex-1 bg-gray-200 text-text-muted font-bold py-3 rounded-lg hover:bg-gray-300 transition"
+                            className="flex-1 bg-surface-highlight text-text-muted font-bold py-3 rounded-lg hover:bg-surface-highlight transition"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleConfirm}
                             disabled={!coordinates.lat || !coordinates.lng}
-                            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-[#111827] font-bold py-3 rounded-lg transition disabled:bg-surface-highlight disabled:cursor-not-allowed"
                         >
                             Confirm Location
                         </button>

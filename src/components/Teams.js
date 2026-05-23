@@ -19,21 +19,21 @@ const isAdminUser = (email) => ADMIN_EMAILS.includes(email);
 const SkeletonCard = () => (
     <div className="bg-surface-base p-6 rounded-2xl border border-border-strong flex flex-col h-full animate-pulse">
         <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-full bg-gray-200"></div>
+            <div className="w-16 h-16 rounded-full bg-surface-highlight"></div>
             <div className="flex-1">
-                <div className="h-5 bg-gray-200 rounded mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                <div className="h-5 bg-surface-highlight rounded mb-2"></div>
+                <div className="h-4 bg-surface-highlight rounded w-2/3"></div>
             </div>
         </div>
         <div className="flex gap-2 mb-4">
-            <div className="h-6 bg-gray-200 rounded-full w-20"></div>
-            <div className="h-6 bg-gray-200 rounded-full w-20"></div>
-            <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+            <div className="h-6 bg-surface-highlight rounded-full w-20"></div>
+            <div className="h-6 bg-surface-highlight rounded-full w-20"></div>
+            <div className="h-6 bg-surface-highlight rounded-full w-20"></div>
         </div>
         <div className="mt-auto pt-4 border-t border-border-strong">
             <div className="flex gap-2">
-                <div className="h-9 bg-gray-200 rounded-lg flex-1"></div>
-                <div className="h-9 bg-gray-200 rounded-lg flex-1"></div>
+                <div className="h-9 bg-surface-highlight rounded-lg flex-1"></div>
+                <div className="h-9 bg-surface-highlight rounded-lg flex-1"></div>
             </div>
         </div>
     </div>
@@ -105,7 +105,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
                     <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-bold text-text-main text-lg truncate">{profile.name || 'Student'}</h3>
                         {profile.email && (profile.email.endsWith('@jec.ac.in') || profile.email.endsWith('@college.edu')) && (
-                            <CheckCircle2 className="w-4 h-4 text-gray-300 flex-shrink-0" />
+                            <CheckCircle2 className="w-4 h-4 text-text-muted flex-shrink-0" />
                         )}
                     </div>
                     <p className="text-text-muted text-sm font-medium">{profile.branch || 'Branch'} • {profile.year || 'Year'}</p>
@@ -132,7 +132,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
                         <SkillTag key={index} skill={skill} index={index} />
                     ))}
                     {remainingSkills > 0 && (
-                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-900 text-text-muted border border-border-strong">
+                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-surface-elevated text-text-muted border border-border-strong">
                             +{remainingSkills}
                         </span>
                     )}
@@ -150,7 +150,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
                                 {project.link && (
                                     <button
                                         onClick={() => window.open(project.link, '_blank')}
-                                        className="text-gray-300 font-bold text-[10px]"
+                                        className="text-text-muted font-bold text-[10px]"
                                     >
                                         View
                                     </button>
@@ -165,13 +165,13 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
             <div className="mt-auto pt-4 border-t border-border-strong grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                     onClick={() => onInvite(profile)}
-                    className="flex items-center justify-center gap-2 bg-surface-elevated hover:bg-surface-elevated-hover text-white px-4 py-2.5 rounded-xl text-sm font-bold transition"
+                    className="flex items-center justify-center gap-2 bg-surface-elevated hover:bg-surface-elevated-hover text-[#111827] px-4 py-2.5 rounded-xl text-sm font-bold transition"
                 >
                     <Mail className="w-4 h-4" /> Invite
                 </button>
                 <button
                     onClick={() => onViewProfile(profile)}
-                    className="flex items-center justify-center gap-2 bg-gray-900/5 hover:bg-gray-900/10 text-text-main px-4 py-2.5 rounded-xl text-sm font-bold transition"
+                    className="flex items-center justify-center gap-2 bg-surface-elevated/5 hover:bg-surface-elevated/10 text-text-main px-4 py-2.5 rounded-xl text-sm font-bold transition"
                 >
                     <User className="w-4 h-4" /> View Profile
                 </button>
@@ -181,7 +181,7 @@ const UserCard = ({ profile, userId, onInvite, currentUserEmail, onViewProfile, 
                             if (profile.github) window.open(profile.github, '_blank');
                             else if (profile.linkedin) window.open(profile.linkedin, '_blank');
                         }}
-                        className="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-200 text-text-muted px-4 py-2.5 rounded-xl text-sm font-bold transition sm:col-span-2"
+                        className="flex items-center justify-center gap-2 bg-surface-elevated hover:bg-surface-highlight text-text-muted px-4 py-2.5 rounded-xl text-sm font-bold transition sm:col-span-2"
                     >
                         <ExternalLink className="w-4 h-4" /> Portfolio
                     </button>
@@ -367,7 +367,7 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
             <div className="relative overflow-hidden rounded-3xl mb-8 bg-surface-base p-8 md:p-12 border border-border-strong">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,var(--color-glow-primary),transparent_35%),radial-gradient(circle_at_80%_10%,var(--color-glow-secondary),transparent_30%)]"></div>
                 <div className="relative z-10">
-                    <h1 className="text-4xl md:text-5xl font-black mb-3 text-gray-300">Build Your Dream Team 🚀</h1>
+                    <h1 className="text-4xl md:text-5xl font-black mb-3 text-text-muted">Build Your Dream Team 🚀</h1>
                     <p className="text-text-muted text-lg md:text-xl mb-8 max-w-2xl">
                         Find the perfect developer, designer, or pitcher for your next Hackathon.
                     </p>
@@ -377,7 +377,7 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
                         <button
                             onClick={() => setActiveView('profiles')}
                             className={`px-6 py-2.5 rounded-xl font-bold transition ${activeView === 'profiles'
-                                ? 'bg-surface-elevated text-white shadow-lg'
+                                ? 'bg-surface-elevated text-[#111827] shadow-md'
                                 : 'bg-surface-elevated text-text-muted hover:bg-[#F2EEE5] border border-border-strong'
                                 }`}
                         >
@@ -386,7 +386,7 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
                         <button
                             onClick={() => setActiveView('teamPosts')}
                             className={`px-6 py-2.5 rounded-xl font-bold transition ${activeView === 'teamPosts'
-                                ? 'bg-surface-elevated text-white shadow-lg'
+                                ? 'bg-surface-elevated text-[#111827] shadow-md'
                                 : 'bg-surface-elevated text-text-muted hover:bg-[#F2EEE5] border border-border-strong'
                                 }`}
                         >
@@ -411,7 +411,7 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
                             {/* Toggle Switch */}
                             <div className="flex items-center gap-3 bg-surface-elevated rounded-xl px-4 py-3 w-fit border border-border-strong">
                                 <ToggleRight
-                                    className={`w-6 h-6 cursor-pointer transition ${showAvailableOnly ? 'text-green-300' : 'text-gray-300'}`}
+                                    className={`w-6 h-6 cursor-pointer transition ${showAvailableOnly ? 'text-green-300' : 'text-text-muted'}`}
                                     onClick={() => setShowAvailableOnly(!showAvailableOnly)}
                                 />
                                 <span className="text-text-main font-bold text-sm">Show only Available Students</span>
@@ -428,9 +428,9 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
                         <SkeletonGrid />
                     ) : filteredProfiles.length === 0 ? (
                         <div className="text-center py-20">
-                            <Users className="w-24 h-24 mx-auto mb-6 text-gray-300 opacity-50" />
+                            <Users className="w-24 h-24 mx-auto mb-6 text-text-muted opacity-50" />
                             <h3 className="text-2xl font-bold text-text-muted mb-2">No profiles found</h3>
-                            <p className="text-gray-500">
+                            <p className="text-text-muted">
                                 {search ? "Try adjusting your search or filters" : "Be the first to create a profile!"}
                             </p>
                         </div>
@@ -460,12 +460,12 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
                         <SkeletonGrid />
                     ) : teamPosts.length === 0 ? (
                         <div className="text-center py-20">
-                            <Briefcase className="w-24 h-24 mx-auto mb-6 text-gray-300 opacity-50" />
+                            <Briefcase className="w-24 h-24 mx-auto mb-6 text-text-muted opacity-50" />
                             <h3 className="text-2xl font-bold text-text-muted mb-2">No team posts yet</h3>
-                            <p className="text-gray-500 mb-4">Be the first to create a team post!</p>
+                            <p className="text-text-muted mb-4">Be the first to create a team post!</p>
                             <button
                                 onClick={() => setIsCreateTeamModalOpen(true)}
-                                className="bg-surface-elevated text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition"
+                                className="bg-surface-elevated text-[#111827] px-6 py-3 rounded-xl font-bold hover:shadow-md transition"
                             >
                                 Create Team Post
                             </button>
@@ -493,7 +493,7 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
             {/* Create Team FAB */}
             <button
                 onClick={() => setIsCreateTeamModalOpen(true)}
-                className="fixed bottom-24 right-6 md:bottom-10 md:right-10 bg-surface-elevated text-white p-4 rounded-full shadow-xl hover:scale-110 transition active:scale-95 z-30 flex items-center gap-2 pr-6"
+                className="fixed bottom-24 right-6 md:bottom-10 md:right-10 bg-surface-elevated text-[#111827] p-4 rounded-full shadow-md hover:scale-110 transition active:scale-95 z-30 flex items-center gap-2 pr-6"
             >
                 <Plus className="w-6 h-6" /> <span className="hidden md:block font-bold">Create Team Post</span>
             </button>
@@ -573,17 +573,17 @@ const TeamPostCard = ({ post, user, onClick, isAdmin, onDelete }) => {
                 </button>
             )}
             {post.image && (
-                <div className="h-48 rounded-xl overflow-hidden mb-4 bg-gray-900 aspect-video w-full">
+                <div className="h-48 rounded-xl overflow-hidden mb-4 bg-surface-elevated aspect-video w-full">
                     <img src={getOptimizedImageUrl(post.image, '16:9')} alt={post.teamName} className="w-full h-full object-cover" />
                 </div>
             )}
             <div className="flex-1">
                 <h3 className="font-bold text-text-main text-xl mb-2">{post.teamName}</h3>
-                <p className="text-gray-300 font-semibold text-sm mb-3">{post.projectName}</p>
+                <p className="text-text-muted font-semibold text-sm mb-3">{post.projectName}</p>
                 <p className="text-text-muted text-sm mb-4 line-clamp-3">{post.description}</p>
                 {post.rolesNeeded && post.rolesNeeded.length > 0 && (
                     <div className="mb-4">
-                        <p className="text-xs font-bold text-gray-500 uppercase mb-2">Roles Needed:</p>
+                        <p className="text-xs font-bold text-text-muted uppercase mb-2">Roles Needed:</p>
                         <div className="flex flex-wrap gap-2">
                             {post.rolesNeeded.map((role, index) => (
                                 <span key={index} className="px-3 py-1 bg-surface-elevated text-text-main rounded-full text-xs font-bold border border-border-strong">
@@ -597,7 +597,7 @@ const TeamPostCard = ({ post, user, onClick, isAdmin, onDelete }) => {
             <div className="pt-4 border-t border-border-strong mt-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
+                        <div className="w-8 h-8 rounded-full bg-surface-highlight overflow-hidden">
                             <img
                                 src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${post.createdByName}`}
                                 alt={post.createdByName}
@@ -701,17 +701,17 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
             <div className="bg-surface-base rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
                 <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
-                    <h3 className="font-bold text-lg text-gray-300">Create Team Post</h3>
-                    <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
+                    <h3 className="font-bold text-lg text-text-muted">Create Team Post</h3>
+                    <button onClick={onClose}><X className="w-5 h-5 text-text-muted" /></button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
                     {/* Image Upload */}
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Team Image (Optional)</label>
+                        <label className="block text-xs font-bold text-text-muted uppercase mb-1">Team Image (Optional)</label>
                         <div
                             onClick={() => fileInputRef.current.click()}
-                            className="border-2 border-dashed border-gray-300 rounded-xl h-32 flex flex-col items-center justify-center text-text-muted hover:bg-surface-elevated transition cursor-pointer relative overflow-hidden"
+                            className="border-2 border-dashed border-border-strong rounded-xl h-32 flex flex-col items-center justify-center text-text-muted hover:bg-surface-elevated transition cursor-pointer relative overflow-hidden"
                         >
                             {formData.image ? (
                                 <img src={getOptimizedImageUrl(formData.image, '16:9')} className="w-full h-full object-cover" alt="Preview" />
@@ -726,7 +726,7 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Team Name</label>
+                        <label className="block text-xs font-bold text-text-muted uppercase mb-1">Team Name</label>
                         <input
                             required
                             value={formData.teamName}
@@ -737,7 +737,7 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Hackathon/Project Name</label>
+                        <label className="block text-xs font-bold text-text-muted uppercase mb-1">Hackathon/Project Name</label>
                         <input
                             required
                             value={formData.projectName}
@@ -748,7 +748,7 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+                        <label className="block text-xs font-bold text-text-muted uppercase mb-1">Description</label>
                         <textarea
                             required
                             value={formData.description}
@@ -761,11 +761,11 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
 
                     <div>
                         <div className="flex justify-between items-center mb-2">
-                            <label className="block text-xs font-bold text-gray-500 uppercase">Roles Needed</label>
+                            <label className="block text-xs font-bold text-text-muted uppercase">Roles Needed</label>
                             <button
                                 type="button"
                                 onClick={handleAddRole}
-                                className="text-gray-300 text-xs font-bold hover:text-gray-300-hover"
+                                className="text-text-muted text-xs font-bold hover:text-text-muted-hover"
                             >
                                 + Add Role
                             </button>
@@ -796,7 +796,7 @@ const CreateTeamModal = ({ isOpen, onClose, user, userData, onSuccess }) => {
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="w-full bg-surface-elevated hover:bg-surface-elevated-hover text-white font-bold py-3 rounded-xl shadow-lg transition flex justify-center"
+                        className="w-full bg-surface-elevated hover:bg-surface-elevated-hover text-[#111827] font-bold py-3 rounded-xl shadow-md transition flex justify-center"
                     >
                         {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Team Post"}
                     </button>
@@ -819,14 +819,14 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                         <p className="text-xs uppercase tracking-[0.3em] text-text-muted">Profile Preview</p>
                         <h3 className="text-2xl font-black text-text-main">{profile.name || 'Student'}</h3>
                     </div>
-                    <button onClick={onClose} className="text-gray-500 hover:text-text-muted">
+                    <button onClick={onClose} className="text-text-muted hover:text-text-muted">
                         <X className="w-6 h-6" />
                     </button>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6 p-6">
                     <div className="space-y-4">
                         <div className="flex items-center gap-4">
-                            <div className="w-24 h-24 rounded-2xl overflow-hidden border-4 border-blue-50 shadow-lg aspect-square">
+                            <div className="w-24 h-24 rounded-2xl overflow-hidden border-4 border-blue-50 shadow-md aspect-square">
                                 <img
                                     src={profile.profileImage ? getOptimizedImageUrl(profile.profileImage, '1:1') : `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name || 'User'}`}
                                     alt={profile.name}
@@ -834,7 +834,7 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                                 />
                             </div>
                             <div>
-                                <p className="text-sm font-semibold text-gray-500">{profile.branch || 'Branch'} • {profile.year || 'Year'}</p>
+                                <p className="text-sm font-semibold text-text-muted">{profile.branch || 'Branch'} • {profile.year || 'Year'}</p>
                                 <div className="mt-2 flex flex-wrap gap-2">
                                     <span className="px-3 py-1 rounded-full text-xs font-bold bg-surface-elevated text-text-main border border-border-strong">
                                         {profile.status === 'busy' ? 'Currently Busy' : 'Open to Work'}
@@ -856,7 +856,7 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                                 <p className="text-xs uppercase font-bold text-text-muted mb-2">Skills</p>
                                 <div className="flex flex-wrap gap-2">
                                     {profile.skills.split(',').map((skill, index) => (
-                                        <span key={index} className="px-3 py-1 rounded-full text-xs font-bold bg-gray-900 text-text-muted">
+                                        <span key={index} className="px-3 py-1 rounded-full text-xs font-bold bg-surface-elevated text-text-muted">
                                             {skill.trim()}
                                         </span>
                                     ))}
@@ -867,7 +867,7 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                             {profile.github && (
                                 <button
                                     onClick={() => window.open(profile.github, '_blank')}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-gray-300 font-bold text-sm"
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-elevated text-text-muted font-bold text-sm"
                                 >
                                     <Github className="w-4 h-4" /> GitHub
                                 </button>
@@ -890,7 +890,7 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                                             window.location.href = `mailto:${profile.email}`;
                                         }
                                     }}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white font-bold text-sm hover:bg-gray-800 transition"
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-elevated text-[#111827] font-bold text-sm hover:bg-surface-highlight transition"
                                 >
                                     <MessageSquare className="w-4 h-4" /> Message
                                 </button>
@@ -902,7 +902,7 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                             <p className="text-xs uppercase font-bold text-text-muted">Showcase</p>
                             <button
                                 onClick={onInvite}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-elevated text-white font-bold text-sm shadow-lg"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-elevated text-[#111827] font-bold text-sm shadow-md"
                             >
                                 <Send className="w-4 h-4" /> Invite to Team
                             </button>
@@ -919,7 +919,7 @@ const ProfilePreviewModal = ({ isOpen, profile, onClose, onInvite, setActiveTab,
                                         {project.link && (
                                             <button
                                                 onClick={() => window.open(project.link, '_blank')}
-                                                className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-gray-300"
+                                                className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-text-muted"
                                             >
                                                 <LinkIcon className="w-4 h-4" /> Open Project
                                             </button>
@@ -958,13 +958,13 @@ const InviteModal = ({ isOpen, onClose, profile, onSend }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
             <div className="bg-surface-base rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
                 <div className="p-4 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
-                    <h3 className="font-bold text-lg text-gray-300">Invite {profile.name}</h3>
-                    <button onClick={onClose}><X className="w-5 h-5 text-gray-500" /></button>
+                    <h3 className="font-bold text-lg text-text-muted">Invite {profile.name}</h3>
+                    <button onClick={onClose}><X className="w-5 h-5 text-text-muted" /></button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Project/Hackathon Name</label>
+                        <label className="block text-xs font-bold text-text-muted uppercase mb-1">Project/Hackathon Name</label>
                         <input
                             required
                             value={projectName}
@@ -973,12 +973,12 @@ const InviteModal = ({ isOpen, onClose, profile, onSend }) => {
                             placeholder="e.g., Statewide Hackathon 2025"
                         />
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-text-muted">
                         An invitation will be sent via email and saved to their notifications.
                     </p>
                     <button
                         type="submit"
-                        className="w-full bg-surface-elevated hover:bg-surface-elevated-hover text-white font-bold py-3 rounded-xl shadow-lg transition"
+                        className="w-full bg-surface-elevated hover:bg-surface-elevated-hover text-[#111827] font-bold py-3 rounded-xl shadow-md transition"
                     >
                         Send Invitation
                     </button>
@@ -1153,18 +1153,18 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                         </div>
                     ) : (
                         <div className="h-64 md:h-80 bg-gradient-to-r from-[#2D2A26] via-[#1C1917] to-[#2D2A26] flex items-center justify-center">
-                            <Briefcase className="w-24 h-24 text-white/30" />
+                            <Briefcase className="w-24 h-24 text-[#111827]/30" />
                         </div>
                     )}
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 bg-surface-base/90 backdrop-blur-md p-2 rounded-full hover:bg-surface-base transition shadow-lg"
+                        className="absolute top-4 right-4 bg-surface-base/90 backdrop-blur-md p-2 rounded-full hover:bg-surface-base transition shadow-md"
                     >
                         <X className="w-5 h-5 text-text-muted" />
                     </button>
                     <button
                         onClick={handleShare}
-                        className="absolute top-4 right-16 bg-surface-base/90 backdrop-blur-md p-2 rounded-full hover:bg-surface-base transition shadow-lg"
+                        className="absolute top-4 right-16 bg-surface-base/90 backdrop-blur-md p-2 rounded-full hover:bg-surface-base transition shadow-md"
                     >
                         <Share2 className="w-5 h-5 text-text-muted" />
                     </button>
@@ -1177,7 +1177,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                         <div className="flex items-start justify-between mb-3">
                             <div className="flex-1">
                                 <h1 className="text-3xl md:text-4xl font-black text-text-main mb-2">{post.teamName}</h1>
-                                <div className="flex items-center gap-3 text-gray-300 font-bold text-lg">
+                                <div className="flex items-center gap-3 text-text-muted font-bold text-lg">
                                     <Briefcase className="w-5 h-5" />
                                     <span>{post.projectName}</span>
                                 </div>
@@ -1188,7 +1188,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                 </span>
                             )}
                         </div>
-                        <div className="flex items-center gap-4 text-sm text-gray-500 mt-4">
+                        <div className="flex items-center gap-4 text-sm text-text-muted mt-4">
                             <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4" />
                                 <span>Posted {formatDate(post.createdAt)}</span>
@@ -1224,10 +1224,10 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                         <h2 className="text-xl font-bold text-text-main mb-4">Team Leader</h2>
                         {loadingProfile ? (
                             <div className="flex items-center gap-4">
-                                <div className="w-16 h-16 rounded-full bg-gray-200 animate-pulse"></div>
+                                <div className="w-16 h-16 rounded-full bg-surface-highlight animate-pulse"></div>
                                 <div className="flex-1">
-                                    <div className="h-5 bg-gray-200 rounded mb-2 animate-pulse"></div>
-                                    <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse"></div>
+                                    <div className="h-5 bg-surface-highlight rounded mb-2 animate-pulse"></div>
+                                    <div className="h-4 bg-surface-highlight rounded w-2/3 animate-pulse"></div>
                                 </div>
                             </div>
                         ) : (
@@ -1243,7 +1243,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                     <div className="flex items-center gap-2 mb-1">
                                         <h3 className="font-bold text-text-main text-lg">{post.createdByName}</h3>
                                         {creatorProfile?.email && (creatorProfile.email.endsWith('@jec.ac.in') || creatorProfile.email.endsWith('@college.edu')) && (
-                                            <CheckCircle2 className="w-5 h-5 text-gray-300" />
+                                            <CheckCircle2 className="w-5 h-5 text-text-muted" />
                                         )}
                                     </div>
                                     <p className="text-text-muted text-sm">
@@ -1265,7 +1265,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                             href={creatorProfile.github}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="p-2 bg-surface-base rounded-lg hover:bg-gray-900 transition"
+                                            className="p-2 bg-surface-base rounded-lg hover:bg-surface-elevated transition"
                                         >
                                             <Github className="w-5 h-5 text-text-muted" />
                                         </a>
@@ -1275,9 +1275,9 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                             href={creatorProfile.linkedin}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="p-2 bg-surface-base rounded-lg hover:bg-gray-900 transition"
+                                            className="p-2 bg-surface-base rounded-lg hover:bg-surface-elevated transition"
                                         >
-                                            <Linkedin className="w-5 h-5 text-gray-300" />
+                                            <Linkedin className="w-5 h-5 text-text-muted" />
                                         </a>
                                     )}
                                 </div>
@@ -1292,7 +1292,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                 <button
                                     onClick={handleJoinTeam}
                                     disabled={applying}
-                                    className="flex-1 bg-surface-elevated hover:bg-surface-elevated-hover text-white font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-lg"
+                                    className="flex-1 bg-surface-elevated hover:bg-surface-elevated-hover text-[#111827] font-bold py-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-lg"
                                 >
                                     {applying ? (
                                         <>
@@ -1318,7 +1318,7 @@ const TeamPostDetailModal = ({ isOpen, onClose, post, user, userData }) => {
                                                 window.location.href = `mailto:${creatorProfile.email}?subject=${subject}&body=${body}`;
                                             }
                                         }}
-                                        className="flex-1 bg-surface-base border-2 border-accent-dark text-gray-300 font-bold py-4 rounded-xl hover:bg-surface-elevated transition flex items-center justify-center gap-2 text-lg"
+                                        className="flex-1 bg-surface-base border-2 border-accent-dark text-text-muted font-bold py-4 rounded-xl hover:bg-surface-elevated transition flex items-center justify-center gap-2 text-lg"
                                     >
                                         <Mail className="w-5 h-5" />
                                         Contact Leader

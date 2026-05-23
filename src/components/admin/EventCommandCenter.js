@@ -216,7 +216,7 @@ export default function EventCommandCenter({ event, onClose }) {
                                                     className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition ${
                                                         p.checkedIn 
                                                             ? 'bg-brand-accent/20 text-brand-accent hover:bg-red-500/20 hover:text-red-500' 
-                                                            : 'bg-surface-highlight text-text-muted hover:bg-brand-accent hover:text-white'
+                                                            : 'bg-surface-highlight text-text-muted hover:bg-brand-accent hover:text-[#111827]'
                                                     }`}
                                                 >
                                                     {p.checkedIn ? (

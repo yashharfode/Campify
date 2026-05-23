@@ -79,14 +79,14 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
     if (initialLoading) return <Skeletons />;
 
     return (
-        <div className="relative min-h-full pb-24 pt-6 px-4 md:px-8 max-w-7xl mx-auto">
+        <div className="relative min-h-full pb-12 pt-6 px-4 md:px-6 max-w-7xl mx-auto space-y-8">
             {/* Ambient Lighting System */}
             <div className="absolute top-0 left-10 w-96 h-96 bg-brand-accent/20 rounded-full blur-[120px] pointer-events-none -z-10"></div>
             <div className="absolute top-40 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
             <div className="absolute bottom-40 left-1/2 -translate-x-1/2 w-[500px] h-96 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
 
             {/* Smart Hero Section */}
-            <div className="relative overflow-hidden bg-surface-elevated/80 backdrop-blur-xl border border-border-strong rounded-3xl p-6 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between shadow-xl mb-10 group transition-all duration-500 hover:shadow-2xl hover:border-brand-accent/40">
+            <div className="relative overflow-hidden bg-surface-elevated/60 backdrop-blur-2xl border border-border-strong/30 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] mb-4 group transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(192,132,87,0.2)] hover:border-brand-accent/30 hover:-translate-y-1">
                 <div className="absolute inset-0 bg-gradient-to-br from-brand-accent/5 to-transparent pointer-events-none z-0"></div>
                 
                 <div className="z-10 flex flex-col gap-4">
@@ -122,7 +122,7 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
                     <div className="absolute inset-0 bg-brand-accent/20 rounded-full blur-xl group-hover:bg-brand-accent/40 transition-all duration-500"></div>
                     <div 
                         onClick={() => setActiveTab('profile')}
-                        className="w-24 h-24 md:w-32 md:h-32 bg-surface-base rounded-full flex items-center justify-center overflow-hidden border-4 border-surface-elevated shadow-xl cursor-pointer relative z-10 transform transition-transform duration-300 hover:scale-105 hover:rotate-3"
+                        className="w-24 h-24 md:w-32 md:h-32 bg-surface-base rounded-full flex items-center justify-center overflow-hidden border-4 border-surface-elevated shadow-lg cursor-pointer relative z-10 transform transition-transform duration-300 hover:scale-105 hover:rotate-3"
                     >
                         {userData?.profileImage ? (
                             <img src={userData.profileImage} className="w-full h-full object-cover" alt="Profile" />
@@ -134,13 +134,13 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
             </div>
 
             {/* Sponsored Ads (Optional, if exists) */}
-            <div className="mb-10">
+            <div className="mb-4 mt-2">
                 <SponsoredAds />
             </div>
 
             {/* Smart Quick Actions */}
-            <div className="mb-12">
-                <h3 className="font-black font-outfit text-xl md:text-2xl text-text-main mb-6 flex items-center gap-2">
+            <div>
+                <h3 className="font-black font-outfit text-xl md:text-2xl text-text-main mb-4 flex items-center gap-2">
                     <Sparkles className="w-6 h-6 text-brand-accent" /> Quick Actions
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -181,8 +181,8 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
 
             {/* Netflix-Style Featured Events */}
             {featuredEvents.length > 0 && (
-                <div className="mb-12">
-                    <h3 className="font-black font-outfit text-xl md:text-2xl text-text-main mb-6 flex items-center gap-2">
+                <div>
+                    <h3 className="font-black font-outfit text-xl md:text-2xl text-text-main mb-4 flex items-center gap-2">
                         <TrendingUp className="w-6 h-6 text-pink-500" /> Trending Events
                     </h3>
                     <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
@@ -193,7 +193,7 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
                                     window.dispatchEvent(new CustomEvent('open-event', { detail: event }));
                                     setActiveTab('discover');
                                 }}
-                                className="group snap-center min-w-[280px] md:min-w-[340px] aspect-[4/5] md:aspect-video relative rounded-3xl overflow-hidden cursor-pointer shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-border-strong/50"
+                                className="group snap-center min-w-[300px] md:min-w-[400px] aspect-[4/5] md:aspect-[4/3] relative rounded-3xl overflow-hidden cursor-pointer shadow-md transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-2 border border-border-strong/20 hover:border-white/10"
                             >
                                 <div className="absolute inset-0 bg-surface-elevated">
                                     {event.image ? (
@@ -202,27 +202,27 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
                                         <div className="w-full h-full bg-gradient-to-br from-brand-accent/20 to-blue-500/20"></div>
                                     )}
                                 </div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95 group-hover:via-black/60 transition-colors duration-500"></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent group-hover:from-black/100 group-hover:via-black/70 transition-colors duration-500"></div>
                                 
                                 <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                                    <span className="px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-bold border border-white/10 uppercase tracking-wide">
+                                    <span className="px-3 py-1.5 rounded-full bg-surface-elevated/20 backdrop-blur-md text-[#111827] text-xs font-bold border border-white/10 uppercase tracking-wide">
                                         {event.category}
                                     </span>
-                                    <div className="bg-black/40 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-1.5">
+                                    <div className="bg-black/40 backdrop-blur-md text-[#111827] text-xs font-bold px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-1.5">
                                         <Calendar className="w-3.5 h-3.5" />
                                         {event.date}
                                     </div>
                                 </div>
 
                                 <div className="absolute bottom-0 left-0 right-0 p-6 transform transition-transform duration-500">
-                                    <h4 className="font-black font-outfit text-white text-2xl mb-2 line-clamp-2 leading-tight">
+                                    <h4 className="font-black font-outfit text-[#111827] text-2xl mb-2 line-clamp-2 leading-tight">
                                         {event.title}
                                     </h4>
-                                    <p className="text-gray-300 text-sm flex items-center gap-1.5 font-medium mb-0 group-hover:mb-4 transition-all duration-500 opacity-80">
+                                    <p className="text-text-muted text-sm flex items-center gap-1.5 font-medium mb-0 group-hover:mb-4 transition-all duration-500 opacity-80">
                                         <MapPin className="w-4 h-4" /> {event.location}
                                     </p>
                                     <div className="overflow-hidden max-h-0 group-hover:max-h-20 transition-all duration-500 opacity-0 group-hover:opacity-100">
-                                        <div className="w-full py-2.5 bg-brand-accent text-white rounded-xl text-sm font-bold text-center flex items-center justify-center gap-2">
+                                        <div className="w-full py-2.5 bg-brand-accent text-[#111827] rounded-xl text-sm font-bold text-center flex items-center justify-center gap-2">
                                             View Details <ChevronRight className="w-4 h-4" />
                                         </div>
                                     </div>
@@ -235,7 +235,7 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
 
             {/* Scholarships & Opportunities */}
             <div>
-                <h3 className="font-black font-outfit text-xl md:text-2xl text-text-main mb-6 flex items-center gap-2">
+                <h3 className="font-black font-outfit text-xl md:text-2xl text-text-main mb-4 flex items-center gap-2">
                     <GraduationCap className="w-6 h-6 text-brand-accent" /> Scholarships & Opportunities
                 </h3>
 
@@ -255,7 +255,7 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
                             <div
                                 key={scholarship.id}
                                 onClick={() => setSelectedScholarship(scholarship)}
-                                className="group relative bg-surface-elevated border border-border-strong rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl hover:border-brand-accent/40 cursor-pointer overflow-hidden flex flex-col h-full"
+                                className="group relative bg-surface-elevated/80 backdrop-blur-xl border border-border-strong/40 rounded-3xl p-6 transition-all duration-500 hover:shadow-[0_15px_35px_-10px_rgba(192,132,87,0.15)] hover:border-brand-accent/30 cursor-pointer overflow-hidden flex flex-col h-full hover:-translate-y-1"
                             >
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-accent/5 rounded-full blur-2xl group-hover:bg-brand-accent/10 transition-colors"></div>
                                 
@@ -280,7 +280,7 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
                                         <p className="text-sm text-text-muted font-medium mb-3">{scholarship.provider}</p>
                                     )}
                                     {scholarship.amount && (
-                                        <div className="inline-block bg-green-500/10 border border-green-500/20 px-4 py-2 rounded-xl mb-4">
+                                        <div className="inline-block bg-green-500/20 border border-green-500/40 px-4 py-2 rounded-xl mb-4">
                                             <p className="text-md font-black text-green-500 tracking-wide">💰 {scholarship.amount}</p>
                                         </div>
                                     )}
@@ -318,7 +318,7 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
                             {/* Amount & Deadline */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {selectedScholarship.amount && (
-                                    <div className="bg-green-500/5 border border-green-500/20 rounded-2xl p-5">
+                                    <div className="bg-green-500/5 border border-green-500/40 rounded-2xl p-5">
                                         <p className="text-xs font-bold text-text-muted uppercase mb-2 tracking-wider">Financial Support</p>
                                         <p className="text-2xl font-black text-green-500">💰 {selectedScholarship.amount}</p>
                                     </div>
@@ -359,7 +359,7 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
                                         href={selectedScholarship.website}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-full flex items-center justify-center gap-2 bg-brand-accent text-white px-6 py-4 rounded-2xl font-bold hover:bg-[#386d31] hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                                        className="w-full flex items-center justify-center gap-2 bg-brand-accent text-[#111827] px-6 py-4 rounded-2xl font-bold hover:bg-[#386d31] hover:shadow-md hover:-translate-y-1 transition-all duration-300"
                                     >
                                         <ExternalLink className="w-5 h-5" />
                                         Visit Official Portal
@@ -379,7 +379,7 @@ function QuickActionTile({ icon, title, desc, color, bg, onClick }) {
     return (
         <div 
             onClick={onClick}
-            className="group relative bg-surface-elevated border border-border-strong rounded-3xl p-6 cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-border-strong/80 hover:-translate-y-1"
+            className="group relative bg-surface-elevated/80 backdrop-blur-xl border border-border-strong/40 rounded-3xl p-6 cursor-pointer overflow-hidden shadow-sm transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(192,132,87,0.3)] hover:border-brand-accent/30 hover:-translate-y-2 hover:scale-[1.02]"
         >
             <div className={`absolute -right-6 -top-6 w-24 h-24 ${bg}/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700`}></div>
             

@@ -286,7 +286,7 @@ export default function Notes({ user, userData }) {
                 <button
                     onClick={() => setActiveTab('all')}
                     className={`min-w-[120px] flex-1 px-3 md:px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 ${
-                        activeTab === 'all' ? 'bg-brand-accent text-white' : 'text-text-muted hover:bg-surface-2'
+                        activeTab === 'all' ? 'bg-brand-accent text-[#111827]' : 'text-text-muted hover:bg-surface-2'
                     }`}
                 >
                     <BookOpen className="w-4 h-4" /> All Notes
@@ -294,7 +294,7 @@ export default function Notes({ user, userData }) {
                 <button
                     onClick={() => setActiveTab('my-notes')}
                     className={`min-w-[120px] flex-1 px-3 md:px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 ${
-                        activeTab === 'my-notes' ? 'bg-brand-accent text-white' : 'text-text-muted hover:bg-surface-2'
+                        activeTab === 'my-notes' ? 'bg-brand-accent text-[#111827]' : 'text-text-muted hover:bg-surface-2'
                     }`}
                 >
                     <FileText className="w-4 h-4" /> My Notes
@@ -302,7 +302,7 @@ export default function Notes({ user, userData }) {
                 <button
                     onClick={() => setActiveTab('upload')}
                     className={`min-w-[132px] flex-1 px-3 md:px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 ${
-                        activeTab === 'upload' ? 'bg-brand-accent text-white' : 'text-text-muted hover:bg-surface-2'
+                        activeTab === 'upload' ? 'bg-brand-accent text-[#111827]' : 'text-text-muted hover:bg-surface-2'
                     }`}
                 >
                     <Upload className="w-4 h-4" /> Upload Note
@@ -331,7 +331,7 @@ export default function Notes({ user, userData }) {
                                     placeholder="Search notes..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-surface-elevated border border-gray-300 text-text-main rounded-lg focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent text-sm"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-surface-elevated border border-border-strong text-text-main rounded-lg focus:ring-2 focus:ring-[#C08457] focus:border-transparent text-sm"
                                 />
                             </div>
 
@@ -341,7 +341,7 @@ export default function Notes({ user, userData }) {
                                     <select
                                         value={filterBranch}
                                         onChange={handleFilterBranchChange}
-                                        className="w-full bg-surface-elevated border border-gray-300 text-text-main rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
+                                        className="w-full bg-surface-elevated border border-border-strong text-text-main rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#C08457]"
                                     >
                                         <option value="All">All Branches</option>
                                         {Object.keys(categories).map(branch => (
@@ -356,7 +356,7 @@ export default function Notes({ user, userData }) {
                                         value={filterSem}
                                         onChange={handleFilterSemChange}
                                         disabled={filterBranch === 'All'}
-                                        className="w-full bg-surface-elevated border border-gray-300 text-text-main rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27] disabled:opacity-50"
+                                        className="w-full bg-surface-elevated border border-border-strong text-text-main rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#C08457] disabled:opacity-50"
                                     >
                                         <option value="All">All Semesters</option>
                                         {availableFilterSems.map(sem => (
@@ -371,7 +371,7 @@ export default function Notes({ user, userData }) {
                                         value={filterSubject}
                                         onChange={(e) => setFilterSubject(e.target.value)}
                                         disabled={filterSem === 'All'}
-                                        className="w-full bg-surface-elevated border border-gray-300 text-text-main rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27] disabled:opacity-50"
+                                        className="w-full bg-surface-elevated border border-border-strong text-text-main rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#C08457] disabled:opacity-50"
                                     >
                                         <option value="All">All Subjects</option>
                                         {availableFilterSubjects.map(sub => (
@@ -385,7 +385,7 @@ export default function Notes({ user, userData }) {
                                     <select
                                         value={filterUnit}
                                         onChange={(e) => setFilterUnit(e.target.value)}
-                                        className="w-full bg-surface-elevated border border-gray-300 text-text-main rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
+                                        className="w-full bg-surface-elevated border border-border-strong text-text-main rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#C08457]"
                                     >
                                         {UNITS.map(unit => (
                                             <option key={unit} value={unit}>{unit}</option>
@@ -401,12 +401,12 @@ export default function Notes({ user, userData }) {
                         {loading ? (
                             <div className="flex flex-col items-center justify-center h-64 bg-surface-base border border-border-strong rounded-xl shadow-sm">
                                 <Loader2 className="w-10 h-10 animate-spin text-[#0f4c52] mb-4" />
-                                <p className="text-gray-500 font-bold tracking-wide">Loading notes...</p>
+                                <p className="text-text-muted font-bold tracking-wide">Loading notes...</p>
                             </div>
                         ) : filteredNotes.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-64 bg-surface-base border border-border-strong rounded-xl shadow-sm">
-                                <FileText className="w-16 h-16 text-gray-300 mb-4" />
-                                <p className="text-gray-500 font-bold text-lg">No notes found</p>
+                                <FileText className="w-16 h-16 text-text-muted mb-4" />
+                                <p className="text-text-muted font-bold text-lg">No notes found</p>
                                 <p className="text-text-muted text-sm">Try adjusting your filters.</p>
                             </div>
                         ) : (
@@ -414,20 +414,20 @@ export default function Notes({ user, userData }) {
                                 {filteredNotes.map(note => (
                                     <div key={note.id} className="bg-surface-base rounded-xl border border-border-strong overflow-hidden hover:shadow-md transition group flex flex-col h-full">
                                         {/* Cover Image */}
-                                        <div className="h-32 bg-gray-900 overflow-hidden relative border-b border-border-strong aspect-video w-full">
+                                        <div className="h-32 bg-surface-elevated overflow-hidden relative border-b border-border-strong aspect-video w-full">
                                             {note.coverImage ? (
                                                 <img src={getOptimizedImageUrl(note.coverImage, '16:9')} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt={note.title} />
                                             ) : (
-                                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#242424]">
-                                                    <BookOpen className="w-12 h-12 text-gray-300" />
+                                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FFFFFF] to-[#F3F0EA]">
+                                                    <BookOpen className="w-12 h-12 text-text-muted" />
                                                 </div>
                                             )}
                                             <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
-                                                <span className="bg-brand-accent text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                                                <span className="bg-brand-accent text-[#111827] text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
                                                     {note.semester}
                                                 </span>
                                                 {note.unit !== 'All Units' && (
-                                                    <span className="bg-[#2f2f2f] text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                                                    <span className="bg-[#2f2f2f] text-[#111827] text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
                                                         {note.unit}
                                                     </span>
                                                 )}
@@ -443,15 +443,15 @@ export default function Notes({ user, userData }) {
                                                 <p className="text-text-muted text-xs font-semibold">{note.subject}</p>
                                             </div>
                                             
-                                            <p className="text-sm text-gray-500 mb-4 line-clamp-2 flex-1">{note.description || 'No description provided.'}</p>
+                                            <p className="text-sm text-text-muted mb-4 line-clamp-2 flex-1">{note.description || 'No description provided.'}</p>
                                             
                                             <div className="flex items-center justify-between mt-auto pt-3 border-t border-border-strong">
                                                 <div className="flex items-center gap-1.5">
-                                                    <span className="text-xs text-gray-500 font-medium truncate max-w-[100px]">By {note.uploadedByName}</span>
+                                                    <span className="text-xs text-text-muted font-medium truncate max-w-[100px]">By {note.uploadedByName}</span>
                                                 </div>
                                                 <button
                                                     onClick={() => handleDownload(note)}
-                                                    className="bg-brand-accent hover:bg-brand-accent-hover text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                                                    className="bg-brand-accent hover:bg-brand-accent-hover text-[#111827] px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
                                                 >
                                                     <LinkIcon className="w-3.5 h-3.5" /> Open
                                                 </button>
@@ -470,11 +470,11 @@ export default function Notes({ user, userData }) {
                 <div>
                     {myNotes.length === 0 ? (
                          <div className="flex flex-col items-center justify-center py-12 bg-surface-base border border-border-strong rounded-xl shadow-sm">
-                             <FileText className="w-16 h-16 text-gray-300 mb-4" />
-                             <p className="text-gray-500 font-bold text-lg mb-4">You haven't uploaded any notes yet.</p>
+                             <FileText className="w-16 h-16 text-text-muted mb-4" />
+                             <p className="text-text-muted font-bold text-lg mb-4">You haven't uploaded any notes yet.</p>
                              <button
                                  onClick={() => setActiveTab('upload')}
-                                 className="bg-brand-accent text-white px-6 py-2.5 rounded-lg font-bold hover:bg-brand-accent-hover transition shadow-md"
+                                 className="bg-brand-accent text-[#111827] px-6 py-2.5 rounded-lg font-bold hover:bg-brand-accent-hover transition shadow-md"
                              >
                                  Upload Your First Note
                              </button>
@@ -484,12 +484,12 @@ export default function Notes({ user, userData }) {
                             {myNotes.map(note => (
                                 <div key={note.id} className="bg-surface-base rounded-xl border border-border-strong overflow-hidden hover:shadow-md transition flex flex-col shadow-sm">
                                     {/* Cover Image */}
-                                    <div className="h-28 bg-gray-900 overflow-hidden relative border-b border-border-strong aspect-video w-full">
+                                    <div className="h-28 bg-surface-elevated overflow-hidden relative border-b border-border-strong aspect-video w-full">
                                         {note.coverImage ? (
                                             <img src={getOptimizedImageUrl(note.coverImage, '16:9')} className="w-full h-full object-cover" alt={note.title} />
                                         ) : (
-                                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#242424]">
-                                                <BookOpen className="w-10 h-10 text-gray-300" />
+                                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FFFFFF] to-[#F3F0EA]">
+                                                <BookOpen className="w-10 h-10 text-text-muted" />
                                             </div>
                                         )}
                                         <div className="absolute top-2 right-2">
@@ -502,13 +502,13 @@ export default function Notes({ user, userData }) {
                                                 {note.semester} • {note.unit}
                                             </span>
                                             <h3 className="font-bold text-text-main text-sm leading-tight mb-1 line-clamp-1">{note.title}</h3>
-                                            <p className="text-gray-500 text-xs font-medium line-clamp-1">{note.subject}</p>
+                                            <p className="text-text-muted text-xs font-medium line-clamp-1">{note.subject}</p>
                                         </div>
                                         
                                         {note.status === 'approved' && (
                                             <button
                                                 onClick={() => handleDownload(note)}
-                                                className="mt-auto w-full bg-gray-900 hover:bg-gray-200 text-gray-300 px-3 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 border border-border-strong"
+                                                className="mt-auto w-full bg-surface-elevated hover:bg-surface-highlight text-text-muted px-3 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 border border-border-strong"
                                             >
                                                 <LinkIcon className="w-3.5 h-3.5" /> Open Drive Link
                                             </button>
@@ -525,7 +525,7 @@ export default function Notes({ user, userData }) {
             {activeTab === 'upload' && (
                 <div className="bg-surface-base rounded-2xl border border-border-strong p-6 md:p-8 max-w-2xl mx-auto shadow-md">
                     <h2 className="text-2xl font-bold text-text-main mb-2">Upload Study Note</h2>
-                    <p className="text-gray-500 text-sm mb-8">Share your materials. All uploads are reviewed before publishing.</p>
+                    <p className="text-text-muted text-sm mb-8">Share your materials. All uploads are reviewed before publishing.</p>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
@@ -535,7 +535,7 @@ export default function Notes({ user, userData }) {
                                 type="text"
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent transition"
+                                className="w-full border border-border-strong rounded-lg p-3 focus:ring-2 focus:ring-[#C08457] focus:border-transparent transition"
                                 placeholder="e.g., Calculus Formula Sheet"
                             />
                         </div>
@@ -546,7 +546,7 @@ export default function Notes({ user, userData }) {
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 rows="3"
-                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent transition resize-none"
+                                className="w-full border border-border-strong rounded-lg p-3 focus:ring-2 focus:ring-[#C08457] focus:border-transparent transition resize-none"
                                 placeholder="Briefly describe what this contains..."
                             />
                         </div>
@@ -564,7 +564,7 @@ export default function Notes({ user, userData }) {
                                         required
                                         value={formData.branch}
                                         onChange={handleFormBranchChange}
-                                        className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
+                                        className="w-full border border-border-strong rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#C08457]"
                                     >
                                         {Object.keys(categories).map(branch => (
                                             <option key={branch} value={branch}>{branch}</option>
@@ -577,7 +577,7 @@ export default function Notes({ user, userData }) {
                                         required
                                         value={formData.semester}
                                         onChange={handleFormSemChange}
-                                        className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
+                                        className="w-full border border-border-strong rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#C08457]"
                                     >
                                         {Object.keys(categories[formData.branch] || {}).map(sem => (
                                             <option key={sem} value={sem}>{sem}</option>
@@ -591,7 +591,7 @@ export default function Notes({ user, userData }) {
                                             required
                                             value={formData.subject}
                                             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                            className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
+                                            className="w-full border border-border-strong rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#C08457]"
                                         >
                                             {(categories[formData.branch]?.[formData.semester] || []).map(sub => (
                                                 <option key={sub} value={sub}>{sub}</option>
@@ -603,7 +603,7 @@ export default function Notes({ user, userData }) {
                                         <select
                                             value={formData.unit}
                                             onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                                            className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#2D5A27]"
+                                            className="w-full border border-border-strong rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#C08457]"
                                         >
                                             {UNITS.map(unit => (
                                                 <option key={unit} value={unit}>{unit}</option>
@@ -621,17 +621,17 @@ export default function Notes({ user, userData }) {
                                 type="url"
                                 value={formData.driveLink}
                                 onChange={(e) => setFormData({ ...formData, driveLink: e.target.value })}
-                                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent transition"
+                                className="w-full border border-border-strong rounded-lg p-3 focus:ring-2 focus:ring-[#C08457] focus:border-transparent transition"
                                 placeholder="https://drive.google.com/file/d/..."
                             />
-                            <p className="text-xs text-gray-500 mt-1.5 font-medium">Make sure the link has viewing permissions for everyone</p>
+                            <p className="text-xs text-text-muted mt-1.5 font-medium">Make sure the link has viewing permissions for everyone</p>
                         </div>
 
                         <div>
                             <label className="block text-sm font-bold text-text-muted mb-2">Cover Image (Optional)</label>
                             <div
                                 onClick={() => coverImageInputRef.current?.click()}
-                                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-[#2D5A27] hover:bg-surface-elevated transition group"
+                                className="border-2 border-dashed border-border-strong rounded-xl p-8 text-center cursor-pointer hover:border-[#C08457] hover:bg-surface-elevated transition group"
                             >
                                 {formData.coverImage ? (
                                     <div className="space-y-3">
@@ -640,11 +640,11 @@ export default function Notes({ user, userData }) {
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center">
-                                        <div className="w-12 h-12 rounded-full bg-gray-900 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                                        <div className="w-12 h-12 rounded-full bg-surface-elevated flex items-center justify-center mb-3 group-hover:scale-110 transition">
                                             <ImageIcon className="w-6 h-6 text-text-muted" />
                                         </div>
                                         <p className="text-sm font-bold text-text-muted">Click to upload preview image</p>
-                                        <p className="text-xs text-gray-500 mt-1">16:9 ratio recommended (Max 500KB)</p>
+                                        <p className="text-xs text-text-muted mt-1">16:9 ratio recommended (Max 500KB)</p>
                                     </div>
                                 )}
                                 <input
@@ -670,7 +670,7 @@ export default function Notes({ user, userData }) {
                         <button
                             type="submit"
                             disabled={uploading || categoriesLoading || !formData.subject}
-                            className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white px-6 py-4 rounded-xl font-bold transition disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 text-base shadow-md hover:shadow-lg"
+                            className="w-full bg-brand-accent hover:bg-brand-accent-hover text-[#111827] px-6 py-4 rounded-xl font-bold transition disabled:bg-surface-highlight disabled:text-text-muted disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 text-base shadow-md hover:shadow-md"
                         >
                             {uploading ? (
                                 <>

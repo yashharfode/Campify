@@ -285,7 +285,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-surface-elevated border border-border-strong rounded-xl p-6 shadow-sm">
           <h4 className="text-text-muted text-sm font-medium mb-1">Total Clubs</h4>
-          <p className="text-3xl font-bold text-white">{clubs.length}</p>
+          <p className="text-3xl font-bold text-[#111827]">{clubs.length}</p>
         </div>
         <div className="bg-surface-elevated border border-border-strong rounded-xl p-6 shadow-sm">
           <h4 className="text-text-muted text-sm font-medium mb-1">Active Clubs</h4>
@@ -296,11 +296,11 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
         <div className="bg-surface-elevated border border-border-strong rounded-xl p-6 shadow-sm flex items-center justify-between">
           <div>
             <h4 className="text-text-muted text-sm font-medium mb-1">Quick Action</h4>
-            <p className="text-white text-sm">Add a new organization</p>
+            <p className="text-[#111827] text-sm">Add a new organization</p>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-brand-accent hover:bg-brand-accent-hover text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
+            className="bg-brand-accent hover:bg-brand-accent-hover text-[#111827] px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
           >
             <Plus size={18} /> Add Club
           </button>
@@ -309,24 +309,24 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
 
       {/* Assign President Section */}
       <div className="bg-surface-elevated border border-border-strong rounded-xl p-6 shadow-sm">
-        <h3 className="text-lg font-bold text-white mb-4">Assign Club President</h3>
+        <h3 className="text-lg font-bold text-[#111827] mb-4">Assign Club President</h3>
         <form onSubmit={handleAssignPresident} className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1 w-full">
-            <label className="block text-sm font-medium text-gray-300 mb-1">User Email Address</label>
+            <label className="block text-sm font-medium text-text-muted mb-1">User Email Address</label>
             <input
               type="email"
               value={assignEmail}
               onChange={(e) => setAssignEmail(e.target.value)}
-              className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+              className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-4 py-2.5 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
               placeholder="student@college.edu"
             />
           </div>
           <div className="flex-1 w-full">
-            <label className="block text-sm font-medium text-gray-300 mb-1">Select Club</label>
+            <label className="block text-sm font-medium text-text-muted mb-1">Select Club</label>
             <select
               value={assignClubId}
               onChange={(e) => setAssignClubId(e.target.value)}
-              className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+              className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-4 py-2.5 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
             >
               <option value="">-- Choose a Club --</option>
               {clubs.map(c => (
@@ -337,7 +337,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
           <button
             type="submit"
             disabled={isAssigning}
-            className="bg-brand-accent hover:bg-brand-accent-hover text-white px-6 py-2.5 rounded-lg font-bold transition disabled:opacity-70 h-[46px] min-w-[120px] flex items-center justify-center"
+            className="bg-brand-accent hover:bg-brand-accent-hover text-[#111827] px-6 py-2.5 rounded-lg font-bold transition disabled:opacity-70 h-[46px] min-w-[120px] flex items-center justify-center"
           >
             {isAssigning ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Assign Role'}
           </button>
@@ -350,24 +350,24 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border-strong bg-[#141414]">
-                <th className="p-4 text-sm font-semibold text-gray-300">Club Name</th>
-                <th className="p-4 text-sm font-semibold text-gray-300">Category</th>
-                <th className="p-4 text-sm font-semibold text-gray-300">Status</th>
-                <th className="p-4 text-sm font-semibold text-gray-300">President</th>
-                <th className="p-4 text-sm font-semibold text-gray-300 text-right">Actions</th>
+                <th className="p-4 text-sm font-semibold text-text-muted">Club Name</th>
+                <th className="p-4 text-sm font-semibold text-text-muted">Category</th>
+                <th className="p-4 text-sm font-semibold text-text-muted">Status</th>
+                <th className="p-4 text-sm font-semibold text-text-muted">President</th>
+                <th className="p-4 text-sm font-semibold text-text-muted text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan="5" className="p-8 text-center text-gray-500">
+                  <td colSpan="5" className="p-8 text-center text-text-muted">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                     Loading clubs...
                   </td>
                 </tr>
               ) : clubs.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="p-8 text-center text-gray-500">
+                  <td colSpan="5" className="p-8 text-center text-text-muted">
                     No clubs found. Create one to get started!
                   </td>
                 </tr>
@@ -375,11 +375,11 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                 clubs.map(club => (
                   <tr key={club.id} className="border-b border-border-strong hover:bg-[#202020] transition group">
                     <td className="p-4 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gray-800 overflow-hidden flex items-center justify-center border border-border-subtle">
+                      <div className="w-10 h-10 rounded-full bg-surface-highlight overflow-hidden flex items-center justify-center border border-border-subtle">
                         {club.logoUrl ? (
                           <img src={getOptimizedImageUrl(club.logoUrl, '1:1')} alt={club.name} className="w-full h-full object-cover" />
                         ) : (
-                          <ImageIcon className="w-5 h-5 text-gray-500" />
+                          <ImageIcon className="w-5 h-5 text-text-muted" />
                         )}
                       </div>
                       <div>
@@ -387,11 +387,11 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                           {club.name}
                           {club.isVerified && <ShieldCheck className="w-4 h-4 text-blue-400" title="Verified" />}
                         </div>
-                        <div className="text-xs text-gray-500">{club.email}</div>
+                        <div className="text-xs text-text-muted">{club.email}</div>
                       </div>
                     </td>
                     <td className="p-4">
-                      <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-300 border border-border-subtle">
+                      <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-surface-highlight text-text-muted border border-border-subtle">
                         {club.category}
                       </span>
                     </td>
@@ -409,10 +409,10 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                       {club.presidentName ? (
                         <div>
                           <div className="text-sm font-medium text-text-main">{club.presidentName}</div>
-                          <div className="text-xs text-gray-500">{club.presidentEmail}</div>
+                          <div className="text-xs text-text-muted">{club.presidentEmail}</div>
                         </div>
                       ) : (
-                        <span className="inline-block px-2 py-0.5 rounded-md text-xs font-medium bg-gray-800 text-text-muted border border-border-subtle">
+                        <span className="inline-block px-2 py-0.5 rounded-md text-xs font-medium bg-surface-highlight text-text-muted border border-border-subtle">
                           No President
                         </span>
                       )}
@@ -451,7 +451,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                         )}
                         <button
                           onClick={() => openEditModal(club)}
-                          className="p-1.5 text-text-muted hover:text-white hover:bg-gray-800 rounded-md transition"
+                          className="p-1.5 text-text-muted hover:text-[#111827] hover:bg-surface-highlight rounded-md transition"
                         >
                           <Edit2 size={18} />
                         </button>
@@ -480,10 +480,10 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="bg-surface-elevated rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl border border-border-strong flex flex-col">
             <div className="p-6 border-b border-border-strong flex justify-between items-center bg-surface-elevated shrink-0">
-              <h3 className="font-bold text-xl text-white">
+              <h3 className="font-bold text-xl text-[#111827]">
                 {editingClub ? 'Edit Club' : 'Add New Club'}
               </h3>
-              <button onClick={closeModal} className="text-text-muted hover:text-white transition bg-gray-800/50 hover:bg-gray-800 p-2 rounded-full">
+              <button onClick={closeModal} className="text-text-muted hover:text-[#111827] transition bg-surface-highlight/50 hover:bg-surface-highlight p-2 rounded-full">
                 <X size={20} />
               </button>
             </div>
@@ -493,27 +493,27 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
 
                 {/* Logo Upload */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Club Logo</label>
+                  <label className="block text-sm font-medium text-text-muted mb-2">Club Logo</label>
                   <div className="flex items-center gap-4">
                     <div
-                      className="w-20 h-20 rounded-xl bg-gray-800 border-2 border-dashed border-border-subtle flex items-center justify-center overflow-hidden cursor-pointer hover:border-gray-500 transition"
+                      className="w-20 h-20 rounded-xl bg-surface-highlight border-2 border-dashed border-border-subtle flex items-center justify-center overflow-hidden cursor-pointer hover:border-border-strong transition"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       {logoPreview ? (
                         <img src={getOptimizedImageUrl(logoPreview, '1:1')} alt="Preview" className="w-full h-full object-cover" />
                       ) : (
-                        <ImageIcon className="w-8 h-8 text-gray-500" />
+                        <ImageIcon className="w-8 h-8 text-text-muted" />
                       )}
                     </div>
                     <div>
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+                        className="bg-surface-highlight hover:bg-border-strong text-[#111827] px-4 py-2 rounded-lg text-sm font-medium transition"
                       >
                         Upload Image
                       </button>
-                      <p className="text-xs text-gray-500 mt-2">Max size: 500KB. 1:1 aspect ratio recommended.</p>
+                      <p className="text-xs text-text-muted mt-2">Max size: 500KB. 1:1 aspect ratio recommended.</p>
                       <input
                         type="file"
                         ref={fileInputRef}
@@ -527,19 +527,19 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Club Name *</label>
+                    <label className="block text-sm font-medium text-text-muted mb-1">Club Name *</label>
                     <input
                       {...register('name')}
-                      className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] focus:border-transparent outline-none transition"
+                      className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-4 py-2.5 text-[#111827] focus:ring-2 focus:ring-[#C08457] focus:border-transparent outline-none transition"
                       placeholder="e.g., Cyber-Security Cell"
                     />
                     {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name.message}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Category *</label>
+                    <label className="block text-sm font-medium text-text-muted mb-1">Category *</label>
                     <select
                       {...register('category')}
-                      className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                      className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-4 py-2.5 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
                     >
                       <option value="Tech">Tech</option>
                       <option value="Arts">Arts</option>
@@ -552,21 +552,21 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Tagline *</label>
+                  <label className="block text-sm font-medium text-text-muted mb-1">Tagline *</label>
                   <input
                     {...register('tagline')}
-                    className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                    className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-4 py-2.5 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
                     placeholder="Short catchy description"
                   />
                   {errors.tagline && <p className="text-red-400 text-xs mt-1">{errors.tagline.message}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Description *</label>
+                  <label className="block text-sm font-medium text-text-muted mb-1">Description *</label>
                   <textarea
                     {...register('description')}
                     rows={4}
-                    className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                    className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-4 py-2.5 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
                     placeholder="Tell us about the club's purpose and vision..."
                   />
                   {errors.description && <p className="text-red-400 text-xs mt-1">{errors.description.message}</p>}
@@ -574,10 +574,10 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Membership Status</label>
+                    <label className="block text-sm font-medium text-text-muted mb-1">Membership Status</label>
                     <select
                       {...register('status')}
-                      className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                      className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-4 py-2.5 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
                     >
                       <option value="Active">Active</option>
                       <option value="Inactive">Inactive</option>
@@ -585,11 +585,11 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Club Email *</label>
+                    <label className="block text-sm font-medium text-text-muted mb-1">Club Email *</label>
                     <input
                       {...register('email')}
                       type="email"
-                      className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                      className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-4 py-2.5 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
                       placeholder="official@club.com"
                     />
                     {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
@@ -597,44 +597,44 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Core Team / Head *</label>
+                  <label className="block text-sm font-medium text-text-muted mb-1">Core Team / Head *</label>
                   <input
                     {...register('coreTeam')}
-                    className="w-full bg-gray-900 border border-border-subtle rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-[#2D5A27] outline-none"
+                    className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-4 py-2.5 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
                     placeholder="Name or Email of the President"
                   />
                   {errors.coreTeam && <p className="text-red-400 text-xs mt-1">{errors.coreTeam.message}</p>}
                 </div>
 
                 <div className="space-y-4 pt-4 border-t border-border-strong">
-                  <h4 className="text-white font-medium">Social Links</h4>
+                  <h4 className="text-[#111827] font-medium">Social Links</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs text-text-muted mb-1">Instagram URL</label>
-                      <input {...register('instagram')} className="w-full bg-gray-900 border border-border-subtle rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#2D5A27] outline-none" placeholder="https://instagram.com/..." />
+                      <input {...register('instagram')} className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-3 py-2 text-sm text-[#111827] focus:ring-1 focus:ring-[#C08457] outline-none" placeholder="https://instagram.com/..." />
                       {errors.instagram && <p className="text-red-400 text-xs mt-1">{errors.instagram.message}</p>}
                     </div>
                     <div>
                       <label className="block text-xs text-text-muted mb-1">LinkedIn URL</label>
-                      <input {...register('linkedin')} className="w-full bg-gray-900 border border-border-subtle rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#2D5A27] outline-none" placeholder="https://linkedin.com/..." />
+                      <input {...register('linkedin')} className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-3 py-2 text-sm text-[#111827] focus:ring-1 focus:ring-[#C08457] outline-none" placeholder="https://linkedin.com/..." />
                       {errors.linkedin && <p className="text-red-400 text-xs mt-1">{errors.linkedin.message}</p>}
                     </div>
                     <div>
                       <label className="block text-xs text-text-muted mb-1">GitHub URL</label>
-                      <input {...register('github')} className="w-full bg-gray-900 border border-border-subtle rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#2D5A27] outline-none" placeholder="https://github.com/..." />
+                      <input {...register('github')} className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-3 py-2 text-sm text-[#111827] focus:ring-1 focus:ring-[#C08457] outline-none" placeholder="https://github.com/..." />
                       {errors.github && <p className="text-red-400 text-xs mt-1">{errors.github.message}</p>}
                     </div>
                     <div>
                       <label className="block text-xs text-text-muted mb-1">Website URL (Optional)</label>
-                      <input {...register('website')} className="w-full bg-gray-900 border border-border-subtle rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-[#2D5A27] outline-none" placeholder="https://..." />
+                      <input {...register('website')} className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-3 py-2 text-sm text-[#111827] focus:ring-1 focus:ring-[#C08457] outline-none" placeholder="https://..." />
                       {errors.website && <p className="text-red-400 text-xs mt-1">{errors.website.message}</p>}
                     </div>
                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-border-strong flex items-center gap-3">
-                  <input type="checkbox" id="isVerified" {...register('isVerified')} className="w-4 h-4 rounded border-border-subtle text-brand-accent focus:ring-[#2D5A27] bg-gray-900" />
-                  <label htmlFor="isVerified" className="text-sm font-medium text-gray-300">
+                  <input type="checkbox" id="isVerified" {...register('isVerified')} className="w-4 h-4 rounded border-border-subtle text-brand-accent focus:ring-[#C08457] bg-surface-elevated" />
+                  <label htmlFor="isVerified" className="text-sm font-medium text-text-muted">
                     Grant Verification Badge (Official Club)
                   </label>
                 </div>
@@ -646,7 +646,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                 type="button"
                 onClick={closeModal}
                 disabled={isUploading}
-                className="px-5 py-2.5 rounded-lg font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition disabled:opacity-50"
+                className="px-5 py-2.5 rounded-lg font-medium text-text-muted hover:text-[#111827] hover:bg-surface-highlight transition disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -654,7 +654,7 @@ function ClubsManager({ user, setAppTab, setTargetClubId }) {
                 type="submit"
                 form="clubForm"
                 disabled={isUploading}
-                className="bg-brand-accent hover:bg-brand-accent-hover text-white px-6 py-2.5 rounded-lg font-medium transition disabled:opacity-70 flex items-center gap-2 shadow-[0_0_15px_rgba(45,90,39,0.3)]"
+                className="bg-brand-accent hover:bg-brand-accent-hover text-[#111827] px-6 py-2.5 rounded-lg font-medium transition disabled:opacity-70 flex items-center gap-2 shadow-[0_0_15px_rgba(45,90,39,0.3)]"
               >
                 {isUploading ? (
                   <><Loader2 className="w-5 h-5 animate-spin" /> Saving...</>

@@ -1,35 +1,99 @@
 @import "tailwindcss";
 
 :root {
-  /* Centralized Dark Theme Variables (Silent Coder) */
-  --background: #121212;
-  --foreground: #E0E0E0;
+  /* Centralized Premium Beige Theme Variables (Light Mode) */
+  --background: #FAF7F2;
+  --foreground: #111827;
   
-  --surface: #1A1A1A;
-  --surface-2: #242424;
+  --surface: #FFFFFF;
+  --surface-2: #F3F0EA;
   
-  --ink-soft: #A0A0A0;
-  --line-soft: #333333;
+  --ink-soft: #6B7280;
+  --line-soft: #E7E5E4;
   
-  --accent-deep: #2D5A27;
-  --accent-hover: #397032;
+  --accent-deep: #C08457;
+  --accent-hover: #A6724A;
 
   /* Total Centralization Base Variables */
-  --surface-base: #121212;
-  --surface-elevated: #1A1A1A;
-  --surface-highlight: #242424;
+  --surface-base: #FAF7F2;
+  --surface-elevated: #FFFFFF;
+  --surface-highlight: #F3F0EA;
   
-  --border-strong: #1F2937;
-  --border-subtle: #333333;
+  --border-strong: #E7E5E4;
+  --border-subtle: #E7E5E4;
   
-  --text-main: #E5E7EB;
-  --text-muted: #9CA3AF;
+  --text-main: #111827;
+  --text-muted: #6B7280;
   
-  --brand-accent: #2D5A27;
-  --brand-accent-hover: #397032;
+  --brand-accent: #C08457;
+  --brand-accent-hover: #A6724A;
   
-  --glow-primary: #1b3834;
-  --glow-secondary: #142a27;
+  --glow-primary: rgba(192, 132, 87, 0.5);
+  --glow-secondary: rgba(166, 114, 74, 0.5);
+}
+
+.dark {
+  /* Centralized Apple Premium Theme Variables (Dark Mode) */
+  --background: #000000;
+  --foreground: #F5F5F7;
+  
+  --surface: #1C1C1E;
+  --surface-2: #2C2C2E;
+  
+  --ink-soft: #A1A1AA;
+  --line-soft: #38383A;
+  
+  --accent-deep: #0A84FF;
+  --accent-hover: #007AFF;
+
+  /* Total Centralization Base Variables */
+  --surface-base: #000000;
+  --surface-elevated: #1C1C1E;
+  --surface-highlight: #2C2C2E;
+  
+  --border-strong: #38383A;
+  --border-subtle: #48484A;
+  
+  --text-main: #F5F5F7;
+  --text-muted: #A1A1AA;
+  
+  --brand-accent: #C08457;
+  --brand-accent-hover: #A6724A;
+  
+  --glow-primary: rgba(192, 132, 87, 0.3);
+  --glow-secondary: rgba(166, 114, 74, 0.3);
+}
+
+.zen {
+  /* Centralized Zen Minimal Theme Variables (Focus Mode) */
+  --background: #F9FAFB;
+  --foreground: #18181B;
+  
+  --surface: #FFFFFF;
+  --surface-2: #F4F4F5;
+  
+  --ink-soft: #71717A;
+  --line-soft: #E4E4E7;
+  
+  --accent-deep: #8BA888;
+  --accent-hover: #7A9677;
+
+  /* Total Centralization Base Variables */
+  --surface-base: #F9FAFB;
+  --surface-elevated: #FFFFFF;
+  --surface-highlight: #F4F4F5;
+  
+  --border-strong: #E4E4E7;
+  --border-subtle: #F4F4F5;
+  
+  --text-main: #18181B;
+  --text-muted: #71717A;
+  
+  --brand-accent: #8BA888;
+  --brand-accent-hover: #7A9677;
+  
+  --glow-primary: transparent;
+  --glow-secondary: transparent;
 }
 
 @theme inline {
@@ -46,8 +110,8 @@
   --color-blue-600: var(--accent-deep);
   --color-blue-700: var(--accent-hover);
   --color-blue-800: var(--accent-hover);
-  --color-blue-900: #1b3834;
-  --color-blue-950: #142a27;
+  --color-blue-900: #0A21C0;
+  --color-blue-950: #050A44;
 
   --color-indigo-50: var(--surface-2);
   --color-indigo-100: var(--surface);
@@ -56,8 +120,8 @@
   --color-indigo-600: var(--accent-deep);
   --color-indigo-700: var(--accent-hover);
   --color-indigo-800: var(--accent-hover);
-  --color-indigo-900: #1b3834;
-  --color-indigo-950: #142a27;
+  --color-indigo-900: #0A21C0;
+  --color-indigo-950: #050A44;
 
   --color-purple-50: var(--surface-2);
   --color-purple-100: var(--surface);
@@ -96,39 +160,16 @@ body {
   min-height: 100vh;
 }
 
-/* Provide fallbacks for common light-mode classes still lingering */
-.bg-white {
-  background-color: var(--surface) !important;
-}
-
-.bg-gray-50 {
-  background-color: var(--surface-2) !important;
-}
-
-.text-gray-900 {
-  color: var(--foreground) !important;
-}
-
-.text-gray-700,
-.text-gray-600 {
-  color: var(--ink-soft) !important;
-}
-
-.border-gray-200,
-.border-gray-100 {
-  border-color: var(--line-soft) !important;
-}
-
-.shadow-lg,
-.shadow-md,
-.shadow-sm {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
-}
-
+/* Fallbacks Removed to prevent theme breaking */
 /* Animations */
 @keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .animate-marquee {
