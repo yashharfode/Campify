@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import HomeDashboard from '../../components/HomeDashboard';
 import {
-    Home, ShoppingBag, Users, Compass, User, Search, Bell, Plus, Heart, Upload,
+    Mail, Lock, Eye, EyeOff, Activity, Trophy, Tent, BarChart3, Home, ShoppingBag, Users, Compass, User, Search, Bell, Plus, Heart, Upload,
     AlertCircle, Calendar, Download, Github, Linkedin, Filter, Menu, Settings,
     LogOut, ChevronRight, MapPin, Music, Code, Mic, Lightbulb,
     Edit3, ShieldCheck, ToggleRight, Briefcase, X, Megaphone, Loader2, Save, Camera,
@@ -61,7 +61,8 @@ const AuthScreen = () => {
     const [loading, setLoading] = useState(false);
     const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
     const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
-
+    const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
     const googleProvider = new GoogleAuthProvider();
     googleProvider.setCustomParameters({ prompt: 'select_account' });
 
@@ -207,6 +208,10 @@ const AuthScreen = () => {
             }
             toast.success('Signed in with Google');
         } catch (error) {
+            if (error.code === 'auth/popup-closed-by-user') {
+                // Silently ignore popup closed by user
+                return;
+            }
             console.error('Google Auth Error', error);
             toast.error(error.message || 'Google sign-in failed');
         } finally {
@@ -238,166 +243,309 @@ const AuthScreen = () => {
     };
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-            {/* Soft decorative blurred circles matching the warm-beige/teal-green palette */}
-            <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-orange-600/10 rounded-full blur-3xl animate-pulse delay-700"></div>
+        <div className="min-h-screen bg-surface-base flex overflow-hidden">
+            <style>{`
+                @keyframes float-slow {
+                    0%, 100% { transform: translateY(0) rotate(0deg); }
+                    50% { transform: translateY(-20px) rotate(2deg); }
+                }
+                @keyframes float-fast {
+                    0%, 100% { transform: translateY(0) rotate(0deg); }
+                    50% { transform: translateY(-15px) rotate(-3deg); }
+                }
+                @keyframes particle-drift {
+                    0% { transform: translateY(0) translateX(0); opacity: 0; }
+                    50% { opacity: 0.5; }
+                    100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+                }
+                .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
+                .animate-float-fast { animation: float-fast 5s ease-in-out infinite; }
+            `}</style>
 
-            <div className="bg-surface-elevated border border-border-strong p-8 rounded-3xl w-full max-w-md shadow-2xl z-10">
-                <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4 overflow-hidden shadow-md">
-                        <img src="/logo.ico" alt="Campify Logo" className="w-full h-full object-cover" />
-                    </div>
-                    <h1 className="text-3xl font-black text-text-main mb-2">{mode === 'login' ? 'Welcome back' : 'Create your account'}</h1>
-                    <p className="text-text-muted">Enter your credentials to continue</p>
+            {/* Left Section (55%) - Hidden on mobile */}
+            <div className="hidden lg:flex w-[55%] relative bg-background border-r border-border-strong items-center justify-center overflow-hidden">
+                {/* Layer 4: Gradient Spotlight */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-accent/20 rounded-full blur-[120px] pointer-events-none"></div>
+
+                {/* Layer 3: Particles */}
+                <div className="absolute inset-0 z-0 pointer-events-none">
+                    {[...Array(15)].map((_, i) => (
+                        <div 
+                            key={i} 
+                            className="absolute w-2 h-2 bg-brand-accent rounded-full opacity-0"
+                            style={{
+                                left: `${Math.random() * 100}%`,
+                                top: `${Math.random() * 100}%`,
+                                animation: `particle-drift ${10 + Math.random() * 20}s linear infinite`,
+                                animationDelay: `-${Math.random() * 20}s`
+                            }}
+                        />
+                    ))}
                 </div>
 
-                <div className="flex gap-2 mb-6 bg-surface-base p-1 rounded-xl">
-                    <button
-                        onClick={() => switchMode('login')}
-                        className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${mode === 'login' ? 'bg-blue-600 text-[#111827] shadow-sm' : 'text-text-muted hover:text-text-muted'}`}
-                    >
-                        Login
-                    </button>
-                    <button
-                        onClick={() => switchMode('signup')}
-                        className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${mode === 'signup' ? 'bg-blue-600 text-[#111827] shadow-sm' : 'text-text-muted hover:text-text-muted'}`}
-                    >
-                        Sign Up
-                    </button>
-                </div>
-
-                <form onSubmit={handleEmailAuth} className="space-y-4">
-                    {mode === 'signup' && (
-                        <>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="text-text-muted text-xs font-bold uppercase tracking-wider ml-1">First Name</label>
-                                    <input
-                                        type="text"
-                                        value={firstName}
-                                        onChange={(e) => setFirstName(e.target.value)}
-                                        className="w-full bg-surface-elevated border border-border-strong rounded-xl p-3 text-text-main mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
-                                        placeholder="Alex"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-text-muted text-xs font-bold uppercase tracking-wider ml-1">Last Name</label>
-                                    <input
-                                        type="text"
-                                        value={lastName}
-                                        onChange={(e) => setLastName(e.target.value)}
-                                        className="w-full bg-surface-elevated border border-border-strong rounded-xl p-3 text-text-main mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
-                                        placeholder="Sharma"
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="text-text-muted text-xs font-bold uppercase tracking-wider ml-1">Username</label>
-                                <input
-                                    type="text"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    className="w-full bg-surface-elevated border border-border-strong rounded-xl p-3 text-text-main mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
-                                    placeholder="uniqueusername"
-                                />
-                                <p className="text-[10px] text-text-muted mt-1">3-20 chars (letters, numbers, ., _, -)</p>
-                            </div>
-                        </>
-                    )}
-
-                    <div>
-                        <label className="text-text-muted text-xs font-bold uppercase tracking-wider ml-1">Email</label>
-                        <input
-                            type="email"
-                            required
-                            placeholder="alex@college.edu"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-surface-elevated border border-border-strong rounded-xl p-3 text-text-main mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition placeholder:text-text-muted"
-                        />
+                {/* Main Content Group */}
+                <div className="relative z-10 flex flex-col items-center">
+                    {/* Typography */}
+                    <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                        <h1 className="text-6xl font-black text-text-main mb-4 tracking-tight">Welcome <span className="text-brand-accent">Back!</span></h1>
+                        <p className="text-lg text-text-muted font-medium">Glad to see you again.<br/>Login to continue your journey.</p>
                     </div>
 
-                    <div>
-                        <label className="text-text-muted text-xs font-bold uppercase tracking-wider ml-1">Password</label>
-                        <input
-                            type="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-surface-elevated border border-border-strong rounded-xl p-3 text-text-main mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition placeholder:text-text-muted"
+                    {/* Image & Glassmorphism Elements */}
+                    <div className="relative">
+                        {/* Layer 1: Character */}
+                        <img 
+                            src="/images/coder.png" 
+                            alt="Student working on laptop" 
+                            className="w-[500px] h-auto object-contain drop-shadow-2xl animate-float-slow"
                         />
-                    </div>
 
-                    {mode === 'signup' && (
-                        <div>
-                            <label className="text-text-muted text-xs font-bold uppercase tracking-wider ml-1">Confirm Password</label>
-                            <input
-                                type="password"
-                                required
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full bg-surface-elevated border border-border-strong rounded-xl p-3 text-text-main mt-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition placeholder:text-text-muted"
-                            />
+                        {/* Layer 2: Glassmorphism Floating Elements */}
+                        <div className="absolute -top-4 -left-12 bg-surface-elevated/70 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-float-fast">
+                            <Trophy className="w-8 h-8 text-brand-accent" />
                         </div>
-                    )}
+                        <div 
+                            className="absolute top-1/4 -right-16 bg-surface-elevated/70 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-float-slow"
+                            style={{ animationDelay: '1s' }}
+                        >
+                            <Shield className="w-8 h-8 text-emerald-500" />
+                        </div>
+                        <div 
+                            className="absolute bottom-1/4 -left-8 bg-surface-elevated/70 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-float-fast"
+                            style={{ animationDelay: '2s' }}
+                        >
+                            <Tent className="w-8 h-8 text-blue-500" />
+                        </div>
+                        <div 
+                            className="absolute bottom-12 -right-4 bg-surface-elevated/70 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-float-slow"
+                            style={{ animationDelay: '1.5s' }}
+                        >
+                            <BarChart3 className="w-8 h-8 text-purple-500" />
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                    {mode === 'login' && (
-                        <div className="text-right">
+            {/* Right Section (45% Desktop, 100% Mobile) */}
+            <div className="w-full lg:w-[45%] flex items-center justify-center p-6 lg:p-12">
+                <div className="w-full max-w-[440px] animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 fill-mode-both">
+                    {/* Compact Hero for Mobile Only */}
+                    <div className="lg:hidden text-center mb-8">
+                        <div className="w-20 h-20 mx-auto bg-brand-accent/10 rounded-full flex items-center justify-center mb-4">
+                            <img src="/logo.ico" alt="Campify" className="w-12 h-12 object-contain" />
+                        </div>
+                        <h1 className="text-3xl font-black text-text-main mb-2">Welcome Back!</h1>
+                        <p className="text-text-muted">Login to continue your journey.</p>
+                    </div>
+
+                    {/* Premium Auth Card */}
+                    <div className="bg-surface-elevated border border-border-strong rounded-3xl p-8 shadow-[0_20px_40px_rgb(0,0,0,0.08)] dark:shadow-[0_20px_40px_rgb(0,0,0,0.3)]">
+                        <div className="text-center mb-8 hidden lg:block">
+                            <div className="w-12 h-12 bg-surface-base border border-border-strong rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                <Lock className="w-6 h-6 text-brand-accent" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-text-main">Login to your account</h2>
+                            <p className="text-sm text-text-muted mt-1">Enter your details below</p>
+                        </div>
+
+                        {/* Mode Toggle */}
+                        <div className="flex bg-surface-base p-1 rounded-xl mb-8 border border-border-subtle">
                             <button
-                                type="button"
-                                onClick={() => {
-                                    setForgotPasswordEmail(email);
-                                    setForgotPasswordOpen(true);
-                                }}
-                                className="text-xs font-bold text-blue-600 hover:text-blue-700 transition"
+                                onClick={() => switchMode('login')}
+                                className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${mode === 'login' ? 'bg-surface-elevated text-brand-accent shadow-sm' : 'text-text-muted hover:text-text-main'}`}
                             >
-                                Forgot password?
+                                Login
+                            </button>
+                            <button
+                                onClick={() => switchMode('signup')}
+                                className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${mode === 'signup' ? 'bg-surface-elevated text-brand-accent shadow-sm' : 'text-text-muted hover:text-text-main'}`}
+                            >
+                                Sign Up
                             </button>
                         </div>
-                    )}
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-gradient-to-r from-brand-accent to-brand-accent-hover text-white font-black py-4 rounded-xl shadow-md transition-all transform hover:-translate-y-1 hover:shadow-[0_0_25px_var(--glow-primary)] active:scale-95 flex items-center justify-center gap-2"
-                    >
-                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (mode === 'login' ? 'Login Securely' : 'Create Account')}
-                    </button>
-                </form>
+                        <form onSubmit={handleEmailAuth} className="space-y-5">
+                            {mode === 'signup' && (
+                                <>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-bold text-text-main ml-1">First Name</label>
+                                            <input
+                                                type="text"
+                                                value={firstName}
+                                                onChange={(e) => setFirstName(e.target.value)}
+                                                className="w-full bg-surface-base border border-border-strong rounded-xl p-3 text-text-main text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all placeholder:text-text-muted"
+                                                placeholder="Alex"
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-bold text-text-main ml-1">Last Name</label>
+                                            <input
+                                                type="text"
+                                                value={lastName}
+                                                onChange={(e) => setLastName(e.target.value)}
+                                                className="w-full bg-surface-base border border-border-strong rounded-xl p-3 text-text-main text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all placeholder:text-text-muted"
+                                                placeholder="Sharma"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-bold text-text-main ml-1">Username</label>
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <User className="h-4 w-4 text-text-muted" />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={username}
+                                                onChange={(e) => setUsername(e.target.value)}
+                                                className="w-full bg-surface-base border border-border-strong rounded-xl p-3 pl-10 text-text-main text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all placeholder:text-text-muted"
+                                                placeholder="uniqueusername"
+                                            />
+                                        </div>
+                                    </div>
+                                </>
+                            )}
 
-                <div className="my-4 flex items-center gap-2 text-text-muted text-xs">
-                    <div className="flex-1 h-px bg-surface-highlight"></div>
-                    OR
-                    <div className="flex-1 h-px bg-surface-highlight"></div>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-text-main ml-1">Email Address</label>
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Mail className="h-4 w-4 text-text-muted group-focus-within:text-brand-accent transition-colors" />
+                                    </div>
+                                    <input
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full bg-surface-base border border-border-strong rounded-xl p-3 pl-10 text-text-main text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all placeholder:text-text-muted"
+                                        placeholder="Enter your email"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-text-main ml-1">Password</label>
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Lock className="h-4 w-4 text-text-muted group-focus-within:text-brand-accent transition-colors" />
+                                    </div>
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        required
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full bg-surface-base border border-border-strong rounded-xl p-3 pl-10 pr-10 text-text-main text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all placeholder:text-text-muted"
+                                        placeholder="Enter your password"
+                                    />
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-muted hover:text-text-main transition-colors"
+                                    >
+                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {mode === 'signup' && (
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-text-main ml-1">Confirm Password</label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <Lock className="h-4 w-4 text-text-muted group-focus-within:text-brand-accent transition-colors" />
+                                        </div>
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            required
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="w-full bg-surface-base border border-border-strong rounded-xl p-3 pl-10 pr-10 text-text-main text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all placeholder:text-text-muted"
+                                            placeholder="Confirm your password"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {mode === 'login' && (
+                                <div className="flex items-center justify-between pt-1">
+                                    <label className="flex items-center gap-2 cursor-pointer group">
+                                        <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${rememberMe ? 'bg-brand-accent border-brand-accent text-white' : 'border-border-strong bg-surface-base group-hover:border-brand-accent'}`}>
+                                            {rememberMe && <CheckCircle2 className="w-3 h-3" />}
+                                        </div>
+                                        <input 
+                                            type="checkbox" 
+                                            className="hidden" 
+                                            checked={rememberMe}
+                                            onChange={(e) => setRememberMe(e.target.checked)}
+                                        />
+                                        <span className="text-xs font-medium text-text-muted group-hover:text-text-main transition-colors">Remember me</span>
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setForgotPasswordEmail(email);
+                                            setForgotPasswordOpen(true);
+                                        }}
+                                        className="text-xs font-bold text-brand-accent hover:text-brand-accent-hover transition-colors"
+                                    >
+                                        Forgot Password?
+                                    </button>
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white font-bold py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(192,132,87,0.39)] transition-all transform hover:-translate-y-[1px] active:scale-[0.98] flex items-center justify-center gap-2 mt-4"
+                            >
+                                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (mode === 'login' ? 'Login' : 'Create Account')}
+                            </button>
+                        </form>
+
+                        <div className="my-6 relative flex items-center justify-center">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-border-strong"></div>
+                            </div>
+                            <span className="relative px-4 bg-surface-elevated text-xs font-medium text-text-muted uppercase tracking-wider">or continue with</span>
+                        </div>
+
+                        <div className="flex justify-center">
+                            <button
+                                onClick={handleGoogleAuth}
+                                className="w-full bg-surface-base border border-border-strong text-text-main font-bold py-3.5 rounded-xl hover:bg-surface-highlight hover:border-brand-accent/50 transition-all flex items-center justify-center gap-3 shadow-sm group"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 group-hover:scale-110 transition-transform" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.61 20.083H42V20H24v8h11.303C34.125 31.617 29.598 35 24 35c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C33.659 5.009 29.082 3 24 3 12.955 3 4 11.955 4 23s8.955 20 20 20c11.045 0 20-8.955 20-20 0-1.341-.138-2.651-.39-3.917z" /><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 16.077 18.961 13 24 13c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C33.659 5.009 29.082 3 24 3c-7.938 0-14.68 4.632-17.694 11.691z" /><path fill="#4CAF50" d="M24 43c5.522 0 10.508-2.115 14.167-5.564l-6.506-5.506C29.64 34.318 26.929 35 24 35c-5.564 0-10.279-3.559-11.957-8.483l-6.6 5.086C8.434 38.419 15.62 43 24 43z" /><path fill="#1976D2" d="M43.61 20.083H42V20H24v8h11.303C34.732 31.135 30.251 35 24 35c-5.564 0-10.279-3.559-11.957-8.483l-6.6 5.086C8.434 38.419 15.62 43 24 43c11.045 0 20-8.955 20-20 0-1.341-.138-2.651-.39-3.917z" /></svg>
+                                Google
+                            </button>
+                        </div>
+                    </div>
                 </div>
-
-                <button
-                    onClick={handleGoogleAuth}
-                    className="w-full border border-border-strong text-text-muted font-bold py-3 rounded-xl hover:bg-surface-base transition flex items-center justify-center gap-3 bg-surface-elevated"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.61 20.083H42V20H24v8h11.303C34.125 31.617 29.598 35 24 35c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C33.659 5.009 29.082 3 24 3 12.955 3 4 11.955 4 23s8.955 20 20 20c11.045 0 20-8.955 20-20 0-1.341-.138-2.651-.39-3.917z" /><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 16.077 18.961 13 24 13c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C33.659 5.009 29.082 3 24 3c-7.938 0-14.68 4.632-17.694 11.691z" /><path fill="#4CAF50" d="M24 43c5.522 0 10.508-2.115 14.167-5.564l-6.506-5.506C29.64 34.318 26.929 35 24 35c-5.564 0-10.279-3.559-11.957-8.483l-6.6 5.086C8.434 38.419 15.62 43 24 43z" /><path fill="#1976D2" d="M43.61 20.083H42V20H24v8h11.303C34.732 31.135 30.251 35 24 35c-5.564 0-10.279-3.559-11.957-8.483l-6.6 5.086C8.434 38.419 15.62 43 24 43c11.045 0 20-8.955 20-20 0-1.341-.138-2.651-.39-3.917z" /></svg>
-                    {mode === 'login' ? 'Continue with Google' : 'Sign up with Google'}
-                </button>
             </div>
 
             {/* Forgot Password Modal */}
             {forgotPasswordOpen && (
-                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-4">
-                    <div className="bg-surface-elevated rounded-2xl w-full max-w-md p-6 shadow-2xl">
-                        <h3 className="text-xl font-bold text-text-main mb-4">Reset Password</h3>
-                        <form onSubmit={handlePasswordReset} className="space-y-3">
-                            <input
-                                type="email"
-                                required
-                                value={forgotPasswordEmail}
-                                onChange={(e) => setForgotPasswordEmail(e.target.value)}
-                                className="w-full border border-border-strong rounded-lg p-3 bg-surface-base text-text-main placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
-                                placeholder="Enter your email"
-                            />
-                            <div className="flex gap-3">
-                                <button type="button" onClick={() => setForgotPasswordOpen(false)} className="flex-1 bg-surface-elevated text-text-muted font-bold py-3 rounded-lg">Cancel</button>
-                                <button type="submit" className="flex-1 bg-blue-600 text-[#111827] font-bold py-3 rounded-lg">Send Reset Link</button>
+                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-surface-elevated rounded-2xl w-full max-w-md p-8 shadow-2xl border border-border-strong animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-bold text-text-main">Reset Password</h3>
+                            <button onClick={() => setForgotPasswordOpen(false)} className="text-text-muted hover:text-text-main"><X className="w-5 h-5"/></button>
+                        </div>
+                        <form onSubmit={handlePasswordReset} className="space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-text-main ml-1">Email Address</label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={forgotPasswordEmail}
+                                    onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                                    className="w-full bg-surface-base border border-border-strong rounded-xl p-3 text-text-main text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all placeholder:text-text-muted"
+                                    placeholder="Enter your registered email"
+                                />
+                            </div>
+                            <div className="flex gap-3 pt-2">
+                                <button type="button" onClick={() => setForgotPasswordOpen(false)} className="flex-1 bg-surface-base text-text-main font-bold py-3 rounded-xl border border-border-strong hover:bg-surface-highlight transition-colors">Cancel</button>
+                                <button type="submit" className="flex-1 bg-brand-accent hover:bg-brand-accent-hover text-white font-bold py-3 rounded-xl shadow-md transition-all">Send Link</button>
                             </div>
                         </form>
                     </div>

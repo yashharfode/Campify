@@ -186,24 +186,6 @@ export default function Academics() {
                                         </p>
                                     )}
 
-                                    {/* Media Preview */}
-                                    {item.documentUrl && (
-                                        <div className="mb-6 w-full h-48 bg-surface-highlight rounded-xl overflow-hidden border border-border-strong relative">
-                                            {item.documentUrl.toLowerCase().endsWith('.pdf') ? (
-                                                <div className="w-full h-full flex flex-col items-center justify-center">
-                                                    <FileText className="w-12 h-12 text-brand-accent/50 mb-2" />
-                                                    <span className="text-xs font-bold text-text-muted">PDF Document</span>
-                                                </div>
-                                            ) : (
-                                                <img 
-                                                    src={item.documentUrl} 
-                                                    alt={item.title} 
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            )}
-                                        </div>
-                                    )}
-
                                     <div className="mt-auto pt-4 border-t border-border-strong">
                                         <a 
                                             href={item.documentUrl}
