@@ -25,6 +25,7 @@ const isAdminUser = (email) => ADMIN_EMAILS.includes(email);
 
 export default function Admin({ user, userData, setActiveTab: setAppTab, setTargetClubId }) {
     const [activeTab, setActiveTab] = useState('overview'); // 'events' or 'users'
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [users, setUsers] = useState([]);
     const [usersLoading, setUsersLoading] = useState(true);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -946,9 +947,63 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
         );
     }
 
+    const ADMIN_TABS = [
+        { id: 'overview', label: 'Overview', icon: <LayoutDashboard className="w-5 h-5" /> },
+        { id: 'clubs', label: 'Clubs', icon: <Tent className="w-5 h-5" /> },
+        { id: 'events', label: 'Events', icon: <Megaphone className="w-5 h-5" /> },
+        { id: 'users', label: 'Users', icon: <User className="w-5 h-5" /> },
+        { id: 'banners', label: 'Banners', icon: <ImageIcon className="w-5 h-5" /> },
+        { id: 'notes', label: 'Notes', icon: <BookOpen className="w-5 h-5" /> },
+        { id: 'notes_categories', label: 'Notes Categories', icon: <List className="w-5 h-5" /> },
+        { id: 'lostfound', label: 'Lost & Found', icon: <Package className="w-5 h-5" /> },
+        { id: 'academics', label: 'Academics', icon: <GraduationCap className="w-5 h-5" /> },
+        { id: 'scholarships', label: 'Scholarships', icon: <GraduationCap className="w-5 h-5" /> },
+        { id: 'admins', label: 'Admins', icon: <UserCog className="w-5 h-5" /> },
+        { id: 'chat_groups', label: 'Chat Groups', icon: <MessageCircle className="w-5 h-5" /> }
+    ];
+
     return (
-                <div className="flex h-screen bg-surface-base overflow-hidden">
-            {/* Sidebar */}
+        <div className="flex h-screen bg-surface-base overflow-hidden">
+            {/* Mobile Sidebar Overlay */}
+            {isMobileMenuOpen && (
+                <div className="md:hidden fixed inset-0 z-[100] flex">
+                    <div className="fixed inset-0 bg-black/50" onClick={() => setIsMobileMenuOpen(false)}></div>
+                    <aside className="relative w-64 bg-surface-elevated h-full flex flex-col shadow-2xl animate-in slide-in-from-left duration-200">
+                        <div className="p-6 pb-2 flex items-center justify-between">
+                            <h1 className="text-2xl font-black text-text-main flex items-center gap-2">
+                                <Shield className="w-6 h-6 text-brand-accent" />
+                                Quantum
+                            </h1>
+                            <button onClick={() => setIsMobileMenuOpen(false)} className="text-text-muted hover:text-text-main">
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <div className="px-6 mb-4">
+                            <div className="inline-flex items-center gap-2 bg-brand-accent/10 text-brand-accent px-3 py-1.5 rounded-full border border-brand-accent/20">
+                                <CheckCircle className="w-4 h-4" />
+                                <span className="text-xs font-bold">Admin Privileges</span>
+                            </div>
+                        </div>
+                        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                            {ADMIN_TABS.map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => {
+                                        setActiveTab(tab.id);
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition ${activeTab === tab.id ? 'bg-brand-accent text-[#111827] shadow-md' : 'text-text-muted hover:bg-surface-highlight hover:text-text-main'}`}
+                                >
+                                    {tab.icon}
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </nav>
+                    </aside>
+                </div>
+            )}
+
+            {/* Desktop Sidebar */}
             <aside className="w-64 bg-surface-elevated border-r border-border-strong hidden md:flex flex-col">
                 <div className="p-6 pb-2">
                     <h1 className="text-2xl font-black text-text-main flex items-center gap-2">
@@ -961,20 +1016,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                     </div>
                 </div>
                 <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-                    {[
-                        { id: 'overview', label: 'Overview', icon: <LayoutDashboard className="w-5 h-5" /> },
-                        { id: 'clubs', label: 'Clubs', icon: <Tent className="w-5 h-5" /> },
-                        { id: 'events', label: 'Events', icon: <Megaphone className="w-5 h-5" /> },
-                        { id: 'users', label: 'Users', icon: <User className="w-5 h-5" /> },
-                        { id: 'banners', label: 'Banners', icon: <ImageIcon className="w-5 h-5" /> },
-                        { id: 'notes', label: 'Notes', icon: <BookOpen className="w-5 h-5" /> },
-                        { id: 'notes_categories', label: 'Notes Categories', icon: <List className="w-5 h-5" /> },
-                        { id: 'lostfound', label: 'Lost & Found', icon: <Package className="w-5 h-5" /> },
-                        { id: 'academics', label: 'Academics', icon: <GraduationCap className="w-5 h-5" /> },
-                        { id: 'scholarships', label: 'Scholarships', icon: <GraduationCap className="w-5 h-5" /> },
-                        { id: 'admins', label: 'Admins', icon: <UserCog className="w-5 h-5" /> },
-                        { id: 'chat_groups', label: 'Chat Groups', icon: <MessageCircle className="w-5 h-5" /> }
-                    ].map(tab => (
+                    {ADMIN_TABS.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
@@ -990,16 +1032,22 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 {/* Topbar */}
-                <header className="h-16 bg-surface-elevated border-b border-border-strong flex items-center justify-between px-6 z-10 shrink-0">
-                    <div className="flex items-center gap-4 flex-1">
-                        <Search className="w-5 h-5 text-text-muted" />
-                        <input type="text" placeholder="Search across platform..." className="bg-transparent border-none text-sm text-text-main focus:outline-none w-full max-w-md placeholder-text-muted" />
+                <header className="h-16 bg-surface-elevated border-b border-border-strong flex items-center justify-between px-4 md:px-6 z-10 shrink-0">
+                    <div className="flex items-center gap-3 md:gap-4 flex-1">
+                        <button 
+                            className="md:hidden p-2 text-text-muted hover:text-text-main hover:bg-surface-highlight rounded-lg transition"
+                            onClick={() => setIsMobileMenuOpen(true)}
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
+                        <Search className="w-5 h-5 text-text-muted hidden sm:block" />
+                        <input type="text" placeholder="Search across platform..." className="bg-transparent border-none text-sm text-text-main focus:outline-none w-full max-w-md placeholder-text-muted hidden sm:block" />
                     </div>
                     <div className="flex items-center gap-4">
-                        <button className="p-2 text-text-muted hover:text-text-main hover:bg-surface-highlight rounded-full transition">
+                        <button className="p-2 text-text-muted hover:text-text-main hover:bg-surface-highlight rounded-full transition hidden sm:block">
                             <Bell className="w-5 h-5" />
                         </button>
-                        <div className="h-6 w-px bg-border-strong mx-2"></div>
+                        <div className="h-6 w-px bg-border-strong mx-2 hidden sm:block"></div>
                         <div className="flex items-center gap-2">
                             {activeTab === 'events' && (
                                 <button

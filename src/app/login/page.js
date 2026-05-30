@@ -22,12 +22,13 @@ import {
     signInWithPopup,
     signOut
 } from 'firebase/auth';
-import { doc, setDoc, onSnapshot, collection, query, where, getDocs, getDoc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot, collection, query, where, getDocs, getDoc, updateDoc, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { auth, db, appId } from '../../lib/firebase';
 import Marketplace from '../../components/Marketplace';
 import Teams from '../../components/Teams';
 import Discover from '../../components/Discover';
 import Admin from '../../components/Admin';
+import NotificationsDropdown from '../../components/NotificationsDropdown';
 import Notes from '../../components/Notes';
 import Chat from '../../components/Chat';
 import Academics from '../../components/Academics';
@@ -1647,6 +1648,17 @@ export default function App() {
         checkDbAdmin();
     }, [user?.email]);
 
+    // Handle global tab navigation events
+    useEffect(() => {
+        const handleNavigate = (e) => {
+            if (e.detail) {
+                setActiveTab(e.detail);
+            }
+        };
+        window.addEventListener('navigate-tab', handleNavigate);
+        return () => window.removeEventListener('navigate-tab', handleNavigate);
+    }, []);
+
     // Fetch User Profile Data
     useEffect(() => {
         if (user) {
@@ -1664,6 +1676,61 @@ export default function App() {
             setUserData(null);
         }
     }, [user]);
+
+    // 24-Hour Reminder Logic
+    useEffect(() => {
+        if (!user || !userData?.favoriteClubs?.length) return;
+
+        const checkUpcomingEvents = async () => {
+            try {
+                const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'events');
+                const snapshot = await getDocs(eventsRef);
+                const now = new Date();
+                const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+                const notifsRef = collection(db, 'artifacts', appId, 'users', user.uid, 'notifications');
+                const notifsSnap = await getDocs(notifsRef);
+                const existingReminderIds = notifsSnap.docs
+                    .filter(d => d.data().type === 'REMINDER')
+                    .map(d => d.data().eventId);
+
+                const batch = writeBatch(db);
+                let addedCount = 0;
+
+                snapshot.forEach(docSnap => {
+                    const event = docSnap.data();
+                    if (userData.favoriteClubs.includes(event.clubId)) {
+                        const eventDate = new Date(event.date);
+                        if (isNaN(eventDate.getTime())) return;
+
+                        if (eventDate > now && eventDate <= tomorrow && !existingReminderIds.includes(docSnap.id)) {
+                            const newNotifRef = doc(notifsRef);
+                            batch.set(newNotifRef, {
+                                type: 'REMINDER',
+                                title: `Reminder: ${event.title} is tomorrow!`,
+                                message: `Starts at ${event.date} at ${event.location || 'campus'}.`,
+                                eventId: docSnap.id,
+                                clubId: event.clubId,
+                                read: false,
+                                createdAt: serverTimestamp()
+                            });
+                            addedCount++;
+                        }
+                    }
+                });
+
+                if (addedCount > 0) {
+                    await batch.commit();
+                }
+            } catch (error) {
+                console.error("Error checking reminders:", error);
+            }
+        };
+
+        checkUpcomingEvents();
+        const intervalId = setInterval(checkUpcomingEvents, 60 * 60 * 1000);
+        return () => clearInterval(intervalId);
+    }, [user, userData?.favoriteClubs]);
 
     if (authLoading) {
         return <div className="min-h-screen flex items-center justify-center bg-surface-elevated"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>;
@@ -1692,6 +1759,7 @@ export default function App() {
                     <DesktopNavLink icon={<Package className="w-5 h-5" />} label="Lost & Found" active={activeTab === 'lost'} onClick={() => setActiveTab('lost')} />
                 </div>
                 <div className="flex items-center gap-4">
+                    <NotificationsDropdown user={user} />
                     <ThemeToggle />
                     <div onClick={() => setActiveTab('profile')} className="flex items-center gap-2 hover:bg-surface-base p-1.5 rounded-lg transition cursor-pointer">
                         <div className="w-8 h-8 rounded-full overflow-hidden bg-surface-elevated">
@@ -1715,6 +1783,7 @@ export default function App() {
                     <h1 className="text-lg font-bold text-text-main">CAMPIFY</h1>
                 </div>
                 <div className="flex items-center gap-2">
+                    <NotificationsDropdown user={user} />
                     <ThemeToggle />
                     <button
                         onClick={() => setHamburgerOpen(!hamburgerOpen)}
@@ -1811,7 +1880,7 @@ export default function App() {
                 {activeTab === 'home' && <HomeDashboard user={user} userData={userData} setActiveTab={setActiveTab} />}
                 {activeTab === 'market' && <div className="pb-24 pt-4 px-4 max-w-7xl mx-auto"><Marketplace user={user} userData={userData} setActiveTab={setActiveTab} setChatTargetUser={setChatTargetUser} /></div>}
                 {activeTab === 'teams' && <Teams user={user} userData={userData} setActiveTab={setActiveTab} setChatTargetUser={setChatTargetUser} />}
-                {activeTab === 'discover' && <Discover user={user} />}
+                {activeTab === 'discover' && <Discover user={user} userData={userData} />}
                 {activeTab === 'notes' && <Notes user={user} userData={userData} />}
                 {activeTab === 'academics' && <Academics user={user} userData={userData} />}
                 {activeTab === 'chat' && <Chat user={user} userData={userData} chatTargetUser={chatTargetUser} setChatTargetUser={setChatTargetUser} />}

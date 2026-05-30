@@ -107,7 +107,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
     setIsSubmitting(true);
     try {
       const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'events');
-      await addDoc(eventsRef, {
+      const eventDoc = await addDoc(eventsRef, {
         clubId: club.id,
         clubName: club.name,
         title: newEventTitle,
@@ -117,6 +117,30 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
         createdAt: serverTimestamp(),
         createdBy: user.uid
       });
+      const eventId = eventDoc.id;
+
+      // Notify all club followers
+      try {
+        const followersRef = collection(db, 'artifacts', appId, 'public', 'data', 'clubs', club.id, 'followers');
+        const followersSnap = await getDocs(followersRef);
+        
+        const notifyPromises = followersSnap.docs.map(followerDoc => {
+            const followerId = followerDoc.id;
+            const userNotifRef = collection(db, 'artifacts', appId, 'users', followerId, 'notifications');
+            return addDoc(userNotifRef, {
+                type: 'NEW_EVENT',
+                title: `New event from ${club.name}`,
+                message: `They just scheduled "${newEventTitle}" for ${newEventDate}.`,
+                eventId: eventId,
+                clubId: club.id,
+                read: false,
+                createdAt: serverTimestamp()
+            });
+        });
+        await Promise.all(notifyPromises);
+      } catch (notifyError) {
+          console.error('Error sending notifications:', notifyError);
+      }
 
       toast.success('Event added successfully!');
       setIsEventModalOpen(false);

@@ -6,7 +6,7 @@ import {
     Sparkles, TrendingUp, Heart, Share2, Zap, BookOpen,
     Music, Palette, Code, Trophy, Globe, Lightbulb, X, Image as ImageIcon, ArrowLeft, Instagram, Linkedin, Mail, Phone, Layers, Copy, CheckCircle
 } from 'lucide-react';
-import { collection, getDocs, query, orderBy, limit, where, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, increment, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, where, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, increment, onSnapshot, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db, appId } from '../lib/firebase';
 import toast from 'react-hot-toast';
 import { getOptimizedImageUrl } from '../lib/cloudinary';
@@ -107,7 +107,7 @@ const UPCOMING_ACTIVITIES = [
     }
 ];
 
-export default function Discover({ user }) {
+export default function Discover({ user, userData }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState('All');
     const [events, setEvents] = useState([]);
@@ -248,6 +248,38 @@ export default function Discover({ user }) {
         } catch (error) {
             console.error('Error joining event:', error);
             toast.error('Failed to join event');
+        }
+    };
+
+    const handleToggleFollow = async (clubId) => {
+        if (!user) {
+            toast.error('Please login to follow clubs');
+            return;
+        }
+        try {
+            const userRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data');
+            const clubFollowerRef = doc(db, 'artifacts', appId, 'public', 'data', 'clubs', clubId, 'followers', user.uid);
+            const isFollowing = userData?.favoriteClubs?.includes(clubId);
+            
+            if (isFollowing) {
+                await updateDoc(userRef, {
+                    favoriteClubs: arrayRemove(clubId)
+                });
+                await deleteDoc(clubFollowerRef).catch(() => {});
+                toast.success('Unfollowed club');
+            } else {
+                await updateDoc(userRef, {
+                    favoriteClubs: arrayUnion(clubId)
+                });
+                await setDoc(clubFollowerRef, {
+                    userId: user.uid,
+                    joinedAt: serverTimestamp()
+                });
+                toast.success('Following club!');
+            }
+        } catch (error) {
+            console.error('Error toggling follow:', error);
+            toast.error('Failed to update follow status');
         }
     };
 
@@ -447,6 +479,9 @@ export default function Discover({ user }) {
                 onLikeEvent={handleLikeEvent}
                 registrations={registrations}
                 wishlist={wishlist}
+                user={user}
+                userData={userData}
+                onToggleFollow={handleToggleFollow}
             />
 
             {/* Event Detail Modal */}
@@ -467,7 +502,7 @@ export default function Discover({ user }) {
 }
 
 // Club Detail Modal
-const ClubDetailModal = ({ isOpen, onClose, club, events, onJoinEvent, onLikeEvent, registrations, wishlist }) => {
+const ClubDetailModal = ({ isOpen, onClose, club, events, onJoinEvent, onLikeEvent, registrations, wishlist, user, userData, onToggleFollow }) => {
     const [copiedEmail, setCopiedEmail] = useState(false);
     
     if (!isOpen || !club) return null;
@@ -533,9 +568,15 @@ const ClubDetailModal = ({ isOpen, onClose, club, events, onJoinEvent, onLikeEve
                                 {displayTagline}
                             </p>
                         </div>
-                        <button className="bg-brand-accent hover:bg-brand-accent-hover text-[#111827] font-bold py-3 px-8 rounded-xl shadow-md transition-all flex items-center gap-2 transform hover:-translate-y-0.5 whitespace-nowrap">
-                            Join Club <ExternalLink className="w-4 h-4" />
-                        </button>
+                        {userData?.favoriteClubs?.includes(club.id) ? (
+                            <button onClick={() => onToggleFollow(club.id)} className="bg-surface-elevated border-2 border-brand-accent text-text-main hover:bg-brand-accent/10 font-bold py-3 px-8 rounded-xl shadow-sm transition-all flex items-center gap-2 whitespace-nowrap">
+                                <CheckCircle className="w-4 h-4 text-brand-accent" /> Following
+                            </button>
+                        ) : (
+                            <button onClick={() => onToggleFollow(club.id)} className="bg-brand-accent hover:bg-brand-accent-hover text-[#111827] font-bold py-3 px-8 rounded-xl shadow-md transition-all flex items-center gap-2 transform hover:-translate-y-0.5 whitespace-nowrap">
+                                <Heart className="w-4 h-4" /> Follow Club
+                            </button>
+                        )}
                     </div>
                 </div>
 
