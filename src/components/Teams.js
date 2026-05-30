@@ -41,7 +41,7 @@ const SkeletonCard = () => (
 
 // Skeleton Grid
 const SkeletonGrid = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 pb-24">
         {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
     </div>
 );
@@ -362,7 +362,7 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
     };
 
     return (
-        <div className="animate-in fade-in pb-24 pt-4 px-4 max-w-7xl mx-auto">
+        <div className="animate-in fade-in pb-24 pt-4 px-4 max-w-[2560px] mx-auto 2xl:px-12">
             {/* Hero Banner */}
             <div className="relative overflow-hidden rounded-3xl mb-8 bg-surface-base p-8 md:p-12 border border-border-strong">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,var(--color-glow-primary),transparent_35%),radial-gradient(circle_at_80%_10%,var(--color-glow-secondary),transparent_30%)]"></div>
@@ -435,7 +435,7 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
                             </p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                             {filteredProfiles.map((profile) => (
                                 <UserCard
                                     key={profile.id}
@@ -471,7 +471,7 @@ export default function Teams({ user, userData, setActiveTab, setChatTargetUser 
                             </button>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                             {teamPosts.map((post) => (
                                 <TeamPostCard
                                     key={post.id}

@@ -377,7 +377,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
     <div className="bg-surface-base min-h-screen">
       {/* Admin Dashboard Header (Dark Theme - Silent Coder) */}
       <div className="bg-[#141414] border-b border-border-strong text-[#111827]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 py-10">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="flex items-center gap-6">
               <div className="w-24 h-24 rounded-2xl bg-surface-highlight border-2 border-border-subtle overflow-hidden shadow-lg shrink-0 flex items-center justify-center">
@@ -413,7 +413,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 py-8 space-y-8">
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -634,7 +634,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
               </form>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
               {club.teamMembers?.map(member => (
                 <div key={member.id} className="bg-surface-base rounded-2xl p-4 shadow-sm border border-border-strong flex items-center justify-between group">
                   <div>
@@ -673,7 +673,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
               </label>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-4">
               {club.gallery?.map((url, idx) => (
                 <div key={idx} className="relative aspect-video rounded-xl overflow-hidden group border border-border-strong">
                   <img src={getOptimizedImageUrl(url, '16:9')} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />

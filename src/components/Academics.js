@@ -135,7 +135,7 @@ export default function Academics() {
 
             {/* Content Feed */}
             <div className="flex-1 overflow-y-auto px-6 md:px-8 py-8 custom-scrollbar relative z-10">
-                <div className="max-w-7xl mx-auto">
+                <div className="max-w-[2560px] mx-auto 2xl:px-12">
                     {loading ? (
                         <div className="flex justify-center py-20">
                             <Loader2 className="w-10 h-10 animate-spin text-brand-accent" />
@@ -155,7 +155,7 @@ export default function Academics() {
                             </button>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                             {filteredResources.map((item, index) => (
                                 <div 
                                     key={item.id} 

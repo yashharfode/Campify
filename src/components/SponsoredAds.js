@@ -64,11 +64,11 @@ export default function SponsoredAds() {
                 {banners.map((ad) => (
                     <div key={ad.id} className="min-w-full flex flex-col shrink-0">
                         {/* Image Section */}
-                        <div className="relative w-full overflow-hidden bg-surface-highlight aspect-[21/9] md:aspect-[32/9] max-h-[220px]">
+                        <div className="relative w-full overflow-hidden bg-surface-highlight aspect-[16/9] max-h-[180px] sm:max-h-[250px] md:max-h-[400px]">
                             {ad.desktopImage || ad.mobileImage || ad.image ? (
-                                <picture>
+                                <picture className="w-full h-full flex items-center justify-center">
                                     {ad.desktopImage && <source media="(min-width: 768px)" srcSet={ad.desktopImage} />}
-                                    <img src={ad.mobileImage || ad.desktopImage || ad.image} className="w-full h-full object-cover" alt={ad.title || ''} />
+                                    <img src={ad.mobileImage || ad.desktopImage || ad.image} className="w-full h-full object-contain md:object-cover" alt={ad.title || ''} />
                                 </picture>
                             ) : (
                                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10" />

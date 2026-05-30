@@ -63,7 +63,7 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
     }, []);
 
     const Skeletons = () => (
-        <div className="space-y-8 max-w-7xl mx-auto px-4 pb-24 pt-6 animate-pulse">
+        <div className="space-y-8 max-w-[2560px] mx-auto px-4 2xl:px-12 pb-24 pt-6 animate-pulse">
             <div className="h-40 bg-surface-elevated/50 rounded-3xl"></div>
             <div className="h-24 bg-surface-elevated/50 rounded-2xl mb-8"></div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -79,59 +79,13 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
     if (initialLoading) return <Skeletons />;
 
     return (
-        <div className="relative min-h-full pb-12 pt-6 px-4 md:px-6 max-w-7xl mx-auto space-y-8">
+        <div className="relative min-h-full pb-12 pt-6 px-4 md:px-6 2xl:px-12 max-w-[2560px] mx-auto space-y-8 overflow-x-hidden">
             {/* Ambient Lighting System */}
-            <div className="absolute top-0 left-10 w-96 h-96 bg-brand-accent/20 rounded-full blur-[120px] pointer-events-none -z-10"></div>
-            <div className="absolute top-40 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
-            <div className="absolute bottom-40 left-1/2 -translate-x-1/2 w-[500px] h-96 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+            <div className="absolute top-0 left-10 w-72 md:w-96 h-72 md:h-96 bg-brand-accent/20 rounded-full blur-[100px] md:blur-[120px] pointer-events-none -z-10"></div>
+            <div className="absolute top-40 right-10 w-72 md:w-96 h-72 md:h-96 bg-blue-500/10 rounded-full blur-[100px] md:blur-[120px] pointer-events-none -z-10"></div>
+            <div className="absolute bottom-40 left-1/2 -translate-x-1/2 w-[100vw] max-w-[500px] h-96 bg-purple-500/10 rounded-full blur-[100px] md:blur-[120px] pointer-events-none -z-10"></div>
 
-            {/* Smart Hero Section */}
-            <div className="relative overflow-hidden bg-surface-elevated/60 backdrop-blur-2xl border border-border-strong/30 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] mb-4 group transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(192,132,87,0.2)] hover:border-brand-accent/30 hover:-translate-y-1">
-                <div className="absolute inset-0 bg-gradient-to-br from-brand-accent/5 to-transparent pointer-events-none z-0"></div>
-                
-                <div className="z-10 flex flex-col gap-4">
-                    <div>
-                        <p className="text-sm md:text-base text-text-muted font-bold tracking-wide uppercase mb-1 flex items-center gap-2">
-                            {greeting.text} {greeting.icon}
-                        </p>
-                        <h1 className="text-3xl md:text-5xl font-black text-text-main mb-2 font-outfit tracking-tight">
-                            {userData?.name?.split(' ')[0] || 'Student'} 👋
-                        </h1>
-                        <p className="text-sm md:text-md text-text-muted max-w-md font-inter leading-relaxed">
-                            {greeting.subText}
-                        </p>
-                    </div>
 
-                    <div className="flex flex-wrap items-center gap-3 mt-2">
-                        <div className="flex items-center gap-1.5 bg-brand-accent/10 border border-brand-accent/20 px-3 py-1.5 rounded-full backdrop-blur-md">
-                            <Calendar className="w-3.5 h-3.5 text-brand-accent" />
-                            <span className="text-xs font-bold text-brand-accent">{stats.events} Active Events</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 px-3 py-1.5 rounded-full backdrop-blur-md">
-                            <BookOpen className="w-3.5 h-3.5 text-blue-500" />
-                            <span className="text-xs font-bold text-blue-500">{stats.notes} Shared Notes</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 bg-purple-500/10 border border-purple-500/20 px-3 py-1.5 rounded-full backdrop-blur-md">
-                            <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
-                            <span className="text-xs font-bold text-purple-500">{stats.online} Online Now</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mt-6 md:mt-0 z-10 relative">
-                    <div className="absolute inset-0 bg-brand-accent/20 rounded-full blur-xl group-hover:bg-brand-accent/40 transition-all duration-500"></div>
-                    <div 
-                        onClick={() => setActiveTab('profile')}
-                        className="w-24 h-24 md:w-32 md:h-32 bg-surface-base rounded-full flex items-center justify-center overflow-hidden border-4 border-surface-elevated shadow-lg cursor-pointer relative z-10 transform transition-transform duration-300 hover:scale-105 hover:rotate-3"
-                    >
-                        {userData?.profileImage ? (
-                            <img src={userData.profileImage} className="w-full h-full object-cover" alt="Profile" />
-                        ) : (
-                            <span className="text-4xl text-brand-accent font-black font-outfit">{userData?.name ? userData.name[0] : 'U'}</span>
-                        )}
-                    </div>
-                </div>
-            </div>
 
             {/* Sponsored Ads (Optional, if exists) */}
             <div className="mb-4 mt-2">
@@ -148,8 +102,8 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
                         icon={<ShoppingBag className="w-8 h-8" />} 
                         title="Market" 
                         desc="Buy & sell essentials"
-                        color="text-orange-500" 
-                        bg="bg-orange-500"
+                        color="text-blue-500" 
+                        bg="bg-blue-500"
                         onClick={() => setActiveTab('market')} 
                     />
                     <QuickActionTile 
@@ -240,7 +194,7 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
                 </h3>
 
                 {scholarshipsLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                         {[1, 2, 3].map(i => <div key={i} className="h-48 bg-surface-elevated/50 rounded-3xl animate-pulse"></div>)}
                     </div>
                 ) : scholarships.length === 0 ? (
@@ -250,7 +204,7 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
                         <p className="text-sm text-text-muted">Check back later for life-changing opportunities.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                         {scholarships.map((scholarship) => (
                             <div
                                 key={scholarship.id}
@@ -280,8 +234,8 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
                                         <p className="text-sm text-text-muted font-medium mb-3">{scholarship.provider}</p>
                                     )}
                                     {scholarship.amount && (
-                                        <div className="inline-block bg-green-500/20 border border-green-500/40 px-4 py-2 rounded-xl mb-4">
-                                            <p className="text-md font-black text-green-500 tracking-wide">💰 {scholarship.amount}</p>
+                                        <div className="inline-block bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full mb-4">
+                                            <p className="text-sm font-bold text-emerald-700 dark:text-emerald-400 tracking-wide font-outfit">💰 {scholarship.amount}</p>
                                         </div>
                                     )}
                                     <div className="flex items-center text-brand-accent text-sm font-bold group-hover:gap-2 transition-all">
@@ -318,9 +272,9 @@ export default function HomeDashboard({ user, userData, setActiveTab }) {
                             {/* Amount & Deadline */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {selectedScholarship.amount && (
-                                    <div className="bg-green-500/5 border border-green-500/40 rounded-2xl p-5">
+                                    <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-5">
                                         <p className="text-xs font-bold text-text-muted uppercase mb-2 tracking-wider">Financial Support</p>
-                                        <p className="text-2xl font-black text-green-500">💰 {selectedScholarship.amount}</p>
+                                        <p className="text-2xl font-black font-outfit text-emerald-700 dark:text-emerald-400">💰 {selectedScholarship.amount}</p>
                                     </div>
                                 )}
                                 {selectedScholarship.deadline && (

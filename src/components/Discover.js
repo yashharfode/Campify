@@ -279,7 +279,7 @@ export default function Discover({ user }) {
     };
 
     return (
-        <div className="min-h-screen bg-surface-elevated text-text-main pb-24 px-4 md:px-6 pt-6 max-w-7xl mx-auto">
+        <div className="min-h-screen bg-surface-elevated text-text-main pb-24 px-4 md:px-6 pt-6 max-w-[2560px] mx-auto 2xl:px-12">
 
             {/* Header */}
             <div className="mb-8">
@@ -310,7 +310,7 @@ export default function Discover({ user }) {
                     <Globe className="w-5 h-5 text-brand-accent" />
                     Campus Clubs
                 </h2>
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-6">
+                <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 2xl:grid-cols-10 gap-6">
                     {clubs.map((club, index) => {
                         const IconComponent = club.icon || Users;
                         return (
@@ -344,7 +344,7 @@ export default function Discover({ user }) {
                         Featured Events
                     </h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                     {events.filter(e => e.featured).map(event => (
                         <div key={event.id}
                              onClick={() => { setSelectedEvent(event); setIsDetailModalOpen(true); }}
@@ -410,7 +410,7 @@ export default function Discover({ user }) {
                     <Calendar className="w-5 h-5 text-brand-accent" />
                     Upcoming Activities
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                     {filteredEvents.map(event => (
                         <EventCard
                             key={event.id}

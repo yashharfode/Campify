@@ -33,7 +33,7 @@ const SkeletonCard = () => (
 
 // Skeleton Grid
 const SkeletonGrid = () => (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 pb-24">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-6 pb-24">
         {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
     </div>
 );
@@ -329,7 +329,7 @@ export default function Marketplace({ user, userData, setActiveTab, setChatTarge
     };
 
     return (
-        <div className="animate-in fade-in pb-24 pt-4 px-4 max-w-7xl mx-auto">
+        <div className="animate-in fade-in pb-24 pt-4 px-4 2xl:px-12 max-w-[2560px] mx-auto">
             {/* Header */}
             <div className="sticky top-0 bg-surface-elevated z-20 pb-4 pt-2 -mx-4 px-4">
                 <div className="flex justify-between items-center mb-4">
@@ -422,7 +422,7 @@ export default function Marketplace({ user, userData, setActiveTab, setChatTarge
                     <p>No items found. Be the first to sell!</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-6">
                     {filteredAndSortedItems.map((item) => (
                         <ProductCard
                             key={item.id}

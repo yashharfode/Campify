@@ -271,7 +271,7 @@ export default function Notes({ user, userData }) {
     const availableFilterSubjects = filterSem === 'All' ? [] : (categories[filterBranch]?.[filterSem] || []);
 
     return (
-        <div className="min-h-screen bg-background pb-24 pt-4 px-3 md:px-4 max-w-7xl mx-auto">
+        <div className="min-h-screen bg-background pb-24 pt-4 px-3 md:px-4 max-w-[2560px] mx-auto 2xl:px-12">
             {/* Header */}
             <div className="mb-6">
                 <h1 className="text-2xl md:text-3xl font-bold text-text-main flex items-center gap-3 mb-2">
@@ -410,7 +410,7 @@ export default function Notes({ user, userData }) {
                                 <p className="text-text-muted text-sm">Try adjusting your filters.</p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
                                 {filteredNotes.map(note => (
                                     <div key={note.id} className="bg-surface-base rounded-xl border border-border-strong overflow-hidden hover:shadow-md transition group flex flex-col h-full">
                                         {/* Cover Image */}
@@ -480,7 +480,7 @@ export default function Notes({ user, userData }) {
                              </button>
                          </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
                             {myNotes.map(note => (
                                 <div key={note.id} className="bg-surface-base rounded-xl border border-border-strong overflow-hidden hover:shadow-md transition flex flex-col shadow-sm">
                                     {/* Cover Image */}

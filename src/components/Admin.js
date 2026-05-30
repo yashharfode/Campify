@@ -981,12 +981,30 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                         </button>
                         <div className="h-6 w-px bg-border-strong mx-2"></div>
                         <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => setIsAddingEvent(true)}
-                                className="bg-brand-accent hover:bg-brand-accent/90 text-[#111827] px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-2"
-                            >
-                                <Plus className="w-4 h-4" /> Create Event
-                            </button>
+                            {activeTab === 'events' && (
+                                <button
+                                    onClick={() => setIsAddingEvent(true)}
+                                    className="bg-brand-accent hover:bg-brand-accent/90 text-[#111827] px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-2"
+                                >
+                                    <Plus className="w-4 h-4" /> Create Event
+                                </button>
+                            )}
+                            {activeTab === 'banners' && (
+                                <button
+                                    onClick={() => setIsAddingBanner(true)}
+                                    className="bg-brand-accent hover:bg-brand-accent/90 text-[#111827] px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-2"
+                                >
+                                    <Plus className="w-4 h-4" /> Add Banner
+                                </button>
+                            )}
+                            {activeTab === 'scholarships' && (
+                                <button
+                                    onClick={() => setIsAddingScholarship(true)}
+                                    className="bg-brand-accent hover:bg-brand-accent/90 text-[#111827] px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-2"
+                                >
+                                    <Plus className="w-4 h-4" /> Add Scholarship
+                                </button>
+                            )}
                         </div>
                     </div>
                 </header>

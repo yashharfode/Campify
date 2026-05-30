@@ -1592,7 +1592,7 @@ const DrawerNavLink = ({ icon, label, active, onClick, color }) => (
     <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
         active 
             ? 'bg-blue-600 text-[#111827] shadow-sm' 
-            : color || 'text-text-muted hover:bg-surface-elevated hover:text-brand-accent'
+            : color || 'text-text-main hover:bg-surface-elevated hover:text-brand-accent'
     }`}>
         {icon}
         <span>{label}</span>
@@ -1681,14 +1681,10 @@ export default function App() {
                     </div>
                     <h1 className="text-xl font-bold text-text-main">CAMPIFY</h1>
                 </div>
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-6">
                     <DesktopNavLink icon={<Home className="w-5 h-5" />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
-                    <DesktopNavLink icon={<ShoppingBag className="w-5 h-5" />} label="Market" active={activeTab === 'market'} onClick={() => setActiveTab('market')} />
-                    <DesktopNavLink icon={<FileText className="w-5 h-5" />} label="Notes" active={activeTab === 'notes'} onClick={() => setActiveTab('notes')} />
-                    <DesktopNavLink icon={<GraduationCap className="w-5 h-5" />} label="Academics" active={activeTab === 'academics'} onClick={() => setActiveTab('academics')} />
-                    <DesktopNavLink icon={<MessageSquare className="w-5 h-5" />} label="Chat" active={activeTab === 'chat'} onClick={() => setActiveTab('chat')} />
-                    <DesktopNavLink icon={<Users className="w-5 h-5" />} label="Teams" active={activeTab === 'teams'} onClick={() => setActiveTab('teams')} />
                     <DesktopNavLink icon={<Compass className="w-5 h-5" />} label="Discover" active={activeTab === 'discover'} onClick={() => setActiveTab('discover')} />
+                    <DesktopNavLink icon={<GraduationCap className="w-5 h-5" />} label="Academics" active={activeTab === 'academics'} onClick={() => setActiveTab('academics')} />
                     <DesktopNavLink icon={<Package className="w-5 h-5" />} label="Lost & Found" active={activeTab === 'lost'} onClick={() => setActiveTab('lost')} />
                 </div>
                 <div className="flex items-center gap-4">
@@ -1736,7 +1732,7 @@ export default function App() {
 
             {/* Slide Drawer Panel */}
             <div
-                className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-surface border-l border-border-strong shadow-2xl z-[60] md:hidden flex flex-col transition-transform duration-300 ease-out transform ${
+                className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-surface-elevated bg-opacity-100 backdrop-blur-none border-l border-border-strong shadow-2xl z-[60] md:hidden flex flex-col transition-transform duration-300 ease-out transform ${
                     hamburgerOpen ? 'translate-x-0' : 'translate-x-full'
                 }`}
             >
@@ -1835,9 +1831,8 @@ export default function App() {
             {/* Mobile Nav */}
             <div className="md:hidden fixed bottom-0 w-full bg-surface-elevated border-t border-border-strong px-6 py-3 flex justify-between items-center z-50 pb-safe shadow-md">
                 <NavBtn icon={<Home className="w-6 h-6" />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
-                <NavBtn icon={<ShoppingBag className="w-6 h-6" />} label="Market" active={activeTab === 'market'} onClick={() => setActiveTab('market')} />
-                <NavBtn icon={<Users className="w-6 h-6" />} label="Teams" active={activeTab === 'teams'} onClick={() => setActiveTab('teams')} />
                 <NavBtn icon={<Compass className="w-6 h-6" />} label="Discover" active={activeTab === 'discover'} onClick={() => setActiveTab('discover')} />
+                <NavBtn icon={<MessageSquare className="w-6 h-6" />} label="Chat" active={activeTab === 'chat'} onClick={() => setActiveTab('chat')} />
                 <NavBtn icon={<User className="w-6 h-6" />} label="Profile" active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} />
             </div>
 
