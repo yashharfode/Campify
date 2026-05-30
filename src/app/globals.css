@@ -1,0 +1,182 @@
+@import "tailwindcss";
+
+:root {
+  /* Centralized Premium Beige Theme Variables (Light Mode) */
+  --background: #FAF7F2;
+  --foreground: #111827;
+  
+  --surface: #FFFFFF;
+  --surface-2: #F3F0EA;
+  
+  --ink-soft: #6B7280;
+  --line-soft: #E7E5E4;
+  
+  --accent-deep: #C08457;
+  --accent-hover: #A6724A;
+
+  /* Total Centralization Base Variables */
+  --surface-base: #FAF7F2;
+  --surface-elevated: #FFFFFF;
+  --surface-highlight: #F3F0EA;
+  
+  --border-strong: #E7E5E4;
+  --border-subtle: #E7E5E4;
+  
+  --text-main: #111827;
+  --text-muted: #6B7280;
+  
+  --brand-accent: #C08457;
+  --brand-accent-hover: #A6724A;
+  
+  --glow-primary: rgba(192, 132, 87, 0.5);
+  --glow-secondary: rgba(166, 114, 74, 0.5);
+}
+
+.dark {
+  /* Centralized Apple Premium Theme Variables (Dark Mode) */
+  --background: #000000;
+  --foreground: #F5F5F7;
+  
+  --surface: #1C1C1E;
+  --surface-2: #2C2C2E;
+  
+  --ink-soft: #A1A1AA;
+  --line-soft: #38383A;
+  
+  --accent-deep: #0A84FF;
+  --accent-hover: #007AFF;
+
+  /* Total Centralization Base Variables */
+  --surface-base: #000000;
+  --surface-elevated: #1C1C1E;
+  --surface-highlight: #2C2C2E;
+  
+  --border-strong: #38383A;
+  --border-subtle: #48484A;
+  
+  --text-main: #F5F5F7;
+  --text-muted: #A1A1AA;
+  
+  --brand-accent: #C08457;
+  --brand-accent-hover: #A6724A;
+  
+  --glow-primary: rgba(192, 132, 87, 0.3);
+  --glow-secondary: rgba(166, 114, 74, 0.3);
+}
+
+.zen {
+  /* Centralized Zen Minimal Theme Variables (Focus Mode) */
+  --background: #F9FAFB;
+  --foreground: #18181B;
+  
+  --surface: #FFFFFF;
+  --surface-2: #F4F4F5;
+  
+  --ink-soft: #71717A;
+  --line-soft: #E4E4E7;
+  
+  --accent-deep: #8BA888;
+  --accent-hover: #7A9677;
+
+  /* Total Centralization Base Variables */
+  --surface-base: #F9FAFB;
+  --surface-elevated: #FFFFFF;
+  --surface-highlight: #F4F4F5;
+  
+  --border-strong: #E4E4E7;
+  --border-subtle: #F4F4F5;
+  
+  --text-main: #18181B;
+  --text-muted: #71717A;
+  
+  --brand-accent: #8BA888;
+  --brand-accent-hover: #7A9677;
+  
+  --glow-primary: transparent;
+  --glow-secondary: transparent;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Map common utility colors to our dark theme tokens so old classes inherit correctly */
+  --color-blue-50: var(--surface-2);
+  --color-blue-100: var(--surface);
+  --color-blue-200: var(--line-soft);
+  --color-blue-500: var(--accent-deep);
+  --color-blue-600: var(--accent-deep);
+  --color-blue-700: var(--accent-hover);
+  --color-blue-800: var(--accent-hover);
+  --color-blue-900: #0A21C0;
+  --color-blue-950: #050A44;
+
+  --color-indigo-50: var(--surface-2);
+  --color-indigo-100: var(--surface);
+  --color-indigo-200: var(--line-soft);
+  --color-indigo-500: var(--accent-deep);
+  --color-indigo-600: var(--accent-deep);
+  --color-indigo-700: var(--accent-hover);
+  --color-indigo-800: var(--accent-hover);
+  --color-indigo-900: #0A21C0;
+  --color-indigo-950: #050A44;
+
+  --color-purple-50: var(--surface-2);
+  --color-purple-100: var(--surface);
+  --color-purple-200: var(--line-soft);
+  --color-purple-500: var(--accent-deep);
+  --color-purple-600: var(--accent-deep);
+  --color-purple-700: var(--accent-hover);
+
+  /* Centralized Beige Theme Variables */
+  --color-primary: #FAF9F6;
+  --color-primary-foreground: #3E3933;
+  --color-secondary: #F6F2E9;
+  --color-secondary-foreground: #4C463E;
+  --color-border-beige: #E8E4D9;
+  --color-accent-dark: #1C1917;
+  --color-accent-dark-hover: #2A2521;
+
+  /* Total Centralization Theme Map */
+  --color-surface-base: var(--surface-base);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-highlight: var(--surface-highlight);
+  --color-border-strong: var(--border-strong);
+  --color-border-subtle: var(--border-subtle);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-hover: var(--brand-accent-hover);
+  --color-glow-primary: var(--glow-primary);
+  --color-glow-secondary: var(--glow-secondary);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
+
+/* Fallbacks Removed to prevent theme breaking */
+/* Animations */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+.stack-card {
+  transform-origin: center top;
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.8);
+}
