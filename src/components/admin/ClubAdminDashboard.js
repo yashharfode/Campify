@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Plus, Trash2, Edit2, Users, Calendar, Image, Link, MapPin, Mail, Loader2, X, Download, MessageSquare, Settings } from 'lucide-react';
+import { ShieldCheck, Plus, Trash2, Edit2, Users, Calendar, Image, Link, MapPin, Mail, Loader2, X, Download, MessageSquare, Settings, FileText } from 'lucide-react';
 import { db, appId } from '../../lib/firebase';
 import { doc, getDoc, updateDoc, collection, getDocs, addDoc, serverTimestamp, arrayUnion, arrayRemove, query, where, deleteDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
@@ -31,6 +31,8 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
   const [newEventTitle, setNewEventTitle] = useState('');
   const [newEventDate, setNewEventDate] = useState('');
   const [newEventDesc, setNewEventDesc] = useState('');
+  const [newEventImagePreview, setNewEventImagePreview] = useState('');
+  const [isEventImageUploading, setIsEventImageUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchClubData = async () => {
@@ -111,6 +113,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
         title: newEventTitle,
         date: newEventDate,
         description: newEventDesc,
+        image: newEventImagePreview || '',
         createdAt: serverTimestamp(),
         createdBy: user.uid
       });
@@ -120,6 +123,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
       setNewEventTitle('');
       setNewEventDate('');
       setNewEventDesc('');
+      setNewEventImagePreview('');
       fetchEvents(club.id);
     } catch (error) {
       console.error('Error adding event:', error);
@@ -200,6 +204,24 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
   };
 
   // --- NEW HANDLERS ---
+  const handleEventImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2097152) {
+      toast.error('File size must be less than 2MB');
+      return;
+    }
+    try {
+      setIsEventImageUploading(true);
+      const secure_url = await uploadToCloudinary(file);
+      setNewEventImagePreview(secure_url);
+    } catch (error) {
+      toast.error('Failed to process image');
+    } finally {
+      setIsEventImageUploading(false);
+    }
+  };
+
   const handleUpdateBasicInfo = async (e) => {
     e.preventDefault();
     try {
@@ -376,7 +398,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
   return (
     <div className="bg-surface-base min-h-screen">
       {/* Admin Dashboard Header (Dark Theme - Silent Coder) */}
-      <div className="bg-[#141414] border-b border-border-strong text-[#111827]">
+      <div className="bg-surface-highlight border-b border-border-strong text-text-main">
         <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 py-10">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="flex items-center gap-6">
@@ -405,7 +427,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
               </div>
             </div>
 
-            <button className="bg-surface-highlight hover:bg-border-strong text-[#111827] px-5 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2 border border-border-subtle">
+            <button className="bg-surface-highlight hover:bg-border-strong text-text-main px-5 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2 border border-border-subtle">
               <Settings size={18} /> Settings
             </button>
           </div>
@@ -453,7 +475,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
               key={tab}
               onClick={() => setDashboardTab(tab)}
               className={`px-4 py-2 rounded-xl text-sm font-bold capitalize transition whitespace-nowrap ${
-                dashboardTab === tab ? 'bg-surface-elevated text-[#111827]' : 'bg-surface-base text-text-muted hover:bg-surface-elevated border border-border-strong'
+                dashboardTab === tab ? 'bg-surface-elevated text-text-main' : 'bg-surface-base text-text-muted hover:bg-surface-elevated border border-border-strong'
               }`}
             >
               {tab === 'events' ? 'Events' :
@@ -475,7 +497,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
               </div>
               <button
                 onClick={() => setIsEventModalOpen(true)}
-                className="bg-brand-accent hover:bg-brand-accent-hover text-[#111827] px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 shadow-md shadow-green-900/20"
+                className="bg-brand-accent hover:bg-brand-accent-hover text-text-main px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 shadow-md shadow-green-900/20"
               >
                 <Plus size={18} /> New Event
               </button>
@@ -565,7 +587,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                 </div>
               </div>
               <div className="pt-4">
-                <button type="submit" disabled={isSubmitting} className="bg-surface-elevated hover:bg-black text-[#111827] px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+                <button type="submit" disabled={isSubmitting} className="bg-surface-elevated hover:bg-surface-highlight text-text-main px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
                   {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Changes'}
                 </button>
               </div>
@@ -609,7 +631,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                 </div>
               </div>
               <div className="pt-4">
-                <button type="submit" disabled={isSubmitting} className="bg-surface-elevated hover:bg-black text-[#111827] px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+                <button type="submit" disabled={isSubmitting} className="bg-surface-elevated hover:bg-surface-highlight text-text-main px-6 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
                   {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Changes'}
                 </button>
               </div>
@@ -627,7 +649,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                 <input type="url" placeholder="LinkedIn URL" value={newTeamMember.linkedInUrl} onChange={e => setNewTeamMember({...newTeamMember, linkedInUrl: e.target.value})} className="bg-surface-elevated border border-border-strong rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#C08457]" />
                 <input type="url" placeholder="Instagram URL" value={newTeamMember.instagramUrl} onChange={e => setNewTeamMember({...newTeamMember, instagramUrl: e.target.value})} className="bg-surface-elevated border border-border-strong rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#C08457]" />
                 <div className="md:col-span-2 mt-2">
-                  <button type="submit" disabled={isAddingTeam} className="bg-surface-elevated hover:bg-black transition text-[#111827] px-6 py-2.5 rounded-xl font-bold flex items-center gap-2">
+                  <button type="submit" disabled={isAddingTeam} className="bg-surface-elevated hover:bg-surface-highlight transition text-text-main px-6 py-2.5 rounded-xl font-bold flex items-center gap-2">
                     {isAddingTeam ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus size={18} />} Add Member
                   </button>
                 </div>
@@ -667,7 +689,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                 <h2 className="text-lg font-bold text-text-main">Media Gallery</h2>
                 <p className="text-sm text-text-muted">Upload photos from events and activities.</p>
               </div>
-              <label className="bg-brand-accent hover:bg-brand-accent-hover text-[#111827] px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 cursor-pointer shadow-md shadow-green-900/20">
+              <label className="bg-brand-accent hover:bg-brand-accent-hover text-text-main px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 cursor-pointer shadow-md shadow-green-900/20">
                 {galleryUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus size={18} />} Upload Image
                 <input type="file" className="hidden" accept="image/*" onChange={handleGalleryUpload} disabled={galleryUploading} />
               </label>
@@ -678,7 +700,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                 <div key={idx} className="relative aspect-video rounded-xl overflow-hidden group border border-border-strong">
                   <img src={getOptimizedImageUrl(url, '16:9')} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                    <button onClick={() => handleDeleteGalleryImage(url)} className="bg-red-500 text-[#111827] p-2 rounded-full hover:scale-110 transition shadow-md">
+                    <button onClick={() => handleDeleteGalleryImage(url)} className="bg-red-500 text-text-main p-2 rounded-full hover:scale-110 transition shadow-md">
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -701,8 +723,8 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-surface-elevated border border-border-strong rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
             <div className="p-6 border-b border-border-strong flex justify-between items-center bg-surface-elevated">
-              <h3 className="font-bold text-xl text-[#111827]">Create Event</h3>
-              <button onClick={() => setIsEventModalOpen(false)} className="text-text-muted hover:text-[#111827] transition">
+              <h3 className="font-bold text-xl text-text-main">Create Event</h3>
+              <button onClick={() => setIsEventModalOpen(false)} className="text-text-muted hover:text-text-main transition">
                 <Trash2 size={20} className="hidden" /> {/* Placeholder for X icon if needed, though usually X is imported from lucide-react. I'll just use text. */}
                 <span className="text-2xl leading-none">&times;</span>
               </button>
@@ -715,7 +737,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                   required
                   value={newEventTitle}
                   onChange={(e) => setNewEventTitle(e.target.value)}
-                  className="w-full bg-surface-elevated border border-border-subtle rounded-xl px-4 py-3 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
+                  className="w-full bg-surface-elevated border border-border-subtle rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#C08457] outline-none"
                   placeholder="e.g., Intro to Cybersecurity"
                 />
               </div>
@@ -726,7 +748,7 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                   required
                   value={newEventDate}
                   onChange={(e) => setNewEventDate(e.target.value)}
-                  className="w-full bg-surface-elevated border border-border-subtle rounded-xl px-4 py-3 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
+                  className="w-full bg-surface-elevated border border-border-subtle rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#C08457] outline-none"
                 />
               </div>
               <div>
@@ -736,22 +758,34 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
                   rows={4}
                   value={newEventDesc}
                   onChange={(e) => setNewEventDesc(e.target.value)}
-                  className="w-full bg-surface-elevated border border-border-subtle rounded-xl px-4 py-3 text-[#111827] focus:ring-2 focus:ring-[#C08457] outline-none"
+                  className="w-full bg-surface-elevated border border-border-subtle rounded-xl px-4 py-3 text-text-main focus:ring-2 focus:ring-[#C08457] outline-none"
                   placeholder="What is this event about?"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-muted mb-1">Event Image (Optional)</label>
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-xl bg-surface-base border-2 border-dashed border-border-strong flex items-center justify-center overflow-hidden">
+                    {newEventImagePreview ? <img src={newEventImagePreview} alt="Event Preview" className="w-full h-full object-cover" /> : <Image className="w-6 h-6 text-text-muted" />}
+                  </div>
+                  <label className="bg-surface-highlight hover:bg-border-strong text-text-main px-4 py-2 rounded-lg text-sm font-bold cursor-pointer transition flex items-center gap-2">
+                    {isEventImageUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upload Image'}
+                    <input type="file" className="hidden" accept="image/*" onChange={handleEventImageUpload} disabled={isEventImageUploading} />
+                  </label>
+                </div>
               </div>
               <div className="pt-4 flex gap-3">
                 <button
                   type="button"
                   onClick={() => setIsEventModalOpen(false)}
-                  className="flex-1 bg-surface-highlight text-[#111827] font-bold py-3 rounded-xl hover:bg-border-strong transition"
+                  className="flex-1 bg-surface-highlight text-text-main font-bold py-3 rounded-xl hover:bg-border-strong transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-brand-accent text-[#111827] font-bold py-3 rounded-xl hover:bg-brand-accent-hover transition disabled:opacity-70 flex items-center justify-center gap-2"
+                  className="flex-1 bg-brand-accent text-text-main font-bold py-3 rounded-xl hover:bg-brand-accent-hover transition disabled:opacity-70 flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Save Event'}
                 </button>
@@ -765,28 +799,28 @@ export default function ClubAdminDashboard({ user, userData, targetClubId }) {
       {isRegistrationsModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
           <div className="bg-surface-elevated rounded-2xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-border-strong flex justify-between items-center bg-[#141414]">
+            <div className="p-6 border-b border-border-strong flex justify-between items-center bg-surface-highlight">
               <div>
-                <h3 className="text-xl font-bold text-[#111827]">Event Registrations</h3>
+                <h3 className="text-xl font-bold text-text-main">Event Registrations</h3>
                 <p className="text-sm text-text-muted">{selectedEventForRegistrations?.title}</p>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleDownloadCSV}
                   disabled={!eventRegistrations.length || loadingRegistrations}
-                  className="bg-brand-accent hover:bg-brand-accent-hover disabled:opacity-50 text-[#111827] px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2"
+                  className="bg-brand-accent hover:bg-brand-accent-hover disabled:opacity-50 text-text-main px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2"
                 >
                   <FileText size={18} /> Download CSV
                 </button>
                 <button
                   onClick={() => setIsRegistrationsModalOpen(false)}
-                  className="bg-surface-highlight hover:bg-border-strong text-[#111827] px-4 py-2 rounded-xl text-sm font-bold transition"
+                  className="bg-surface-highlight hover:bg-border-strong text-text-main px-4 py-2 rounded-xl text-sm font-bold transition"
                 >
                   Close
                 </button>
               </div>
             </div>
-            <div className="p-6 overflow-y-auto bg-surface-elevated text-[#111827] flex-1">
+            <div className="p-6 overflow-y-auto bg-surface-elevated text-text-main flex-1">
               {loadingRegistrations ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-brand-accent mb-4" />

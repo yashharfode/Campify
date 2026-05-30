@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db, appId } from '../../lib/firebase';
 import toast from 'react-hot-toast';
 import { uploadToCloudinary } from '../../lib/cloudinary';
-import { Plus, Trash2, Edit2, Loader2, Book, FileText, ExternalLink, GraduationCap, X, Save, Image as ImageIcon } from 'lucide-react';
+import { Plus, Trash2, Edit2, Loader2, Book, FileText, ExternalLink, GraduationCap, X, Save, Image as ImageIcon, Settings } from 'lucide-react';
+import { useBranches, DEFAULT_BRANCHES } from '../../lib/useBranches';
 
 export default function AcademicsManager({ user }) {
     const [academicItems, setAcademicItems] = useState([]);
@@ -25,15 +26,54 @@ export default function AcademicsManager({ user }) {
     });
 
     const SEMESTERS = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6', 'Sem 7', 'Sem 8'];
-    const BRANCHES = [
-        'Computer Science (CSE)',
-        'Information Technology (IT)',
-        'Electronics (ECE)',
-        'Electrical (EE)',
-        'Mechanical (ME)',
-        'Civil (CE)',
-        'First Year (Common)'
-    ];
+    const { branches: BRANCHES, refreshBranches } = useBranches();
+
+    // Branch Management State
+    const [isManagingBranches, setIsManagingBranches] = useState(false);
+    const [branchList, setBranchList] = useState([]);
+    const [newBranchName, setNewBranchName] = useState('');
+    const [savingBranches, setSavingBranches] = useState(false);
+
+    useEffect(() => {
+        if (isManagingBranches) {
+            setBranchList([...BRANCHES]);
+        }
+    }, [isManagingBranches, BRANCHES]);
+
+    const handleSaveBranches = async () => {
+        setSavingBranches(true);
+        try {
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'metadata_branches'), {
+                branches: branchList
+            }).catch(async () => {
+                // If document doesn't exist, create it
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'metadata_branches'), {
+                    branches: branchList
+                });
+            });
+            toast.success('Branches updated successfully!');
+            refreshBranches();
+            setIsManagingBranches(false);
+        } catch (error) {
+            console.error('Error saving branches:', error);
+            toast.error('Failed to save branches');
+        } finally {
+            setSavingBranches(false);
+        }
+    };
+
+    const handleAddBranch = () => {
+        if (newBranchName.trim() && !branchList.includes(newBranchName.trim())) {
+            setBranchList([...branchList, newBranchName.trim()]);
+            setNewBranchName('');
+        }
+    };
+
+    const handleRemoveBranch = (branch) => {
+        if (window.confirm(`Remove branch "${branch}"?`)) {
+            setBranchList(branchList.filter(b => b !== branch));
+        }
+    };
 
     useEffect(() => {
         fetchAcademicItems();
@@ -161,15 +201,92 @@ export default function AcademicsManager({ user }) {
                     <GraduationCap className="w-6 h-6 text-brand-accent" />
                     Academics Management
                 </h2>
-                {!isAdding && (
-                    <button
-                        onClick={() => setIsAdding(true)}
-                        className="bg-brand-accent hover:bg-brand-accent-hover text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2"
-                    >
-                        <Plus className="w-4 h-4" /> Add Resource
-                    </button>
+                {!isAdding && !isManagingBranches && (
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setIsManagingBranches(true)}
+                            className="bg-surface-highlight hover:bg-border-strong text-text-main px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2"
+                        >
+                            <Settings className="w-4 h-4" /> Manage Branches
+                        </button>
+                        <button
+                            onClick={() => setIsAdding(true)}
+                            className="bg-brand-accent hover:bg-brand-accent-hover text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2"
+                        >
+                            <Plus className="w-4 h-4" /> Add Resource
+                        </button>
+                    </div>
                 )}
             </div>
+
+            {/* Branch Management Modal */}
+            {isManagingBranches && (
+                <div className="bg-surface-elevated rounded-2xl p-6 mb-8 border border-border-strong shadow-sm relative">
+                    <button 
+                        onClick={() => setIsManagingBranches(false)}
+                        className="absolute top-4 right-4 p-2 text-text-muted hover:bg-surface-highlight rounded-full transition"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                    
+                    <h3 className="text-lg font-bold text-text-main mb-6 flex items-center gap-2">
+                        <Settings className="w-5 h-5 text-brand-accent" /> Manage Branches
+                    </h3>
+
+                    <div className="space-y-4">
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={newBranchName}
+                                onChange={(e) => setNewBranchName(e.target.value)}
+                                placeholder="Enter new branch name..."
+                                className="flex-1 bg-surface-highlight border border-border-strong text-text-main rounded-xl p-3 focus:ring-2 focus:ring-brand-accent/50 outline-none"
+                                onKeyDown={(e) => e.key === 'Enter' && handleAddBranch()}
+                            />
+                            <button
+                                onClick={handleAddBranch}
+                                className="bg-brand-accent text-white px-4 py-2 rounded-xl font-bold hover:bg-brand-accent-hover transition flex items-center gap-2"
+                            >
+                                <Plus className="w-4 h-4" /> Add
+                            </button>
+                        </div>
+
+                        <div className="bg-surface-base border border-border-strong rounded-xl p-4 max-h-[300px] overflow-y-auto">
+                            {branchList.length === 0 ? (
+                                <p className="text-sm text-text-muted text-center py-4">No branches found.</p>
+                            ) : (
+                                <ul className="space-y-2">
+                                    {branchList.map((branch, idx) => (
+                                        <li key={idx} className="flex justify-between items-center bg-surface-highlight p-3 rounded-lg border border-border-strong">
+                                            <span className="font-bold text-sm text-text-main">{branch}</span>
+                                            <button onClick={() => handleRemoveBranch(branch)} className="text-text-muted hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-md transition">
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+
+                        <div className="flex gap-3 pt-4 border-t border-border-strong">
+                            <button
+                                onClick={() => setIsManagingBranches(false)}
+                                className="px-6 py-3 bg-surface-highlight text-text-muted rounded-xl font-bold hover:bg-border-strong transition"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSaveBranches}
+                                disabled={savingBranches}
+                                className="flex-1 bg-brand-accent hover:bg-brand-accent-hover disabled:opacity-50 text-white py-3 rounded-xl font-bold shadow-sm transition flex items-center justify-center gap-2"
+                            >
+                                {savingBranches ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                                Save Branches
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {isAdding && (
                 <div className="bg-surface-elevated rounded-2xl p-6 mb-8 border border-border-strong shadow-sm relative">

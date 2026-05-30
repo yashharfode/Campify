@@ -32,6 +32,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
 
     // Missing state variables
     const [events, setEvents] = useState([]);
+    const [clubs, setClubs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAddingEvent, setIsAddingEvent] = useState(false);
     const [selectedManageEvent, setSelectedManageEvent] = useState(null);
@@ -46,7 +47,9 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
         color: 'blue',
         attendees: 0,
         image: '',
-        featured: false
+        featured: false,
+        clubId: '',
+        clubName: ''
     });
 
     // Banner State
@@ -156,8 +159,23 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
             fetchAdmins();
             fetchNotesCategories();
             fetchChatGroups();
+            fetchClubs();
         }
     }, [isAdmin]);
+
+    const fetchClubs = async () => {
+        try {
+            const clubsRef = collection(db, 'artifacts', appId, 'public', 'data', 'clubs');
+            const snapshot = await getDocs(clubsRef);
+            const fetchedClubs = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setClubs(fetchedClubs);
+        } catch (error) {
+            console.error('Error fetching clubs:', error);
+        }
+    };
 
     const fetchEvents = async () => {
         try {
@@ -815,7 +833,9 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
             color: event.color || 'blue',
             attendees: event.attendees || 0,
             image: event.image || '',
-            featured: event.featured || false
+            featured: event.featured || false,
+            clubId: event.clubId || '',
+            clubName: event.clubName || ''
         });
         setIsAddingEvent(true);
     };
@@ -1179,6 +1199,27 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                     className="w-4 h-4 text-brand-accent rounded focus:ring-2 focus:ring-[#C08457]"
                                 />
                                 <label htmlFor="featured" className="text-sm font-bold text-text-muted">Mark as Featured Event</label>
+                            </div>
+
+                            <div className="pt-2">
+                                <label className="block text-sm font-bold text-text-muted mb-2">Hosting Club (Optional)</label>
+                                <select
+                                    value={formData.clubId}
+                                    onChange={(e) => {
+                                        const selectedClub = clubs.find(c => c.id === e.target.value);
+                                        setFormData({ 
+                                            ...formData, 
+                                            clubId: e.target.value, 
+                                            clubName: selectedClub ? selectedClub.name : '' 
+                                        });
+                                    }}
+                                    className="w-full bg-surface-base border border-border-strong rounded-xl px-4 py-3 text-text-main focus:outline-none focus:border-brand-accent transition"
+                                >
+                                    <option value="">No Club (Global Event)</option>
+                                    {clubs.map(club => (
+                                        <option key={club.id} value={club.id}>{club.name}</option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className="flex gap-3 pt-4">

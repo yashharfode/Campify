@@ -10,6 +10,7 @@ import {
     Link as LinkIcon, ExternalLink, CheckCircle2, Package, CreditCard, KeyRound, Layers,
     Shield, Database, Server, Clock, FileText, GraduationCap, MessageSquare
 } from 'lucide-react';
+import { useBranches } from '../../lib/useBranches';
 
 // --- FIREBASE IMPORTS ---
 import {
@@ -563,6 +564,7 @@ const createEmptyProject = () => ({
 });
 
 const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
+    const { branches: BRANCHES, loadingBranches } = useBranches();
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({});
     const [saving, setSaving] = useState(false);
@@ -857,13 +859,15 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                                 placeholder="Full Name"
                             />
                             <div className="flex gap-2">
-                                <input
+                                <select
                                     name="branch"
                                     value={formData.branch || ''}
                                     onChange={handleChange}
-                                    className="w-1/2 bg-surface-base border border-border-subtle rounded-lg py-2 px-3 text-text-main text-sm placeholder-gray-500 text-center focus:outline-none focus:border-[#C08457]"
-                                    placeholder="Branch (e.g. CSE)"
-                                />
+                                    className="w-1/2 bg-surface-base border border-border-subtle rounded-lg py-2 px-3 text-text-main text-sm text-center focus:outline-none focus:border-[#C08457]"
+                                >
+                                    <option value="" disabled>Select Branch</option>
+                                    {!loadingBranches && BRANCHES.filter(b => b !== 'All').map(b => <option key={b} value={b}>{b}</option>)}
+                                </select>
                                 <input
                                     name="year"
                                     value={formData.year || ''}

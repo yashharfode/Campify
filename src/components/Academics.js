@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, getDocs } from 'firebase/firestore';
 import { db, appId } from '../lib/firebase';
-import { GraduationCap, Book, FileText, Search, Loader2, Filter, ExternalLink, CalendarDays } from 'lucide-react';
+import { GraduationCap, Book, FileText, Search, Loader2, Filter, ExternalLink, CalendarDays, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import AttendanceTracker from './AttendanceTracker';
+import { useBranches } from '../lib/useBranches';
 
-export default function Academics() {
-    const [activeTab, setActiveTab] = useState('timetable'); // 'timetable' or 'syllabus'
+export default function Academics({ user, userData }) {
+    const [activeTab, setActiveTab] = useState('attendance'); // 'attendance', 'timetable', or 'syllabus'
     const [resources, setResources] = useState([]);
     const [loading, setLoading] = useState(true);
     
@@ -17,16 +19,7 @@ export default function Academics() {
     const [searchQuery, setSearchQuery] = useState('');
 
     const SEMESTERS = ['All', 'Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6', 'Sem 7', 'Sem 8'];
-    const BRANCHES = [
-        'All',
-        'Computer Science (CSE)',
-        'Information Technology (IT)',
-        'Electronics (ECE)',
-        'Electrical (EE)',
-        'Mechanical (ME)',
-        'Civil (CE)',
-        'First Year (Common)'
-    ];
+    const { branches: BRANCHES, loadingBranches } = useBranches();
 
     useEffect(() => {
         fetchResources();
@@ -87,7 +80,17 @@ export default function Academics() {
                     </div>
 
                     {/* Main Tabs */}
-                    <div className="flex gap-2 mt-6">
+                    <div className="flex gap-2 mt-6 overflow-x-auto custom-scrollbar pb-2">
+                        <button
+                            onClick={() => setActiveTab('attendance')}
+                            className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+                                activeTab === 'attendance'
+                                    ? 'bg-brand-accent text-white shadow-md'
+                                    : 'bg-surface-highlight text-text-muted hover:text-text-main border border-border-strong'
+                            }`}
+                        >
+                            <CheckCircle className="w-4 h-4" /> Attendance Tracker
+                        </button>
                         <button
                             onClick={() => setActiveTab('timetable')}
                             className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${
@@ -111,32 +114,37 @@ export default function Academics() {
                     </div>
                 </div>
 
-                {/* Filters Bar */}
-                <div className="px-6 md:px-8 py-3 bg-surface-highlight border-t border-border-strong flex flex-col sm:flex-row gap-3">
-                    <div className="flex items-center gap-2 text-text-muted text-sm font-bold">
-                        <Filter className="w-4 h-4" /> Filters:
+                {/* Filters Bar - Only for resources */}
+                {activeTab !== 'attendance' && (
+                    <div className="px-6 md:px-8 py-3 bg-surface-highlight border-t border-border-strong flex flex-col sm:flex-row gap-3">
+                        <div className="flex items-center gap-2 text-text-muted text-sm font-bold">
+                            <Filter className="w-4 h-4" /> Filters:
+                        </div>
+                        <select
+                            value={selectedBranch}
+                            onChange={(e) => setSelectedBranch(e.target.value)}
+                            className="bg-surface-elevated border border-border-strong rounded-xl px-3 py-1.5 text-sm text-text-main focus:ring-2 focus:ring-brand-accent/50 outline-none cursor-pointer shadow-sm"
+                        >
+                            <option value="All">All Branches</option>
+                            {!loadingBranches && BRANCHES.map(b => <option key={b} value={b}>{b}</option>)}
+                        </select>
+                        <select
+                            value={selectedSemester}
+                            onChange={(e) => setSelectedSemester(e.target.value)}
+                            className="bg-surface-elevated border border-border-strong rounded-xl px-3 py-1.5 text-sm text-text-main focus:ring-2 focus:ring-brand-accent/50 outline-none cursor-pointer shadow-sm"
+                        >
+                            {SEMESTERS.map(s => <option key={s} value={s}>{s === 'All' ? 'All Semesters' : s}</option>)}
+                        </select>
                     </div>
-                    <select
-                        value={selectedBranch}
-                        onChange={(e) => setSelectedBranch(e.target.value)}
-                        className="bg-surface-elevated border border-border-strong rounded-xl px-3 py-1.5 text-sm text-text-main focus:ring-2 focus:ring-brand-accent/50 outline-none cursor-pointer shadow-sm"
-                    >
-                        {BRANCHES.map(b => <option key={b} value={b}>{b === 'All' ? 'All Branches' : b}</option>)}
-                    </select>
-                    <select
-                        value={selectedSemester}
-                        onChange={(e) => setSelectedSemester(e.target.value)}
-                        className="bg-surface-elevated border border-border-strong rounded-xl px-3 py-1.5 text-sm text-text-main focus:ring-2 focus:ring-brand-accent/50 outline-none cursor-pointer shadow-sm"
-                    >
-                        {SEMESTERS.map(s => <option key={s} value={s}>{s === 'All' ? 'All Semesters' : s}</option>)}
-                    </select>
-                </div>
+                )}
             </div>
 
             {/* Content Feed */}
             <div className="flex-1 overflow-y-auto px-6 md:px-8 py-8 custom-scrollbar relative z-10">
                 <div className="max-w-[2560px] mx-auto 2xl:px-12">
-                    {loading ? (
+                    {activeTab === 'attendance' ? (
+                        <AttendanceTracker user={user} userData={userData} />
+                    ) : loading ? (
                         <div className="flex justify-center py-20">
                             <Loader2 className="w-10 h-10 animate-spin text-brand-accent" />
                         </div>

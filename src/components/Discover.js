@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Search, Clock, MapPin, Users, Calendar, ExternalLink,
     Sparkles, TrendingUp, Heart, Share2, Zap, BookOpen,
-    Music, Palette, Code, Trophy, Globe, Lightbulb, X, Image as ImageIcon, ArrowLeft, Instagram, Linkedin, Mail, Phone, Layers
+    Music, Palette, Code, Trophy, Globe, Lightbulb, X, Image as ImageIcon, ArrowLeft, Instagram, Linkedin, Mail, Phone, Layers, Copy, CheckCircle
 } from 'lucide-react';
 import { collection, getDocs, query, orderBy, limit, where, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, increment, onSnapshot } from 'firebase/firestore';
 import { db, appId } from '../lib/firebase';
@@ -468,10 +468,16 @@ export default function Discover({ user }) {
 
 // Club Detail Modal
 const ClubDetailModal = ({ isOpen, onClose, club, events, onJoinEvent, onLikeEvent, registrations, wishlist }) => {
+    const [copiedEmail, setCopiedEmail] = useState(false);
+    
     if (!isOpen || !club) return null;
 
     const IconComponent = club.icon || Users;
     const gradient = club.gradient || 'from-slate-800 to-slate-900';
+    
+    // Fix typo in tagline if present
+    const displayTagline = club.tagline?.replace('AGRESSIVE', 'AGGRESSIVE') || 'Connect, Learn, and Grow with us.';
+
 
     return (
         <div className="fixed inset-0 z-[100] w-full h-full bg-surface-base overflow-y-auto animate-in fade-in zoom-in-95 duration-300">
@@ -501,8 +507,8 @@ const ClubDetailModal = ({ isOpen, onClose, club, events, onJoinEvent, onLikeEve
             <div className="max-w-6xl mx-auto px-4 md:px-8 pb-24 -mt-20 relative z-10">
                 
                 {/* Header Profile Section */}
-                <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-end mb-12">
-                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-surface-elevated p-2 shadow-lg flex-shrink-0 relative group border border-border-strong">
+                <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-end mb-12 relative z-20">
+                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-surface-elevated p-2 shadow-xl flex-shrink-0 relative group border-4 border-surface-base transform -translate-y-4">
                         <div className="w-full h-full rounded-2xl bg-surface-base overflow-hidden flex items-center justify-center">
                             {club.logoUrl ? (
                                 <img src={getOptimizedImageUrl(club.logoUrl, '1:1')} alt={club.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -511,30 +517,35 @@ const ClubDetailModal = ({ isOpen, onClose, club, events, onJoinEvent, onLikeEve
                             )}
                         </div>
                         {club.isVerified && (
-                            <div className="absolute -bottom-2 -right-2 bg-brand-accent rounded-full p-1.5 border-4 border-white shadow-md">
+                            <div className="absolute -bottom-2 -right-2 bg-brand-accent rounded-full p-1.5 border-4 border-surface-base shadow-md">
                                 <Sparkles className="w-5 h-5 text-[#111827]" />
                             </div>
                         )}
                     </div>
-                    <div className="flex-1 bg-surface-elevated p-6 rounded-3xl shadow-sm border border-border-strong/80 w-full">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-lg text-blue-700 text-xs font-bold tracking-wide mb-3 border border-blue-100">
-                            <Layers className="w-3 h-3" />
-                            {club.category || 'Student Community'}
+                    <div className="flex-1 bg-surface-elevated p-6 rounded-3xl shadow-sm border border-border-strong/80 w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-600 rounded-full text-white text-xs font-bold tracking-wide mb-3 shadow-sm border border-blue-700">
+                                <Layers className="w-3 h-3" />
+                                {club.category || 'Student Community'}
+                            </div>
+                            <h1 className="text-3xl md:text-4xl font-black text-text-main mb-2 tracking-tight">{club.name}</h1>
+                            <p className="text-base md:text-lg text-text-muted font-medium leading-relaxed">
+                                {displayTagline}
+                            </p>
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-black text-text-main mb-2 tracking-tight">{club.name}</h1>
-                        <p className="text-base md:text-lg text-text-muted font-medium leading-relaxed">
-                            {club.tagline || 'Connect, Learn, and Grow with us.'}
-                        </p>
+                        <button className="bg-brand-accent hover:bg-brand-accent-hover text-[#111827] font-bold py-3 px-8 rounded-xl shadow-md transition-all flex items-center gap-2 transform hover:-translate-y-0.5 whitespace-nowrap">
+                            Join Club <ExternalLink className="w-4 h-4" />
+                        </button>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
+                <div className="flex flex-col lg:flex-row gap-8 md:gap-12 items-stretch">
                     
                     {/* Left Column: About & Events */}
-                    <div className="lg:col-span-2 space-y-12">
+                    <div className="lg:w-2/3 space-y-12 flex flex-col">
                         
                         {/* About Section */}
-                        <section className="bg-surface-elevated rounded-3xl p-8 md:p-10 shadow-sm border border-border-strong">
+                        <section className="bg-surface-elevated rounded-3xl p-8 shadow-sm border border-border-strong flex flex-col justify-center h-full min-h-[250px]">
                             <h2 className="text-2xl font-bold text-text-main mb-6 flex items-center gap-3">
                                 <span className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl"><BookOpen className="w-6 h-6" /></span>
                                 About Us
@@ -582,18 +593,18 @@ const ClubDetailModal = ({ isOpen, onClose, club, events, onJoinEvent, onLikeEve
                         
                         {/* Media Gallery */}
                         {club.gallery && club.gallery.length > 0 && (
-                            <section>
+                            <section className="bg-surface-elevated rounded-3xl p-8 shadow-sm border border-border-strong">
                                 <h2 className="text-2xl font-bold text-text-main mb-6 flex items-center gap-3">
                                     <span className="p-2.5 bg-emerald-50 text-emerald-500 rounded-xl"><ImageIcon className="w-6 h-6" /></span>
                                     Gallery
                                 </h2>
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     {club.gallery.map((url, idx) => (
-                                        <div key={idx} className="group aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-lg transition-all relative">
+                                        <div key={idx} className="group aspect-video md:aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-lg transition-all relative">
                                             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center justify-center">
                                                 <ImageIcon className="w-8 h-8 text-[#111827] drop-shadow-md" />
                                             </div>
-                                            <img src={getOptimizedImageUrl(url, '16:9')} alt={`Gallery ${idx}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                            <img src={getOptimizedImageUrl(url, '1:1')} alt={`Gallery ${idx}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                         </div>
                                     ))}
                                 </div>
@@ -602,21 +613,32 @@ const ClubDetailModal = ({ isOpen, onClose, club, events, onJoinEvent, onLikeEve
                     </div>
 
                     {/* Right Column: Contact & Team */}
-                    <div className="space-y-8">
+                    <div className="lg:w-1/3 space-y-8 flex flex-col">
                         
                         {/* Contact Widget */}
-                        <div className="bg-surface-elevated rounded-3xl p-8 shadow-sm border border-border-strong sticky top-24">
+                        <div className="bg-surface-elevated rounded-3xl p-8 shadow-sm border border-border-strong h-full min-h-[250px]">
                             <h3 className="text-xl font-bold text-text-main mb-6">Contact Info</h3>
                             <div className="space-y-5">
-                                <a href={`mailto:${club.contactEmail || club.email}`} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-surface-base transition group border border-transparent hover:border-border-strong">
-                                    <div className="w-12 h-12 rounded-xl bg-blue-50 text-brand-accent flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <div className="flex items-center gap-4 p-4 rounded-2xl hover:bg-surface-base transition group border border-border-subtle hover:border-border-strong">
+                                    <div className="w-12 h-12 rounded-xl bg-blue-50 text-brand-accent flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                                         <Mail className="w-5 h-5" />
                                     </div>
-                                    <div className="overflow-hidden">
+                                    <div className="overflow-hidden flex-1">
                                         <p className="text-xs text-text-muted font-medium mb-0.5">Email Address</p>
-                                        <p className="text-sm font-bold text-text-main truncate">{club.contactEmail || club.email || "No email"}</p>
+                                        <p className="text-sm font-bold text-text-main break-all">{club.contactEmail || club.email || "No email"}</p>
                                     </div>
-                                </a>
+                                    <button 
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            navigator.clipboard.writeText(club.contactEmail || club.email);
+                                            setCopiedEmail(true);
+                                            setTimeout(() => setCopiedEmail(false), 2000);
+                                        }}
+                                        className="p-2 text-text-muted hover:text-brand-accent transition-colors flex-shrink-0"
+                                    >
+                                        {copiedEmail ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                                    </button>
+                                </div>
                                 
                                 {club.contactPhone && (
                                     <a href={`tel:${club.contactPhone}`} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-surface-base transition group border border-transparent hover:border-border-strong">
