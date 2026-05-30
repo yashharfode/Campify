@@ -6,9 +6,9 @@ import EventCommandCenter from './admin/EventCommandCenter';
 import {
     Plus, Edit2, Trash2, Save, X, Shield, Lock,
     Calendar, Users, Clock, Tag, AlertCircle, CheckCircle, FileText, Download, XCircle,
-    UserPlus, Loader2, MessageSquare, Hash, Check, Image as ImageIcon, MapPin, LayoutDashboard, Tent, Megaphone, User, BookOpen, List, Package, GraduationCap, UserCog, MessageCircle, Menu, Search, Bell, MenuIcon, ChevronRight
+    UserPlus, Loader2, MessageSquare, Hash, Check, Image as ImageIcon, MapPin, LayoutDashboard, Tent, Megaphone, User, BookOpen, List, Package, GraduationCap, UserCog, MessageCircle, Menu, Search, Bell, MenuIcon, ChevronRight, Flame
 } from 'lucide-react';
-import { collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp, collectionGroup } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp, collectionGroup, increment } from 'firebase/firestore';
 import { db, appId } from '../lib/firebase';
 import toast from 'react-hot-toast';
 import { uploadToCloudinary, getOptimizedImageUrl } from '../lib/cloudinary';
@@ -118,6 +118,15 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
     const [admins, setAdmins] = useState([]);
     const [adminsLoading, setAdminsLoading] = useState(true);
     const [newAdminEmail, setNewAdminEmail] = useState('');
+    
+    // Karma Logs State
+    const [karmaLogs, setKarmaLogs] = useState([]);
+    const [karmaLogsLoading, setKarmaLogsLoading] = useState(true);
+    const [isKarmaModalOpen, setIsKarmaModalOpen] = useState(false);
+    const [karmaActionType, setKarmaActionType] = useState('add');
+    const [karmaAmount, setKarmaAmount] = useState('');
+    const [karmaReason, setKarmaReason] = useState('');
+    const [karmaUser, setKarmaUser] = useState(null);
 
     const fileInputRef = useRef(null);
 
@@ -161,6 +170,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
             fetchNotesCategories();
             fetchChatGroups();
             fetchClubs();
+            fetchKarmaLogs();
         }
     }, [isAdmin]);
 
@@ -175,6 +185,22 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
             setClubs(fetchedClubs);
         } catch (error) {
             console.error('Error fetching clubs:', error);
+        }
+    };
+
+    const fetchKarmaLogs = async () => {
+        try {
+            const logsRef = collection(db, 'artifacts', appId, 'karma_logs');
+            const snapshot = await getDocs(logsRef);
+            const fetchedLogs = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setKarmaLogs(fetchedLogs);
+            setKarmaLogsLoading(false);
+        } catch (error) {
+            console.error('Error fetching karma logs:', error);
+            setKarmaLogsLoading(false);
         }
     };
 
@@ -759,6 +785,39 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
         }
     };
 
+    const handleUpdateUserKarma = async (e) => {
+        e.preventDefault();
+        if (!karmaUser || !karmaAmount || isNaN(karmaAmount)) return;
+        try {
+            const userRef = doc(db, 'artifacts', appId, 'users', karmaUser.id, 'profile', 'data');
+            const change = karmaActionType === 'add' ? parseInt(karmaAmount) : -parseInt(karmaAmount);
+            
+            await updateDoc(userRef, {
+                karma: increment(change)
+            });
+            
+            const notificationsRef = collection(db, 'artifacts', appId, 'users', karmaUser.id, 'notifications');
+            await addDoc(notificationsRef, {
+                type: 'karma_update',
+                title: `Karma ${karmaActionType === 'add' ? 'Increased' : 'Reduced'} by Admin`,
+                message: karmaReason ? `Reason: ${karmaReason}` : `Your karma has been updated.`,
+                amount: change,
+                read: false,
+                createdAt: serverTimestamp()
+            });
+
+            toast.success(`Successfully updated karma for ${karmaUser.name}`);
+            setIsKarmaModalOpen(false);
+            setKarmaAmount('');
+            setKarmaReason('');
+            setKarmaUser(null);
+            fetchUsers();
+        } catch (error) {
+            console.error("Error updating karma:", error);
+            toast.error("Failed to update karma");
+        }
+    };
+
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -959,7 +1018,8 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
         { id: 'academics', label: 'Academics', icon: <GraduationCap className="w-5 h-5" /> },
         { id: 'scholarships', label: 'Scholarships', icon: <GraduationCap className="w-5 h-5" /> },
         { id: 'admins', label: 'Admins', icon: <UserCog className="w-5 h-5" /> },
-        { id: 'chat_groups', label: 'Chat Groups', icon: <MessageCircle className="w-5 h-5" /> }
+        { id: 'chat_groups', label: 'Chat Groups', icon: <MessageCircle className="w-5 h-5" /> },
+        { id: 'karma', label: 'Karma Management', icon: <Flame className="w-5 h-5" /> }
     ];
 
     return (
@@ -1095,6 +1155,79 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                     {/* Academics Management Tab */}
                     {activeTab === 'academics' && (
                         <AcademicsManager user={user} />
+                    )}
+
+                    {/* Karma Management Tab */}
+                    {activeTab === 'karma' && (
+                        <div className="bg-surface-elevated rounded-2xl p-6 border border-border-strong mt-6">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-3 bg-orange-100 rounded-xl">
+                                    <Flame className="w-6 h-6 text-orange-600" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-text-main">Karma Management</h2>
+                                    <p className="text-sm text-text-muted">Review pending karma points</p>
+                                </div>
+                            </div>
+
+                            {karmaLogsLoading ? (
+                                <div className="text-center py-12"><Loader2 className="w-8 h-8 animate-spin mx-auto text-orange-500" /></div>
+                            ) : karmaLogs.length === 0 ? (
+                                <div className="text-center py-12 border border-border-strong rounded-xl bg-surface-base">
+                                    <p className="text-text-muted">No karma logs found.</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {karmaLogs.map(log => (
+                                        <div key={log.id} className="bg-surface-base border border-border-strong p-4 rounded-xl flex items-center justify-between">
+                                            <div>
+                                                <p className="font-bold text-text-main">{log.userName} <span className="text-sm font-normal text-text-muted">({log.userEmail})</span></p>
+                                                <p className="text-sm text-text-muted">{log.reason}</p>
+                                                <p className="text-xs text-text-muted mt-1">{new Date(log.createdAt?.toDate?.() || Date.now()).toLocaleString()}</p>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <span className="font-black text-orange-500 text-lg">+{log.amount}</span>
+                                                {log.status === 'pending' ? (
+                                                    <div className="flex gap-2">
+                                                        <button 
+                                                            onClick={async () => {
+                                                                try {
+                                                                    const logRef = doc(db, 'artifacts', appId, 'karma_logs', log.id);
+                                                                    await updateDoc(logRef, { status: 'approved' });
+                                                                    
+                                                                    const { increment } = await import('firebase/firestore');
+                                                                    const userRef = doc(db, 'artifacts', appId, 'users', log.userId, 'profile', 'data');
+                                                                    await updateDoc(userRef, { karma: increment(log.amount) });
+                                                                    
+                                                                    toast.success("Karma Approved!");
+                                                                    fetchKarmaLogs();
+                                                                } catch (e) { console.error(e); toast.error("Failed to approve"); }
+                                                            }}
+                                                            className="bg-green-100 text-green-700 px-3 py-1 rounded font-bold hover:bg-green-200 transition"
+                                                        >Accept</button>
+                                                        <button 
+                                                            onClick={async () => {
+                                                                try {
+                                                                    const logRef = doc(db, 'artifacts', appId, 'karma_logs', log.id);
+                                                                    await updateDoc(logRef, { status: 'rejected' });
+                                                                    toast.success("Karma Rejected!");
+                                                                    fetchKarmaLogs();
+                                                                } catch (e) { toast.error("Failed to reject"); }
+                                                            }}
+                                                            className="bg-red-100 text-red-700 px-3 py-1 rounded font-bold hover:bg-red-200 transition"
+                                                        >Reject</button>
+                                                    </div>
+                                                ) : (
+                                                    <span className={`px-2 py-1 text-xs font-bold rounded-full ${log.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                        {log.status.toUpperCase()}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     )}
 
                     {/* Add/Edit Event Form */}
@@ -1512,6 +1645,39 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Karma Update Modal */}
+            {isKarmaModalOpen && karmaUser && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-surface-elevated rounded-2xl w-full max-w-md p-6 md:p-8 shadow-2xl border border-border-strong animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-bold text-text-main flex items-center gap-2">
+                                <Flame className="w-6 h-6 text-orange-500" /> Edit Karma
+                            </h3>
+                            <button onClick={() => setIsKarmaModalOpen(false)} className="text-text-muted hover:text-text-main"><X className="w-5 h-5"/></button>
+                        </div>
+                        <p className="text-sm text-text-muted mb-4">Editing karma for <span className="font-bold text-text-main">{karmaUser.name}</span> (Current: {karmaUser.karma || 0})</p>
+                        <form onSubmit={handleUpdateUserKarma} className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-text-muted mb-2 uppercase">Action</label>
+                                <div className="flex gap-2">
+                                    <button type="button" onClick={() => setKarmaActionType('add')} className={`flex-1 py-2 rounded-lg font-bold text-sm border ${karmaActionType === 'add' ? 'bg-green-500/20 text-green-600 border-green-500/50' : 'bg-surface-base text-text-muted border-border-strong hover:bg-surface-highlight'}`}>Add Karma</button>
+                                    <button type="button" onClick={() => setKarmaActionType('deduct')} className={`flex-1 py-2 rounded-lg font-bold text-sm border ${karmaActionType === 'deduct' ? 'bg-red-500/20 text-red-600 border-red-500/50' : 'bg-surface-base text-text-muted border-border-strong hover:bg-surface-highlight'}`}>Reduce Karma</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-text-muted mb-2 uppercase">Amount</label>
+                                <input required type="number" min="1" value={karmaAmount} onChange={(e) => setKarmaAmount(e.target.value)} className="w-full bg-surface-highlight border border-border-strong text-text-main rounded-xl p-3 focus:outline-none focus:border-orange-500" placeholder="e.g. 50" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-text-muted mb-2 uppercase">Reason (Included in Notification)</label>
+                                <input required type="text" value={karmaReason} onChange={(e) => setKarmaReason(e.target.value)} className="w-full bg-surface-highlight border border-border-strong text-text-main rounded-xl p-3 focus:outline-none focus:border-orange-500" placeholder="e.g. Spamming the forum" />
+                            </div>
+                            <button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl shadow-md transition-all mt-4">Save Changes</button>
+                        </form>
                     </div>
                 </div>
             )}
@@ -2204,6 +2370,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                         <div className="space-y-1 text-xs text-text-muted mb-3">
                                             <p className="truncate">Email: {user.email}</p>
                                             <p>Branch/Year: {user.branch || '-'} / {user.year || '-'}</p>
+                                            <p className="text-orange-500 font-bold flex items-center gap-1"><Flame className="w-3 h-3" /> Karma: {user.karma || 0}</p>
                                         </div>
                                         <div className="flex items-center justify-between gap-2">
                                             {user.isVisibleInTeams !== false ? (
@@ -2226,6 +2393,16 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                                     View
                                                 </button>
                                                 <button
+                                                    onClick={() => {
+                                                        setKarmaUser(user);
+                                                        setIsKarmaModalOpen(true);
+                                                    }}
+                                                    className="p-1.5 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition"
+                                                    title="Edit Karma"
+                                                >
+                                                    <Flame className="w-4 h-4" />
+                                                </button>
+                                                <button
                                                     onClick={() => handleDeleteUser(user.id)}
                                                     className="p-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition"
                                                     title="Delete User"
@@ -2244,6 +2421,7 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                         <th className="py-3 px-4 text-xs font-bold text-text-muted uppercase">User</th>
                                         <th className="py-3 px-4 text-xs font-bold text-text-muted uppercase">Branch/Year</th>
                                         <th className="py-3 px-4 text-xs font-bold text-text-muted uppercase">Email</th>
+                                        <th className="py-3 px-4 text-xs font-bold text-text-muted uppercase">Karma</th>
                                         <th className="py-3 px-4 text-xs font-bold text-text-muted uppercase">Status</th>
                                         <th className="py-3 px-4 text-xs font-bold text-text-muted uppercase text-right">Actions</th>
                                     </tr>
@@ -2274,6 +2452,11 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                             </td>
                                             <td className="py-3 px-4 text-sm text-text-muted">{user.email}</td>
                                             <td className="py-3 px-4">
+                                                <span className="inline-flex items-center gap-1 font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-full text-xs">
+                                                    <Flame className="w-3 h-3" /> {user.karma || 0}
+                                                </span>
+                                            </td>
+                                            <td className="py-3 px-4">
                                                 {user.isVisibleInTeams !== false ? (
                                                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">
                                                         <CheckCircle className="w-3 h-3" /> Visible
@@ -2294,6 +2477,16 @@ export default function Admin({ user, userData, setActiveTab: setAppTab, setTarg
                                                         className="text-brand-accent hover:text-indigo-800 font-bold text-xs"
                                                     >
                                                         View Profile
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            setKarmaUser(user);
+                                                            setIsKarmaModalOpen(true);
+                                                        }}
+                                                        className="p-1.5 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition"
+                                                        title="Edit Karma"
+                                                    >
+                                                        <Flame className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteUser(user.id)}

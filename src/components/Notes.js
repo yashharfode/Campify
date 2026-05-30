@@ -5,10 +5,11 @@ import {
     Upload, FileText, Download, Clock, CheckCircle, XCircle,
     Filter, Search, BookOpen, GraduationCap, X, Loader2, AlertCircle, Link as LinkIcon, ImageIcon, ChevronDown, Menu
 } from 'lucide-react';
-import { collection, addDoc, getDocs, query, where, serverTimestamp, getDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, serverTimestamp, getDoc, doc, updateDoc, increment } from 'firebase/firestore';
 import { db, appId } from '../lib/firebase';
 import toast from 'react-hot-toast';
 import { uploadToCloudinary, getOptimizedImageUrl } from '../lib/cloudinary';
+import { checkCooldown, awardKarma } from '../lib/karma';
 
 export default function Notes({ user, userData }) {
     const [activeTab, setActiveTab] = useState('all'); // 'all', 'my-notes', 'upload'
@@ -138,6 +139,11 @@ export default function Notes({ user, userData }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!checkCooldown(userData, 'notes')) return;
+        
+        if (!user) return toast.error('You must be logged in to upload notes');
+        
         if (!formData.driveLink || !formData.subject) {
             toast.error('Please fill all required fields');
             return;
@@ -162,6 +168,8 @@ export default function Notes({ user, userData }) {
             });
 
             toast.success('Note uploaded successfully! Waiting for admin approval.');
+            
+            await awardKarma(user, 10, `Uploaded Note: ${formData.title}`, 'notes');
             
             // Reset form but keep last selected categories
             setFormData(prev => ({

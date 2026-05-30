@@ -6,6 +6,7 @@ import { doc, collection, addDoc, updateDoc, deleteDoc, serverTimestamp, query, 
 import { db, appId } from '../lib/firebase';
 import toast from 'react-hot-toast';
 import { uploadToCloudinary, getOptimizedImageUrl } from '../lib/cloudinary';
+import { checkCooldown, awardKarma } from '../lib/karma';
 
 // ADMIN EMAILS
 const ADMIN_EMAILS = [
@@ -593,6 +594,11 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!editingItem && !checkCooldown(userData, 'market')) {
+            return;
+        }
+        
         setSubmitting(true);
         try {
             if (editingItem) {
@@ -621,6 +627,7 @@ const PostAdModal = ({ isOpen, onClose, user, userData, editingItem }) => {
                     price: Number(formData.price),
                     quantity: Number(formData.quantity) || 1
                 });
+                await awardKarma(user, 10, `Posted Market Item: ${formData.title}`, 'market');
                 toast.success("Item posted successfully!");
             }
             onClose();

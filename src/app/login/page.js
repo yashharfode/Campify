@@ -8,7 +8,7 @@ import {
     LogOut, ChevronRight, MapPin, Music, Code, Mic, Lightbulb,
     Edit3, ShieldCheck, ToggleRight, Briefcase, X, Megaphone, Loader2, Save, Camera,
     Link as LinkIcon, ExternalLink, CheckCircle2, Package, CreditCard, KeyRound, Layers,
-    Shield, Database, Server, Clock, FileText, GraduationCap, MessageSquare
+    Shield, Database, Server, Clock, FileText, GraduationCap, MessageSquare, Flame, Bug
 } from 'lucide-react';
 import { useBranches } from '../../lib/useBranches';
 
@@ -23,12 +23,15 @@ import {
     signOut
 } from 'firebase/auth';
 import { doc, setDoc, onSnapshot, collection, query, where, getDocs, getDoc, updateDoc, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
-import { auth, db, appId } from '../../lib/firebase';
+import { db, auth, appId } from '../../lib/firebase';
+import { checkCooldown, awardKarma } from '../../lib/karma';
 import Marketplace from '../../components/Marketplace';
 import Teams from '../../components/Teams';
 import Discover from '../../components/Discover';
 import Admin from '../../components/Admin';
 import NotificationsDropdown from '../../components/NotificationsDropdown';
+import Leaderboard from '../../components/Leaderboard';
+import Forums from '../../components/Forums';
 import Notes from '../../components/Notes';
 import Chat from '../../components/Chat';
 import Academics from '../../components/Academics';
@@ -565,6 +568,7 @@ const createEmptyProject = () => ({
 });
 
 const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
+    const isSuperAdmin = ['yash.harfode.sati@gmail.com', 'yashharfode123@gmail.com'].includes(user?.email);
     const { branches: BRANCHES, loadingBranches } = useBranches();
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({});
@@ -576,6 +580,12 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
     const [myOrders, setMyOrders] = useState([]);
     const [pendingSales, setPendingSales] = useState([]);
     const [ordersLoading, setOrdersLoading] = useState(true);
+    const [showHelpModal, setShowHelpModal] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reportType, setReportType] = useState('bug');
+    const [reportTitle, setReportTitle] = useState('');
+    const [reportDesc, setReportDesc] = useState('');
+    const [submittingReport, setSubmittingReport] = useState(false);
     const fileInputRef = useRef(null);
     const fallbackPalettes = [
         'from-blue-500 via-indigo-500 to-purple-500',
@@ -618,6 +628,10 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                 link: project?.link || ''
             }))
             : [createEmptyProject()];
+        
+        if (merged.hideFromLeaderboard === undefined) {
+            merged.hideFromLeaderboard = false;
+        }
         return merged;
     };
 
@@ -770,6 +784,36 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
         }
     };
 
+    const handleSubmitReport = async (e) => {
+        e.preventDefault();
+        if (!reportTitle.trim() || !reportDesc.trim()) {
+            toast.error("Please fill in all fields");
+            return;
+        }
+        setSubmittingReport(true);
+        try {
+            const reportsRef = collection(db, 'artifacts', appId, 'public', 'data', 'reports');
+            await addDoc(reportsRef, {
+                type: reportType,
+                title: reportTitle.trim(),
+                description: reportDesc.trim(),
+                reportedBy: user?.uid,
+                reportedByName: formData.name || 'Student',
+                status: 'open',
+                createdAt: serverTimestamp()
+            });
+            toast.success("Report submitted! Thank you.");
+            setShowReportModal(false);
+            setReportTitle('');
+            setReportDesc('');
+        } catch (error) {
+            console.error("Error submitting report:", error);
+            toast.error("Failed to submit report");
+        } finally {
+            setSubmittingReport(false);
+        }
+    };
+
     // Save Data to Firestore
     const handleSave = async () => {
         if (!user) return;
@@ -792,6 +836,14 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                 projects: sanitizedProjects,
                 updatedAt: new Date().toISOString()
             }, { merge: true });
+
+            const oldProjectsCount = (userData?.projects || []).filter(p => p.title || p.description || p.link).length;
+            const newProjectsCount = sanitizedProjects.length;
+            
+            if (newProjectsCount > oldProjectsCount) {
+                const projectsAdded = newProjectsCount - oldProjectsCount;
+                await awardKarma(user, projectsAdded * 20, `Added ${projectsAdded} Project(s) to Showcase`);
+            }
 
             setFormData(prev => normalizeProfile({ ...prev, projects: sanitizedProjects }));
 
@@ -1292,7 +1344,22 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                         />
                     )}
 
-                    <SettingsItem icon={<AlertCircle className="w-5 h-5" />} label="Help & Support" />
+                    {isSuperAdmin && (
+                        <SettingsItem
+                            icon={<Flame className="w-5 h-5 text-orange-500" />}
+                            label="Cheat: Add Karma"
+                            color="text-orange-500"
+                            onClick={async () => {
+                                const amount = window.prompt("SuperAdmin: Enter Karma amount to add");
+                                if (amount && !isNaN(amount)) {
+                                    await awardKarma(user, parseInt(amount), "SuperAdmin Cheat Code");
+                                }
+                            }}
+                        />
+                    )}
+
+                    <SettingsItem icon={<AlertCircle className="w-5 h-5 text-green-500" />} label="Help & Support" onClick={() => setShowHelpModal(true)} />
+                    <SettingsItem icon={<Bug className="w-5 h-5 text-rose-500" />} label="Report Bug / Request Feature" onClick={() => setShowReportModal(true)} />
                     <SettingsItem
                         icon={<LogOut className="w-5 h-5 text-red-500" />}
                         label="Log Out"
@@ -1301,6 +1368,120 @@ const Profile = ({ user, userData, setActiveTab, isDbAdmin }) => {
                     />
                 </div>
             </div>
+
+            {/* Help & Support Modal */}
+            {showHelpModal && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-surface-elevated rounded-2xl w-full max-w-lg p-6 md:p-8 shadow-2xl border border-border-strong animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+                        <div className="flex items-center justify-between mb-6 flex-shrink-0">
+                            <h3 className="text-xl font-bold text-text-main flex items-center gap-2">
+                                <AlertCircle className="w-6 h-6 text-green-500" /> Help & Support
+                            </h3>
+                            <button onClick={() => setShowHelpModal(false)} className="text-text-muted hover:text-text-main transition-colors"><X className="w-5 h-5"/></button>
+                        </div>
+                        
+                        <div className="overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-6">
+                            <div>
+                                <h4 className="font-bold text-text-main text-sm mb-3 uppercase tracking-wider text-text-muted">Frequently Asked Questions</h4>
+                                <div className="space-y-3">
+                                    <div className="bg-surface-base p-4 rounded-xl border border-border-strong">
+                                        <h5 className="font-bold text-text-main text-sm mb-1">How do I earn Karma?</h5>
+                                        <p className="text-xs text-text-muted leading-relaxed">You can earn Karma by contributing to the community: uploading notes, posting in the marketplace, reporting found items, or adding projects to your showcase. Admins will review your contributions and award points!</p>
+                                    </div>
+                                    <div className="bg-surface-base p-4 rounded-xl border border-border-strong">
+                                        <h5 className="font-bold text-text-main text-sm mb-1">How does the Marketplace work?</h5>
+                                        <p className="text-xs text-text-muted leading-relaxed">When someone wants to buy your item, they will receive a 4-digit OTP. Meet them in person, hand over the item, and ask for their OTP. Enter the OTP in your "Pending Sales" tab to complete the transaction and receive payment.</p>
+                                    </div>
+                                    <div className="bg-surface-base p-4 rounded-xl border border-border-strong">
+                                        <h5 className="font-bold text-text-main text-sm mb-1">Can I create my own Channel?</h5>
+                                        <p className="text-xs text-text-muted leading-relaxed">Yes! Go to the Chat section and click the '+' icon next to 'All Channels'. Submit a request, and an admin will review it. You can even upload a custom logo for your channel!</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 className="font-bold text-text-main text-sm mb-3 uppercase tracking-wider text-text-muted">Contact Administration</h4>
+                                <div className="bg-surface-highlight p-4 rounded-xl flex items-center justify-between border border-border-strong">
+                                    <div>
+                                        <p className="text-sm font-bold text-text-main">Need more help?</p>
+                                        <p className="text-xs text-text-muted mt-1">Email us directly for urgent issues.</p>
+                                    </div>
+                                    <a href="mailto:yash.harfode.sati@gmail.com" className="bg-brand-accent hover:bg-brand-accent-hover text-[#111827] px-4 py-2 rounded-lg font-bold text-xs transition-colors shadow-sm">
+                                        Email Support
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Report Bug / Feature Request Modal */}
+            {showReportModal && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-surface-elevated rounded-2xl w-full max-w-lg p-6 md:p-8 shadow-2xl border border-border-strong animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+                        <div className="flex items-center justify-between mb-6 flex-shrink-0">
+                            <h3 className="text-xl font-bold text-text-main flex items-center gap-2">
+                                <Bug className="w-6 h-6 text-rose-500" /> Feedback & Reports
+                            </h3>
+                            <button onClick={() => setShowReportModal(false)} className="text-text-muted hover:text-text-main transition-colors"><X className="w-5 h-5"/></button>
+                        </div>
+                        
+                        <form onSubmit={handleSubmitReport} className="overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Type</label>
+                                <div className="flex gap-2">
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setReportType('bug')}
+                                        className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all border ${reportType === 'bug' ? 'bg-rose-500/10 text-rose-500 border-rose-500/50 shadow-[inset_0_0_0_1px_rgba(244,63,94,0.2)]' : 'bg-surface-base text-text-muted border-border-strong hover:bg-surface-highlight'}`}
+                                    >
+                                        Report a Bug
+                                    </button>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setReportType('feature')}
+                                        className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all border ${reportType === 'feature' ? 'bg-brand-accent/10 text-brand-accent border-brand-accent/50 shadow-[inset_0_0_0_1px_rgba(192,132,87,0.2)]' : 'bg-surface-base text-text-muted border-border-strong hover:bg-surface-highlight'}`}
+                                    >
+                                        Feature Request
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Title</label>
+                                <input
+                                    required
+                                    type="text"
+                                    value={reportTitle}
+                                    onChange={(e) => setReportTitle(e.target.value)}
+                                    placeholder={reportType === 'bug' ? 'e.g. Chat is not scrolling down' : 'e.g. Add dark mode toggle'}
+                                    className="w-full bg-surface-highlight border border-border-strong text-text-main rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent outline-none transition-all"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Description</label>
+                                <textarea
+                                    required
+                                    value={reportDesc}
+                                    onChange={(e) => setReportDesc(e.target.value)}
+                                    placeholder={reportType === 'bug' ? 'Please describe how to reproduce the issue...' : 'Describe how this feature would work...'}
+                                    className="w-full bg-surface-highlight border border-border-strong text-text-main rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent outline-none transition-all resize-none min-h-[120px] custom-scrollbar"
+                                ></textarea>
+                            </div>
+
+                            <button 
+                                type="submit"
+                                disabled={submittingReport || !reportTitle.trim() || !reportDesc.trim()}
+                                className="w-full bg-brand-accent hover:bg-brand-accent-hover disabled:bg-surface-highlight disabled:text-text-muted text-[#111827] font-bold py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-4"
+                            >
+                                {submittingReport ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Submit'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -1638,7 +1819,11 @@ export default function App() {
                 const adminsRef = collection(db, 'artifacts', appId, 'admins');
                 const snapshot = await getDocs(adminsRef);
                 const adminEmails = snapshot.docs.map(doc => doc.data().email);
-                setIsDbAdmin(adminEmails.includes(user.email.toLowerCase()));
+                
+                const superAdmins = ['yash.harfode.sati@gmail.com', 'yashharfode123@gmail.com'];
+                const isSuperAdmin = superAdmins.includes(user.email.toLowerCase());
+                
+                setIsDbAdmin(isSuperAdmin || adminEmails.includes(user.email.toLowerCase()));
             } catch (error) {
                 console.error('Error checking admin status:', error);
                 setIsDbAdmin(false);
@@ -1664,11 +1849,23 @@ export default function App() {
         if (user) {
             // Correct path with 6 segments
             const userRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data');
-            const unsub = onSnapshot(userRef, (docSnap) => {
+            const unsub = onSnapshot(userRef, async (docSnap) => {
                 if (docSnap.exists()) {
-                    setUserData(docSnap.data());
+                    const data = docSnap.data();
+                    if (data.karma === undefined) {
+                        await updateDoc(userRef, { karma: 0 }).catch(() => {});
+                        data.karma = 0;
+                    }
+                    // Also ensure uid is stored for leaderboard lookup
+                    if (!data.uid) {
+                        await updateDoc(userRef, { uid: user.uid }).catch(() => {});
+                        data.uid = user.uid;
+                    }
+                    setUserData(data);
                 } else {
-                    setUserData({ name: 'Student', branch: 'CSE', year: '1st Year', skills: '' });
+                    const newData = { name: user.displayName || 'Student', branch: 'CSE', year: '1st Year', skills: '', karma: 0, uid: user.uid };
+                    await setDoc(userRef, newData).catch(() => {});
+                    setUserData(newData);
                 }
             }, (error) => console.error("Error fetching profile:", error));
             return () => unsub();
@@ -1755,6 +1952,8 @@ export default function App() {
                 <div className="flex items-center gap-6">
                     <DesktopNavLink icon={<Home className="w-5 h-5" />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
                     <DesktopNavLink icon={<Compass className="w-5 h-5" />} label="Discover" active={activeTab === 'discover'} onClick={() => setActiveTab('discover')} />
+                    <DesktopNavLink icon={<MessageSquare className="w-5 h-5" />} label="Forums" active={activeTab === 'forums'} onClick={() => setActiveTab('forums')} />
+                    <DesktopNavLink icon={<Flame className="w-5 h-5 text-orange-500" />} label="Leaderboard" active={activeTab === 'leaderboard'} onClick={() => setActiveTab('leaderboard')} />
                     <DesktopNavLink icon={<GraduationCap className="w-5 h-5" />} label="Academics" active={activeTab === 'academics'} onClick={() => setActiveTab('academics')} />
                     <DesktopNavLink icon={<Package className="w-5 h-5" />} label="Lost & Found" active={activeTab === 'lost'} onClick={() => setActiveTab('lost')} />
                 </div>
@@ -1880,7 +2079,9 @@ export default function App() {
                 {activeTab === 'home' && <HomeDashboard user={user} userData={userData} setActiveTab={setActiveTab} />}
                 {activeTab === 'market' && <div className="pb-24 pt-4 px-4 max-w-7xl mx-auto"><Marketplace user={user} userData={userData} setActiveTab={setActiveTab} setChatTargetUser={setChatTargetUser} /></div>}
                 {activeTab === 'teams' && <Teams user={user} userData={userData} setActiveTab={setActiveTab} setChatTargetUser={setChatTargetUser} />}
-                {activeTab === 'discover' && <Discover user={user} userData={userData} />}
+                {activeTab === 'discover' && <Discover user={user} userData={userData} setActiveTab={setActiveTab} />}
+                {activeTab === 'forums' && <Forums user={user} userData={userData} isDbAdmin={isDbAdmin} />}
+                {activeTab === 'leaderboard' && <Leaderboard user={user} userData={userData} />}
                 {activeTab === 'notes' && <Notes user={user} userData={userData} />}
                 {activeTab === 'academics' && <Academics user={user} userData={userData} />}
                 {activeTab === 'chat' && <Chat user={user} userData={userData} chatTargetUser={chatTargetUser} setChatTargetUser={setChatTargetUser} />}

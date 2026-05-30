@@ -148,7 +148,19 @@ export default function AttendanceTracker({ user, userData }) {
 
         const overallPercentage = totalHeld > 0 ? ((totalPresent / totalHeld) * 100).toFixed(1) : 0;
         
-        return { subjectStats: Object.values(stats), totalHeld, totalPresent, overallPercentage };
+        let safeBunks = 0;
+        let neededClasses = 0;
+
+        if (totalHeld > 0) {
+            const threshold = 0.75;
+            if (totalPresent / totalHeld >= threshold) {
+                safeBunks = Math.floor((totalPresent - (threshold * totalHeld)) / threshold);
+            } else {
+                neededClasses = Math.ceil((threshold * totalHeld - totalPresent) / (1 - threshold));
+            }
+        }
+        
+        return { subjectStats: Object.values(stats), totalHeld, totalPresent, overallPercentage, safeBunks, neededClasses };
     };
 
     const stats = calculateStats();
@@ -263,6 +275,34 @@ export default function AttendanceTracker({ user, userData }) {
                             <div className="mt-0.5">{motivation.icon}</div>
                             <p className={`text-sm font-bold ${motivation.color} leading-relaxed`}>{motivation.text}</p>
                         </div>
+
+                        {/* Bunk Meter */}
+                        {stats.totalHeld > 0 && (
+                            <div className="bg-surface-elevated p-6 rounded-2xl border border-border-strong shadow-sm">
+                                <h3 className="text-sm font-bold text-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                                    <TrendingDown className="w-4 h-4" /> Bunk Meter (75% Req)
+                                </h3>
+                                {stats.safeBunks > 0 ? (
+                                    <div className="bg-green-500/10 border-2 border-green-500/20 rounded-xl p-4 text-center">
+                                        <p className="text-3xl font-black text-green-500 mb-1">{stats.safeBunks}</p>
+                                        <p className="text-xs font-bold text-green-600 uppercase tracking-widest">Safe Bunks</p>
+                                        <p className="text-xs text-text-muted mt-2">You can safely skip this many classes and stay above 75%.</p>
+                                    </div>
+                                ) : stats.neededClasses > 0 ? (
+                                    <div className="bg-red-500/10 border-2 border-red-500/20 rounded-xl p-4 text-center">
+                                        <p className="text-3xl font-black text-red-500 mb-1">{stats.neededClasses}</p>
+                                        <p className="text-xs font-bold text-red-600 uppercase tracking-widest">Classes Needed</p>
+                                        <p className="text-xs text-text-muted mt-2">You must attend this many consecutive classes to reach 75%.</p>
+                                    </div>
+                                ) : (
+                                    <div className="bg-orange-500/10 border-2 border-orange-500/20 rounded-xl p-4 text-center">
+                                        <p className="text-3xl font-black text-orange-500 mb-1">0</p>
+                                        <p className="text-xs font-bold text-orange-600 uppercase tracking-widest">Zero Margin</p>
+                                        <p className="text-xs text-text-muted mt-2">You are exactly at 75%. Don't miss the next class!</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Right Column: Date Selection & Subject Stats */}

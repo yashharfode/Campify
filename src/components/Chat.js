@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-    MessageSquare, Plus, Hash, Send, X, Users, Loader2, Info, Search, User
+    MessageSquare, Plus, Hash, Send, X, Users, Loader2, Info, Search, User, CheckCheck, Image as ImageIcon
 } from 'lucide-react';
 import { 
     collection, query, where, onSnapshot, addDoc, serverTimestamp, 
@@ -10,6 +10,7 @@ import {
 } from 'firebase/firestore';
 import { db, appId } from '../lib/firebase';
 import toast from 'react-hot-toast';
+import { uploadToCloudinary, getOptimizedImageUrl } from '../lib/cloudinary';
 
 export default function Chat({ user, userData, chatTargetUser, setChatTargetUser }) {
     const [sidebarTab, setSidebarTab] = useState('channels'); // 'channels' or 'dms'
@@ -27,11 +28,18 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
     const [newGroupName, setNewGroupName] = useState('');
     const [newGroupDesc, setNewGroupDesc] = useState('');
     const [submittingRequest, setSubmittingRequest] = useState(false);
+    const [newGroupLogo, setNewGroupLogo] = useState(null);
+    const groupLogoInputRef = useRef(null);
 
     // User Search State
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
+    
+    // Image Upload State
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const fileInputRef = useRef(null);
     
     // Read Receipts state
     const [readReceipts, setReadReceipts] = useState({});
@@ -239,23 +247,47 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
         return () => unsubscribe();
     }, [activeGroupId]);
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error('Image size should be less than 5MB');
+                return;
+            }
+            setSelectedImage(file);
+        }
+    };
+
     const handleSendMessage = async (e) => {
         e.preventDefault();
-        if (!newMessage.trim() || !activeGroupId || !user) return;
+        if ((!newMessage.trim() && !selectedImage) || !activeGroupId || !user || isUploadingImage) return;
 
         const msgText = newMessage.trim();
-        setNewMessage(''); // optimistic clear
+        setNewMessage('');
+        const imgToUpload = selectedImage;
+        setSelectedImage(null);
+        setIsUploadingImage(true);
 
         try {
+            let imageUrl = null;
+            if (imgToUpload) {
+                toast.loading('Sending image...', { id: 'chat_upload' });
+                imageUrl = await uploadToCloudinary(imgToUpload);
+                toast.dismiss('chat_upload');
+            }
+
             const groupRef = doc(db, 'artifacts', appId, 'public', 'data', 'chat_groups', activeGroupId);
             const messagesRef = collection(groupRef, 'messages');
             
-            await addDoc(messagesRef, {
+            const msgData = {
                 text: msgText,
                 senderId: user.uid,
                 senderName: userData?.name || 'Anonymous Coder',
                 timestamp: serverTimestamp()
-            });
+            };
+            if (imageUrl) msgData.imageUrl = imageUrl;
+
+            await addDoc(messagesRef, msgData);
 
             // Update parent updatedAt for sorting DMs
             await setDoc(groupRef, { updatedAt: serverTimestamp() }, { merge: true });
@@ -263,6 +295,10 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
             console.error('Error sending message:', error);
             toast.error('Failed to send message');
             setNewMessage(msgText); // restore on fail
+            if (imgToUpload) setSelectedImage(imgToUpload);
+        } finally {
+            setIsUploadingImage(false);
+            toast.dismiss('chat_upload');
         }
     };
 
@@ -275,8 +311,15 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
 
         setSubmittingRequest(true);
         try {
+            let logoUrl = null;
+            if (newGroupLogo) {
+                toast.loading('Uploading logo...', { id: 'group_logo' });
+                logoUrl = await uploadToCloudinary(newGroupLogo);
+                toast.dismiss('group_logo');
+            }
+
             const groupsRef = collection(db, 'artifacts', appId, 'public', 'data', 'chat_groups');
-            await addDoc(groupsRef, {
+            const groupData = {
                 name: newGroupName.trim(),
                 description: newGroupDesc.trim(),
                 createdBy: user.uid,
@@ -284,16 +327,21 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                 type: 'group',
                 createdAt: serverTimestamp(),
                 members: [user.uid]
-            });
+            };
+            if (logoUrl) groupData.logo = logoUrl;
+
+            await addDoc(groupsRef, groupData);
             toast.success('Group request submitted to Admin!');
             setIsModalOpen(false);
             setNewGroupName('');
             setNewGroupDesc('');
+            setNewGroupLogo(null);
         } catch (error) {
             console.error('Error requesting group:', error);
             toast.error('Failed to request group');
         } finally {
             setSubmittingRequest(false);
+            toast.dismiss('group_logo');
         }
     };
 
@@ -354,16 +402,18 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                                             onClick={() => setActiveGroupId(group.id)}
                                             className={`w-full text-left px-4 py-3 rounded-2xl flex items-center justify-between transition-all duration-200 group ${
                                                 isActive 
-                                                    ? 'bg-brand-accent/10 text-brand-accent shadow-sm border border-brand-accent/20' 
+                                                    ? 'bg-brand-accent/10 text-brand-accent shadow-[inset_0_0_0_1px_rgba(var(--brand-accent),0.2)]' 
                                                     : 'text-text-muted hover:bg-surface-highlight hover:text-text-main border border-transparent'
                                             }`}
                                         >
                                             <div className="flex items-center gap-3 overflow-hidden">
-                                                <Hash className={`w-4 h-4 flex-shrink-0 transition-colors ${isActive ? 'text-brand-accent' : 'text-text-muted group-hover:text-text-main'}`} />
-                                                <span className={`font-semibold truncate text-sm ${isUnread && !isActive ? 'text-text-main font-bold' : ''} ${isActive ? 'text-text-main' : ''}`}>{group.name}</span>
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${isActive ? 'bg-gradient-to-tr from-brand-accent to-orange-400 text-white shadow-md shadow-brand-accent/20' : 'bg-surface-elevated border border-border-strong text-text-muted group-hover:text-text-main group-hover:border-text-muted/30'}`}>
+                                                    {group.logo ? <img src={getOptimizedImageUrl(group.logo, '1:1')} alt="" className="w-full h-full object-cover rounded-xl" /> : <Hash className="w-5 h-5" />}
+                                                </div>
+                                                <span className={`font-semibold truncate text-[15px] ${isUnread && !isActive ? 'text-text-main font-bold' : ''} ${isActive ? 'text-text-main' : ''}`}>{group.name}</span>
                                             </div>
                                             {isUnread && (
-                                                <div className="w-2 h-2 rounded-full bg-brand-accent flex-shrink-0 animate-pulse"></div>
+                                                <div className="w-2.5 h-2.5 rounded-full bg-brand-accent flex-shrink-0 animate-pulse shadow-[0_0_8px_rgba(255,100,0,0.6)]"></div>
                                             )}
                                         </button>
                                     );
@@ -432,18 +482,18 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                                             onClick={() => setActiveGroupId(dm.id)}
                                             className={`w-full text-left px-4 py-3 rounded-2xl flex items-center justify-between transition-all duration-200 group ${
                                                 isActive 
-                                                    ? 'bg-brand-accent/10 text-brand-accent shadow-sm border border-brand-accent/20' 
+                                                    ? 'bg-brand-accent/10 text-brand-accent shadow-[inset_0_0_0_1px_rgba(var(--brand-accent),0.2)]' 
                                                     : 'text-text-muted hover:bg-surface-highlight hover:text-text-main border border-transparent'
                                             }`}
                                         >
                                             <div className="flex items-center gap-3 overflow-hidden">
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${isActive ? 'bg-brand-accent text-white shadow-md' : 'bg-surface-highlight border border-border-strong text-text-muted group-hover:text-text-main'}`}>
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold flex-shrink-0 transition-all ${isActive ? 'bg-gradient-to-tr from-brand-accent to-orange-400 text-white shadow-md shadow-brand-accent/20' : 'bg-surface-elevated border border-border-strong text-text-muted group-hover:text-text-main group-hover:border-text-muted/30'}`}>
                                                     {dmName.charAt(0)}
                                                 </div>
-                                                <span className={`font-semibold truncate text-sm ${isUnread && !isActive ? 'text-text-main font-bold' : ''} ${isActive ? 'text-text-main' : ''}`}>{dmName}</span>
+                                                <span className={`font-semibold truncate text-[15px] ${isUnread && !isActive ? 'text-text-main font-bold' : ''} ${isActive ? 'text-text-main' : ''}`}>{dmName}</span>
                                             </div>
                                             {isUnread && (
-                                                <div className="w-2 h-2 rounded-full bg-brand-accent flex-shrink-0 animate-pulse"></div>
+                                                <div className="w-2.5 h-2.5 rounded-full bg-brand-accent flex-shrink-0 animate-pulse shadow-[0_0_8px_rgba(255,100,0,0.6)]"></div>
                                             )}
                                         </button>
                                     );
@@ -455,15 +505,19 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
             </div>
 
             {/* Main Chat Area */}
-            <div className="flex-1 flex flex-col h-full bg-transparent relative">
+            <div className="flex-1 flex flex-col h-full bg-surface-base relative overflow-hidden">
+                {/* Subtle Chat Background Pattern */}
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cubes.png")' }}></div>
                 
                 {/* Frosted Glass Header */}
                 {activeGroupData ? (
                     <div className="absolute top-0 inset-x-0 z-30 p-4 border-b border-border-strong bg-surface-elevated/70 backdrop-blur-2xl flex justify-between items-center transition-all">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-surface-highlight border border-border-strong flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-2xl bg-surface-highlight border border-border-strong flex items-center justify-center overflow-hidden">
                                 {activeGroupData.type === 'direct' ? (
                                     <User className="w-5 h-5 text-text-main" />
+                                ) : activeGroupData.logo ? (
+                                    <img src={getOptimizedImageUrl(activeGroupData.logo, '1:1')} alt="" className="w-full h-full object-cover" />
                                 ) : (
                                     <Hash className="w-5 h-5 text-text-main" />
                                 )}
@@ -515,23 +569,32 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                             const showHeader = idx === 0 || messages[idx - 1].senderId !== msg.senderId;
                             
                             return (
-                                <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-full`}>
+                                <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-full animate-in slide-in-from-bottom-2 duration-300`}>
                                     {showHeader && (
-                                        <div className={`text-xs font-bold text-text-muted mb-1.5 px-1 flex items-center gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+                                        <div className={`text-[11px] font-bold text-text-muted mb-1 px-1 flex items-center gap-1.5 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
                                             {!isMe && (
-                                                <div className="w-6 h-6 rounded-full bg-surface-highlight border border-border-strong flex items-center justify-center text-[10px] text-text-main font-bold shadow-sm">
+                                                <div className="w-5 h-5 rounded-full bg-surface-highlight border border-border-strong flex items-center justify-center text-[9px] text-text-main font-bold shadow-sm">
                                                     {msg.senderName?.charAt(0) || '?'}
                                                 </div>
                                             )}
                                             {isMe ? 'You' : msg.senderName}
                                         </div>
                                     )}
-                                    <div className={`px-5 py-3 max-w-[85%] md:max-w-[70%] text-sm leading-relaxed shadow-sm ${
+                                    <div className={`px-4 py-2.5 max-w-[85%] md:max-w-[75%] text-[15px] leading-relaxed shadow-sm relative group ${
                                         isMe 
                                             ? 'bg-brand-accent text-white rounded-2xl rounded-tr-sm' 
                                             : 'bg-surface-elevated border border-border-strong text-text-main rounded-2xl rounded-tl-sm'
                                     }`}>
-                                        {msg.text}
+                                        {msg.imageUrl && (
+                                            <a href={msg.imageUrl} target="_blank" rel="noopener noreferrer">
+                                                <img src={getOptimizedImageUrl(msg.imageUrl, 'auto')} alt="Chat attachment" className="max-w-full rounded-xl mb-2 object-cover max-h-64 border border-white/20" />
+                                            </a>
+                                        )}
+                                        {msg.text && <p className="mb-3.5 pr-8">{msg.text}</p>}
+                                        <div className={`absolute bottom-1.5 right-2 flex items-center gap-1 ${isMe ? 'text-white/80' : 'text-text-muted'} text-[10px] font-medium`}>
+                                            {msg.timestamp ? new Date(msg.timestamp.toMillis ? msg.timestamp.toMillis() : Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
+                                            {isMe && <CheckCheck className="w-3 h-3" />}
+                                        </div>
                                     </div>
                                 </div>
                             );
@@ -544,8 +607,34 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                 {activeGroupId && (
                     <div className="p-4 pb-6 bg-gradient-to-t from-surface-elevated via-surface-elevated/95 to-transparent z-20 flex-shrink-0">
                         <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto relative group">
+                            {selectedImage && (
+                                <div className="absolute bottom-full mb-2 left-4 z-10 bg-surface-elevated border border-border-strong rounded-xl p-2 shadow-lg flex items-center gap-3">
+                                    <img src={URL.createObjectURL(selectedImage)} alt="Preview" className="w-12 h-12 rounded-lg object-cover" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs font-bold text-text-main truncate">{selectedImage.name}</p>
+                                        <p className="text-[10px] text-text-muted">{(selectedImage.size / 1024).toFixed(1)} KB</p>
+                                    </div>
+                                    <button type="button" onClick={() => setSelectedImage(null)} className="p-1 text-text-muted hover:text-red-500 transition-colors">
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            )}
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-accent/20 to-brand-accent/10 rounded-[28px] blur opacity-0 group-focus-within:opacity-100 transition duration-500"></div>
-                            <div className="relative flex items-end gap-2 bg-surface-elevated border border-border-strong rounded-[24px] p-2 shadow-sm focus-within:shadow-md transition-shadow">
+                            <div className="relative flex items-end gap-2 bg-surface-elevated/80 backdrop-blur-md border border-border-strong rounded-[24px] p-2 shadow-sm focus-within:shadow-md transition-all">
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="w-11 h-11 rounded-full text-text-muted hover:text-text-main hover:bg-surface-highlight transition-colors flex items-center justify-center flex-shrink-0"
+                                >
+                                    <ImageIcon className="w-5 h-5" />
+                                </button>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleImageChange}
+                                    accept="image/*"
+                                    className="hidden"
+                                />
                                 <textarea
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
@@ -556,15 +645,15 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                                         }
                                     }}
                                     placeholder={activeGroupData?.type === 'direct' ? `Message ${getDmName(activeGroupData)}...` : `Message #${activeGroupData?.name}...`}
-                                    className="flex-1 bg-transparent max-h-32 min-h-[44px] px-4 py-3 text-sm text-text-main placeholder:text-text-muted outline-none resize-none custom-scrollbar"
+                                    className="flex-1 bg-transparent max-h-32 min-h-[44px] px-2 py-3 text-[15px] text-text-main placeholder:text-text-muted outline-none resize-none custom-scrollbar"
                                     rows="1"
                                 />
                                 <button 
                                     type="submit"
-                                    disabled={!newMessage.trim()}
-                                    className="bg-brand-accent hover:bg-brand-accent-hover disabled:bg-surface-highlight disabled:text-text-muted text-white w-11 h-11 rounded-[18px] transition-all flex items-center justify-center flex-shrink-0 shadow-sm disabled:shadow-none"
+                                    disabled={(!newMessage.trim() && !selectedImage) || isUploadingImage}
+                                    className="bg-brand-accent hover:bg-brand-accent-hover disabled:bg-surface-highlight disabled:text-text-muted text-white w-11 h-11 rounded-full transition-all flex items-center justify-center flex-shrink-0 shadow-sm disabled:shadow-none"
                                 >
-                                    <Send className="w-5 h-5 ml-0.5" />
+                                    {isUploadingImage ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 ml-0.5" />}
                                 </button>
                             </div>
                         </form>
@@ -589,6 +678,26 @@ export default function Chat({ user, userData, chatTargetUser, setChatTargetUser
                         </div>
                         
                         <form onSubmit={handleRequestGroup} className="p-6 space-y-5">
+                            <div className="flex flex-col items-center gap-2 mb-4">
+                                <input type="file" accept="image/*" className="hidden" ref={groupLogoInputRef} onChange={(e) => {
+                                    if (e.target.files[0]) {
+                                        if (e.target.files[0].size > 2 * 1024 * 1024) toast.error('Max size 2MB');
+                                        else setNewGroupLogo(e.target.files[0]);
+                                    }
+                                }} />
+                                <div onClick={() => groupLogoInputRef.current?.click()} className="w-20 h-20 rounded-2xl border-2 border-dashed border-border-strong bg-surface-highlight flex flex-col items-center justify-center cursor-pointer hover:border-brand-accent transition-colors overflow-hidden group">
+                                    {newGroupLogo ? (
+                                        <img src={URL.createObjectURL(newGroupLogo)} alt="" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <>
+                                            <ImageIcon className="w-6 h-6 text-text-muted group-hover:text-brand-accent transition-colors mb-1" />
+                                            <span className="text-[10px] text-text-muted font-medium">Logo</span>
+                                        </>
+                                    )}
+                                </div>
+                                <span className="text-[10px] text-text-muted">Optional Channel Logo</span>
+                            </div>
+
                             <div>
                                 <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Channel Name</label>
                                 <input

@@ -9,6 +9,7 @@ import { collection, addDoc, getDocs, query, where, serverTimestamp } from 'fire
 import { db, appId } from '../lib/firebase';
 import toast from 'react-hot-toast';
 import { uploadToCloudinary, getOptimizedImageUrl } from '../lib/cloudinary';
+import { checkCooldown, awardKarma } from '../lib/karma';
 
 export default function LostAndFound({ user, userData }) {
     const [activeTab, setActiveTab] = useState('lost'); // 'lost', 'found', 'post'
@@ -86,6 +87,9 @@ export default function LostAndFound({ user, userData }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!checkCooldown(userData, 'lostfound')) return;
+        
         setPosting(true);
         try {
             const itemsRef = collection(db, 'artifacts', appId, 'public', 'data', 'lost_and_found');
@@ -96,6 +100,9 @@ export default function LostAndFound({ user, userData }) {
                 status: 'pending',
                 createdAt: serverTimestamp()
             });
+            
+            const points = formData.type === 'found' ? 15 : 5;
+            await awardKarma(user, points, `Reported ${formData.type} item: ${formData.itemName}`, 'lostfound');
 
             toast.success('Item posted! Waiting for admin approval.');
             setFormData({
